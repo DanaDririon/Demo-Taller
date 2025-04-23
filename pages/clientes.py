@@ -98,7 +98,7 @@ def main():
 
     #left_co, cent_co,last_co = st.columns([0.5,1,0.5])
     cent_co = st.image("src\\img\\taller.png",use_container_width=True)
-    cent_co
+    #cent_co
 
 #if __name__ == "__main__":
 #    import importlib

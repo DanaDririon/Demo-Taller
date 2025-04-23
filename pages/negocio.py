@@ -130,7 +130,7 @@ def main():
     col4.altair_chart(bars3, use_container_width=False)
 
     cent_co = st.image("src\\img\\taller.png",use_container_width=True)
-    cent_co
+    #cent_co
 
 
 #if __name__ == "__main__":
