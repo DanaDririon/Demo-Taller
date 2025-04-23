@@ -9,6 +9,8 @@ import os
 
 def sidebar():
     st.sidebar.title("Menú")
+    if st.sidebar.button("Inicio"):
+        st.switch_page("pages\\home.py")
     if st.sidebar.button("Clientes"):
         st.switch_page("pages\\clientes.py")
     if st.sidebar.button("Cotizaciones"):

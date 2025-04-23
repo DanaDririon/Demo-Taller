@@ -9,6 +9,8 @@ import os
 
 def sidebar():
     st.sidebar.title("Menú")
+    if st.sidebar.button("Inicio"):
+        st.switch_page("pages\\home.py")
     if st.sidebar.button("Clientes"):
         st.switch_page("pages\\clientes.py")
     if st.sidebar.button("Cotizaciones"):
@@ -22,8 +24,6 @@ def main():
     #configuracion de pagina
     st.set_page_config(layout="wide", page_title='Inicio - Taller', page_icon="src\\img\\logo-servicena.png")
     #cs.increase_page()
-    if st.button("⬅︎Volver"):
-        st.switch_page("pages\\home.py")
     st.markdown("<h1>"+"Órdenes de Trabajo"+"</h1>", unsafe_allow_html=True)
     sidebar()
 
