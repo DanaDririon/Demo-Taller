@@ -10,10 +10,10 @@ import os
 def filtros_detalles(df, rut=None, cod_nubox=None, nombre=None, fecha=None) -> pd.DataFrame:
     if rut != None:
         df = df[df['RUT']==rut]
-    if cod_nubox != None:
-        df = df[df['Cod Nubox']==cod_nubox]
+    #if cod_nubox != None:
+    #    df = df[df['Cod Nubox']==cod_nubox]
     if nombre != None:
-        df = df[df['Nombre Completo']==nombre]
+        df = df[df['Nombre']==nombre]
     if fecha != None:
         if len(fecha) == 2:
             df = df[(pd.to_datetime(df['Fecha'])>=pd.to_datetime(fecha[0])) & (pd.to_datetime(df['Fecha'])<=pd.to_datetime(fecha[1]))]
@@ -40,6 +40,28 @@ def main():
     #configuracion de pagina
     st.set_page_config(layout="wide", page_title='Clientes', page_icon="src\\img\\logo-servicena.png")
     #cs.increase_page()
+    st.markdown("""
+        <style>
+            .reportview-container {
+                margin-top: -2em;
+            }
+            #MainMenu {visibility: hidden;}
+            .stAppDeployButton {display:none;}
+            .stDeployButton {display:none;}
+            footer {visibility: hidden;}
+            #stDecoration {display:none;}
+        </style>
+        """, unsafe_allow_html=True)
+    st.markdown("""
+        <style>
+                .block-container {
+                    padding-top: 1rem;
+                    padding-bottom: 0rem;
+                    padding-left: 1rem;
+                    padding-right: 1rem;
+                }
+        </style>
+        """, unsafe_allow_html=True)
     st.markdown("<h1>"+"Clientes"+"</h1>", unsafe_allow_html=True)
     sidebar()
 
@@ -64,13 +86,13 @@ def main():
     
     col1, col2, col3, col4 = st.columns((0.5,0.5,1,0.5))
 
-    rut_filter = col1.selectbox("RUT", df_clientes['RUT'].unique() , index=None, placeholder='RUT')
+    rut_filter = col1.selectbox("Buscar RUT", df_clientes['RUT'].unique() , index=None, placeholder='RUT')
     if rut_filter:
         df_clientes = filtros_detalles(df_clientes, rut=rut_filter)
 
-    nombre_filter = col2.selectbox("Nombre", df_clientes['Nombre'] , index=None, placeholder='Nombre')
+    nombre_filter = col2.selectbox("Buscar Nombre", df_clientes['Nombre'].unique() , index=None, placeholder='Nombre')
     if nombre_filter:
-        df_clientes = filtros_detalles(df_clientes, rut=nombre_filter)
+        df_clientes = filtros_detalles(df_clientes, nombre=nombre_filter)
 
     df_clientes
 

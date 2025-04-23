@@ -3,6 +3,7 @@ import mysql.connector
 import pandas as pd
 import numpy as np
 import altair as alt
+from babel.numbers import format_currency 
 from time import sleep
 #from control_servicena import utils as cs
 import os
@@ -25,6 +26,28 @@ def main():
     #configuracion de pagina
     st.set_page_config(layout="wide", page_title='Inicio - Taller', page_icon="src\\img\\logo-servicena.png")
     #cs.increase_page()
+    st.markdown("""
+        <style>
+            .reportview-container {
+                margin-top: -2em;
+            }
+            #MainMenu {visibility: hidden;}
+            .stAppDeployButton {display:none;}
+            .stDeployButton {display:none;}
+            footer {visibility: hidden;}
+            #stDecoration {display:none;}
+        </style>
+        """, unsafe_allow_html=True)
+    st.markdown("""
+        <style>
+                .block-container {
+                    padding-top: 1rem;
+                    padding-bottom: 0rem;
+                    padding-left: 1rem;
+                    padding-right: 1rem;
+                }
+        </style>
+        """, unsafe_allow_html=True)
     st.markdown("<h1>"+"Negocio"+"</h1>", unsafe_allow_html=True)
     sidebar()
 
@@ -37,23 +60,27 @@ def main():
         "Ventas":[9685415, 8754361, 16487591, 13548794,0,0,0]
     })
 
+    df_ventas["Ventas_str"] = df_ventas["Ventas"].apply(lambda x: format_currency(x, currency="CLP", locale="es_CL"))
+
     points = alt.Chart(df_ventas).mark_circle(size = 0)
     lines = alt.Chart(df_ventas, title = 'Ventas Mensuales'.upper()).mark_line().encode(
                  x = alt.X('Meses:O', axis = alt.Axis(title = 'Meses'.upper())).sort(["Enero", "Febrero", "Marzo", "Abril","Mayo","Junio", "Julio"]),
                  y = alt.Y('Ventas:Q', axis = alt.Axis(title = 'Ventas'.upper()))
-            ).properties(width=500)
+            ).properties(width=600).interactive()
 
-    text = alt.Chart(df_ventas).mark_text(dx=0,dy=00,color="black").encode(
+    text = alt.Chart(df_ventas).mark_text(dx=0,dy=00,color="black",fontWeight='bold',fontSize=18).encode(
         x = alt.X('Meses:O', axis = alt.Axis(title = 'Meses'.upper())).sort(["Enero", "Febrero", "Marzo", "Abril","Mayo","Junio", "Julio"]),
         y = alt.Y('Ventas:Q', axis = alt.Axis(title = 'Ventas'.upper())),
-        text = 'Ventas'
-        ).properties(width=500)
+        text = 'Ventas_str'
+        ).properties(width=600)
     
     text_background = text.mark_text(
     stroke='white',
     strokeWidth=5,
-    strokeJoin='round',
-    dx=3
+    #strokeJoin='miter',
+    fontWeight='bold',
+    fontSize=18,
+    dx=0
 )
     chart = lines + points + text_background +  text 
 
@@ -62,9 +89,9 @@ def main():
     bars = alt.Chart(df_ventas, title = 'Ventas Mensuales'.upper()).mark_bar().encode(
                 x = alt.X('Meses:O', axis = alt.Axis(title = 'Meses'.upper())).sort(["Enero", "Febrero", "Marzo", "Abril","Mayo","Junio", "Julio"]),
                 y = alt.Y('Ventas:Q', axis = alt.Axis(title = 'Ventas'.upper()))
-                ).properties(width=500)
+                ).properties(width=600).interactive()
 
-    test2 = bars+text
+    test2 = bars+ text_background+text
 
     col2.altair_chart(test2, use_container_width=False)
     #col1=st.line_chart(df_ventas,x="Meses",y="Ventas",x_label="Meses",y_label="Ventas")
@@ -84,7 +111,7 @@ def main():
     bars2 = alt.Chart(df_proovedores, title = 'Compras por Proovedor'.upper()).mark_bar().encode(
         x = alt.X('Compras:Q', axis = alt.Axis(title = 'Compras'.upper())),
         y = alt.Y('Proovedor:N', axis = alt.Axis(title = 'Proovedores'.upper())).sort(['Compras'])
-        ).properties(width=500,height=300)
+        ).properties(width=600,height=300).interactive()
     col3.altair_chart(bars2, use_container_width=False)
 
     df_ots =  pd.DataFrame({
@@ -93,12 +120,12 @@ def main():
         "# Órdenes de Trabajo": [23,12,19,7,38,22,33,15,25,15,21,9]
         })
 
-    bars3 = alt.Chart(df_ots).mark_bar().encode(
+    bars3 = alt.Chart(df_ots, title='Órdenes por mes'.upper()).mark_bar().encode(
         x=alt.X("Mes:O", axis=alt.Axis(title = 'Meses'.upper())).sort(["Enero", "Febrero", "Marzo", "Abril","Mayo","Junio", "Julio"]),
         xOffset="Tipos de OTs:N",
         y=alt.Y("# Órdenes de Trabajo:Q", axis = alt.Axis(title = '# Órdenes de Trabajo'.upper())),
         color=alt.Color("Tipos de OTs:N")
-    )
+    ).properties(width=600).interactive()
 
     col4.altair_chart(bars3, use_container_width=False)
 
