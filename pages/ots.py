@@ -87,13 +87,11 @@ def main():
         "Estado":["Finalizada", "Desarme", "Armado", "Para entrega", "Proc. de repuesto","En preparación","Facturada"],
         "Fecha Ingreso":["03-MAR-2025", "05-ABR-2025", "05-ABR-2025", "20-MAR-2025", "28-MAR-2025","02-ABR-2025","23-ABR-2025"],
         "Fecha Entrega":["20-MAR-2025","-","-","-","-","-","22-ABR-2025"]
-    })
+    },index=None)
 
-    df_detalle = pd.DataFrame
-    
+    df_detalle = df_ots    
 
     a,b = st.columns((3.5,2))
-
 
     with a.container(height=500):
         df_ots['rut_name'] = df_ots['RUT Cliente'] +' | '+df_ots['Nombre Cliente']
@@ -121,34 +119,36 @@ def main():
                 on_select='rerun',
                 selection_mode='single-row',
                 hide_index=True)
-
-    container_detalle = b.container(height=500)
-    container_detalle.subheader("Detalle OT")
-    if len(data.selection['rows']):
-        selected_row = data.selection['rows'][0]
-        st.session_state['selected_id_ot'] = df_ots.iloc[selected_row]['Id Orden']
-
-        #with b.container:
         
-        detalle = container_detalle.table()
-        container_detalle.image(image=r'C:\slak.jpg', use_container_width =True)
-        container_detalle.image(image=r'C:\slak.jpg')
-        container_detalle.image(image=r'C:\slak.jpg')
-        container_detalle.image(image=r'C:\slak.jpg')
-        container_detalle.image(image=r'C:\slak.jpg')
-        container_detalle.image(image=r'C:\slak.jpg')
-        container_detalle.image(image=r'C:\slak.jpg')
-        container_detalle.image(image=r'C:\slak.jpg')
-        container_detalle.image(image=r'C:\slak.jpg')
-        container_detalle.image(image=r'C:\slak.jpg')
-        container_detalle.image(image=r'C:\slak.jpg')
+    with b.container(height=500):
+        st.subheader("Detalle OT")
+        if len(data.selection['rows']):
+            selected_row = data.selection['rows'][0]
+            st.session_state['selected_id_ot'] = df_detalle.iloc[selected_row]['Id Orden']
+            detalle = pd.DataFrame({
+                "Item":["ID","RUT","Cliente","Patente","Marca","Modelo","Estado","Fecha Ingreso","Fecha Entrega","Repuestos"],
+                "Detalle":[df_detalle.iloc[selected_row]['Id Orden'],
+                           df_detalle.iloc[selected_row]['RUT Cliente'],
+                           df_detalle.iloc[selected_row]['Nombre Cliente'],
+                           df_detalle.iloc[selected_row]['Patente'],
+                           df_detalle.iloc[selected_row]['Marca'],
+                           df_detalle.iloc[selected_row]['Modelo'],
+                           df_detalle.iloc[selected_row]['Estado'],
+                           df_detalle.iloc[selected_row]['Fecha Ingreso'],
+                           df_detalle.iloc[selected_row]['Fecha Entrega'],
+                           ("4 Pastillas, 2 Amortiguadores")]
+                })
+            data = st.dataframe(detalle, hide_index=True)
+            #st.image(image=r'C:\slak.jpg', use_container_width =True)
 
-    else:
-        selected_row = None
-        st.session_state['selected_id_ot'] = None
-
-    
-
+        else:
+            selected_row = None
+            st.session_state['selected_id_ot'] = None
+            detalle = pd.DataFrame({
+                "Item":["ID","RUT","Cliente","Patente","Marca","Modelo","Estado","Fecha Ingreso","Fecha Entrega","Repuestos"],
+                "Detalle":["","","","","","","","","",""]
+                })
+            data = st.dataframe(detalle, hide_index=True)
     st.write(st.session_state)
 
     #left_co, cent_co,last_co = st.columns([0.5,1,0.5])

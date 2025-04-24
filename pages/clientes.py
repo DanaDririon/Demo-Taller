@@ -94,8 +94,7 @@ def main():
     if nombre_filter:
         df_clientes = filtros_detalles(df_clientes, nombre=nombre_filter)
 
-    df_clientes
-
+    st.dataframe(df_clientes, hide_index=True)
     #left_co, cent_co,last_co = st.columns([0.5,1,0.5])
     cent_co = st.image("src\\img\\taller.png",use_container_width=True)
     #cent_co
