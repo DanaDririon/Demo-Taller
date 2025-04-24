@@ -8,19 +8,57 @@ from time import sleep
 #from control_servicena import utils as cs
 import os
 
+def ChangeTheme():
+    ms = st.session_state
+    previous_theme = ms.themes["current_theme"]
+    tdict = ms.themes["light"] if ms.themes["current_theme"] == "light" else ms.themes["dark"]
+    for vkey, vval in tdict.items(): 
+        if vkey.startswith("theme"): st._config.set_option(vkey, vval)
+
+    ms.themes["refreshed"] = False
+    if previous_theme == "dark": ms.themes["current_theme"] = "light"
+    elif previous_theme == "light": ms.themes["current_theme"] = "dark"
 
 def sidebar():
     st.sidebar.title("Menú")
-    if st.sidebar.button("Inicio"):
-        st.switch_page("pages\\home.py")
-    if st.sidebar.button("Clientes"):
-        st.switch_page("pages\\clientes.py")
-    if st.sidebar.button("Cotizaciones"):
-        st.switch_page("pages\\cotiz.py")
     if st.sidebar.button("Órdenes de Trabajo"):
         st.switch_page("pages\\ots.py")
+    if st.sidebar.button("Cotizaciones"):
+        st.switch_page("pages\\cotiz.py")
+    #if st.sidebar.button("Inicio"):
+        #st.switch_page("pages\\home.py")
+    if st.sidebar.button("Clientes"):
+        st.switch_page("pages\\clientes.py")
+    if st.sidebar.button("Cobranza"):
+        st.switch_page("pages\\cobranza.py")
     if st.sidebar.button("Negocio"):
         st.switch_page("pages\\negocio.py")
+
+    ms = st.session_state
+    if "themes" not in ms: 
+        ms.themes = {"current_theme": "light",
+                            "refreshed": True,
+                            
+                            "light": {"theme.base": "dark",
+                                    "theme.backgroundColor": "#0E1117",
+                                    "theme.primaryColor": "#FF4B4B",
+                                    "theme.secondaryBackgroundColor": "#262730",
+                                    "theme.textColor": "#FAFAFA",
+                                    "button_face": "🌜"},
+
+                            "dark":  {"theme.base": "light",
+                                    "theme.backgroundColor": "#FFFFFF",
+                                    "theme.primaryColor": "#FF4B4B",
+                                    "theme.secondaryBackgroundColor": "#F0F2F6",
+                                    "theme.textColor": "#31333F",
+                                    "button_face": "🌞"},
+                            }
+    btn_face = ms.themes["light"]["button_face"] if ms.themes["current_theme"] == "light" else ms.themes["dark"]["button_face"]
+    st.sidebar.button(btn_face, on_click=ChangeTheme)
+
+    if ms.themes["refreshed"] == False:
+        ms.themes["refreshed"] = True
+        st.rerun()
 
 def main():
     #configuracion de pagina

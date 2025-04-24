@@ -31,14 +31,16 @@ def filtros_detalles(df, rut=None, cod_nubox=None, nombre=None, fecha=None, pate
 
 def sidebar():
     st.sidebar.title("Menú")
-    if st.sidebar.button("Inicio"):
-        st.switch_page("pages\\home.py")
-    if st.sidebar.button("Clientes"):
-        st.switch_page("pages\\clientes.py")
-    if st.sidebar.button("Cotizaciones"):
-        st.switch_page("pages\\cotiz.py")
     if st.sidebar.button("Órdenes de Trabajo"):
         st.switch_page("pages\\ots.py")
+    if st.sidebar.button("Cotizaciones"):
+        st.switch_page("pages\\cotiz.py")
+    #if st.sidebar.button("Inicio"):
+        #st.switch_page("pages\\home.py")
+    if st.sidebar.button("Clientes"):
+        st.switch_page("pages\\clientes.py")
+    if st.sidebar.button("Cobranza"):
+        st.switch_page("pages\\cobranza.py")
     if st.sidebar.button("Negocio"):
         st.switch_page("pages\\negocio.py")
 
@@ -91,13 +93,13 @@ def main():
 
     df_detalle = df_ots    
 
-    a,b = st.columns((3.5,2))
+    #a,b = st.columns((3.5,2))
 
-    with a.container(height=500):
+    with st.container(height=320):
         df_ots['rut_name'] = df_ots['RUT Cliente'] +' | '+df_ots['Nombre Cliente']
         col1, col2 , col3 , col4= st.columns((1,0.5,0.5,1))
         #rut_filter = col1.selectbox("Buscar RUT", df_ots['RUT Cliente'].unique() , index=None, placeholder='RUT')
-        rut_filter = col1.selectbox("Buscar Cliente", df_ots['rut_name'].sort_values().unique() , index=None, placeholder='Cliente')
+        rut_filter = col1.selectbox("Buscar Cliente", df_ots['rut_name'].sort_values().unique() , index=None, placeholder='Cliente',label_visibility="collapsed")
         if rut_filter:
             #df_ots = filtros_detalles(df_ots, rut=rut_filter)
             df_ots = filtros_detalles(df_ots, rut_name=rut_filter)
@@ -106,11 +108,11 @@ def main():
         #if nombre_filter:
             #df_ots = filtros_detalles(df_ots, nombre=nombre_filter)
         
-        patente_filter = col2.selectbox("Buscar Patente", df_ots['Patente'].unique() , index=None, placeholder='Patente')
+        patente_filter = col2.selectbox("Buscar Patente", df_ots['Patente'].unique() , index=None, placeholder='Patente',label_visibility="collapsed")
         if patente_filter:
             df_ots = filtros_detalles(df_ots, patente=patente_filter)
 
-        estado_filter = col3.selectbox("Buscar Estado", ("Abiertas","Finalizadas") , index=None, placeholder='Estado')
+        estado_filter = col3.selectbox("Buscar Estado", ("Abiertas","Finalizadas") , index=None, placeholder='Estado',label_visibility="collapsed")
         if estado_filter:
             df_ots = filtros_detalles(df_ots, estado=estado_filter)
 
@@ -118,38 +120,72 @@ def main():
         data = st.dataframe(df_ots,
                 on_select='rerun',
                 selection_mode='single-row',
-                hide_index=True)
+                hide_index=True,
+                height=220)
         
-    with b.container(height=500):
-        st.subheader("Detalle OT")
         if len(data.selection['rows']):
             selected_row = data.selection['rows'][0]
-            st.session_state['selected_id_ot'] = df_detalle.iloc[selected_row]['Id Orden']
-            detalle = pd.DataFrame({
-                "Item":["ID","RUT","Cliente","Patente","Marca","Modelo","Estado","Fecha Ingreso","Fecha Entrega","Repuestos"],
-                "Detalle":[df_detalle.iloc[selected_row]['Id Orden'],
-                           df_detalle.iloc[selected_row]['RUT Cliente'],
-                           df_detalle.iloc[selected_row]['Nombre Cliente'],
-                           df_detalle.iloc[selected_row]['Patente'],
-                           df_detalle.iloc[selected_row]['Marca'],
-                           df_detalle.iloc[selected_row]['Modelo'],
-                           df_detalle.iloc[selected_row]['Estado'],
-                           df_detalle.iloc[selected_row]['Fecha Ingreso'],
-                           df_detalle.iloc[selected_row]['Fecha Entrega'],
-                           ("4 Pastillas, 2 Amortiguadores")]
-                })
-            data = st.dataframe(detalle, hide_index=True)
-            #st.image(image=r'C:\slak.jpg', use_container_width =True)
-
         else:
-            selected_row = None
-            st.session_state['selected_id_ot'] = None
-            detalle = pd.DataFrame({
-                "Item":["ID","RUT","Cliente","Patente","Marca","Modelo","Estado","Fecha Ingreso","Fecha Entrega","Repuestos"],
-                "Detalle":["","","","","","","","","",""]
-                })
+             selected_row = None
+             st.session_state['selected_id_ot'] = None
+        
+    # with b.container(height=500,):
+    #     st.subheader("Detalle OT")
+    #     if len(data.selection['rows']):
+    #         selected_row = data.selection['rows'][0]
+    #         st.session_state['selected_id_ot'] = df_detalle.iloc[selected_row]['Id Orden']
+    #         detalle = pd.DataFrame({
+    #             "Item":["ID","RUT","Cliente","Patente","Marca","Modelo","Estado","Fecha Ingreso","Fecha Entrega","Repuestos"],
+    #             "Detalle":[df_detalle.iloc[selected_row]['Id Orden'],
+    #                        df_detalle.iloc[selected_row]['RUT Cliente'],
+    #                        df_detalle.iloc[selected_row]['Nombre Cliente'],
+    #                        df_detalle.iloc[selected_row]['Patente'],
+    #                        df_detalle.iloc[selected_row]['Marca'],
+    #                        df_detalle.iloc[selected_row]['Modelo'],
+    #                        df_detalle.iloc[selected_row]['Estado'],
+    #                        df_detalle.iloc[selected_row]['Fecha Ingreso'],
+    #                        df_detalle.iloc[selected_row]['Fecha Entrega'],
+    #                        ("4 Pastillas, 2 Amortiguadores")]
+    #             })
+    #         detalle = df_detalle.iloc[[selected_row]]
+    #         data = st.dataframe(detalle, hide_index=True)
+    #         #st.image(image=r'C:\slak.jpg', use_container_width =True)
+
+    #     else:
+    #         selected_row = None
+    #         st.session_state['selected_id_ot'] = None
+    #         detalle = pd.DataFrame({
+    #             "Item":["ID","RUT","Cliente","Patente","Marca","Modelo","Estado","Fecha Ingreso","Fecha Entrega","Repuestos"],
+    #             "Detalle":["","","","","","","","","",""]
+    #             })
+    #         data = st.dataframe(detalle, hide_index=True)
+    
+    with st.container(height=400):
+        tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["Info General", "Repuestos", "Servicios Extras", "Imágenes", "Cotizaciones", "Cobranza", "Registro Estados"])
+    with tab1:
+        st.header("Info General")
+        if selected_row:
+            detalle = df_detalle.iloc[[selected_row]]
             data = st.dataframe(detalle, hide_index=True)
-    st.write(st.session_state)
+    with tab2:
+        st.header("Repuestos")
+        st.image("https://static.streamlit.io/examples/dog.jpg", width=200)
+    with tab3:
+        st.header("Servicios Extras")
+        st.image("https://static.streamlit.io/examples/owl.jpg", width=200)
+    with tab4:
+        st.header("Imágenes")
+        st.image(image='C:\slak.jpg', use_container_width =True)
+    with tab5:
+        st.header("Cotizaciones")
+        st.image("https://static.streamlit.io/examples/dog.jpg", width=200)
+    with tab6:
+        st.header("Cobranza")
+        st.image("https://static.streamlit.io/examples/owl.jpg", width=200)
+    with tab7:
+        st.header("Registro Estados")
+        st.image("https://static.streamlit.io/examples/owl.jpg", width=200)       
+    #st.write(st.session_state)
 
     #left_co, cent_co,last_co = st.columns([0.5,1,0.5])
     cent_co = st.image("src\\img\\taller.png",use_container_width=True)

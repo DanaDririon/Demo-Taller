@@ -16,7 +16,7 @@ def main():
         submit_button = st.form_submit_button(label='Ingresar')
 
     if submit_button:
-        st.switch_page("pages\\home.py")
+        st.switch_page("pages\\ots.py")
 
 
 #if __name__ == "__main__":
