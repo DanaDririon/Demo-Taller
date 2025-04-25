@@ -31,6 +31,8 @@ def sidebar():
         st.switch_page("pages\\clientes.py")
     if st.sidebar.button("Cobranza"):
         st.switch_page("pages\\cobranza.py")
+    if st.sidebar.button("Inventario"):
+        st.switch_page("pages\\inventario.py")
     if st.sidebar.button("Negocio"):
         st.switch_page("pages\\negocio.py")
 

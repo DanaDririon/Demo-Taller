@@ -34,7 +34,6 @@ def sidebar():
         st.switch_page("pages\\inventario.py")
     if st.sidebar.button("Negocio"):
         st.switch_page("pages\\negocio.py")
-
     ms = st.session_state
     if "themes" not in ms: 
         ms.themes = {"current_theme": "light",
@@ -63,7 +62,7 @@ def sidebar():
 
 def main():
     #configuracion de pagina
-    st.set_page_config(layout="wide", page_title='Cotizaciones', page_icon="src\\img\\logo-servicena.png")
+    st.set_page_config(layout="wide", page_title='Clientes', page_icon="src\\img\\logo-servicena.png")
     #cs.increase_page()
     st.markdown("""
         <style>
@@ -87,7 +86,7 @@ def main():
                 }
         </style>
         """, unsafe_allow_html=True)
-    st.markdown("<h1>"+"Cotizaciones"+"</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>"+"Inventario"+"</h1>", unsafe_allow_html=True)
     sidebar()
 
     df_ejemplo = pd.DataFrame({
@@ -97,10 +96,11 @@ def main():
         "Precio Total": ["$1.555","222.444","$1","$666.666","$50","$321.123","$500"]
     })
 
-    st.button(label="Nueva Cotizacion", key="new_cotiz")
+    st.button(label="Agregar Item", key="new_item")
 
     with st.container(height=500):
         st.dataframe(df_ejemplo, hide_index=True, height=200)
+
     st.image("src\\img\\taller.png",use_container_width=True)
 
 
@@ -111,3 +111,4 @@ if __name__ == "__main__":
 #    cs.control_login(page,allow=True)
 
     main()
+

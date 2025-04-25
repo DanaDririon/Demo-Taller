@@ -31,10 +31,10 @@ def main():
     cent_co.image("src\\img\\intranet_img.jpg", width=550)
 
 
-#if __name__ == "__main__":
+if __name__ == "__main__":
 #    import importlib
 #    importlib.reload(cs)
 
 #    cs.control_login(page,allow=True)
 
-main()
+    main()

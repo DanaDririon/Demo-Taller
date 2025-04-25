@@ -6,6 +6,16 @@ from time import sleep
 #from control_servicena import utils as cs
 import os
 
+def ChangeTheme():
+    ms = st.session_state
+    previous_theme = ms.themes["current_theme"]
+    tdict = ms.themes["light"] if ms.themes["current_theme"] == "light" else ms.themes["dark"]
+    for vkey, vval in tdict.items(): 
+        if vkey.startswith("theme"): st._config.set_option(vkey, vval)
+
+    ms.themes["refreshed"] = False
+    if previous_theme == "dark": ms.themes["current_theme"] = "light"
+    elif previous_theme == "light": ms.themes["current_theme"] = "dark"
 
 def filtros_detalles(df, rut=None, cod_nubox=None, nombre=None, fecha=None) -> pd.DataFrame:
     if rut != None:
@@ -35,8 +45,36 @@ def sidebar():
         st.switch_page("pages\\clientes.py")
     if st.sidebar.button("Cobranza"):
         st.switch_page("pages\\cobranza.py")
+    if st.sidebar.button("Inventario"):
+        st.switch_page("pages\\inventario.py")
     if st.sidebar.button("Negocio"):
         st.switch_page("pages\\negocio.py")
+
+    ms = st.session_state
+    if "themes" not in ms: 
+        ms.themes = {"current_theme": "light",
+                            "refreshed": True,
+                            
+                            "light": {"theme.base": "dark",
+                                    "theme.backgroundColor": "#0E1117",
+                                    "theme.primaryColor": "#FF4B4B",
+                                    "theme.secondaryBackgroundColor": "#262730",
+                                    "theme.textColor": "#FAFAFA",
+                                    "button_face": "🌜"},
+
+                            "dark":  {"theme.base": "light",
+                                    "theme.backgroundColor": "#FFFFFF",
+                                    "theme.primaryColor": "#FF4B4B",
+                                    "theme.secondaryBackgroundColor": "#F0F2F6",
+                                    "theme.textColor": "#31333F",
+                                    "button_face": "🌞"},
+                            }
+    btn_face = ms.themes["light"]["button_face"] if ms.themes["current_theme"] == "light" else ms.themes["dark"]["button_face"]
+    st.sidebar.button(btn_face, on_click=ChangeTheme)
+
+    if ms.themes["refreshed"] == False:
+        ms.themes["refreshed"] = True
+        st.rerun()
 
 def main():
     #configuracion de pagina
@@ -67,14 +105,8 @@ def main():
     st.markdown("<h1>"+"Clientes"+"</h1>", unsafe_allow_html=True)
     sidebar()
 
-    with st.popover("Nuevo Cliente"):
-        with st.form('cliente_form'):
-            rut = st.text_input("RUT")
-            nombre = st.text_input("Nombre")
-            correo = st.text_input("Correo")
-            telefono = st.text_input("Telefóno")
-            direccion = st.text_input("Dirección")
-            submit_button = st.form_submit_button(label='Agregar',type="primary")
+    if st.button("Nuevo Cliente"):
+        st.switch_page("pages\\cliente_nuevo.py")
 
 
     with st.container(height=400):
@@ -96,15 +128,13 @@ def main():
         if nombre_filter:
             df_clientes = filtros_detalles(df_clientes, nombre=nombre_filter)
 
-        st.dataframe(df_clientes, hide_index=True)
-    #left_co, cent_co,last_co = st.columns([0.5,1,0.5])
-    cent_co = st.image("src\\img\\taller.png",use_container_width=True)
-    #cent_co
+        st.dataframe(df_clientes, hide_index=True, height=250)
+    st.image("src\\img\\taller.png",use_container_width=True)
 
-#if __name__ == "__main__":
+if __name__ == "__main__":
 #    import importlib
 #    importlib.reload(cs)
 
 #    cs.control_login(page,allow=True)
 
-main()
+    main()

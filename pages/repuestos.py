@@ -34,7 +34,6 @@ def sidebar():
         st.switch_page("pages\\inventario.py")
     if st.sidebar.button("Negocio"):
         st.switch_page("pages\\negocio.py")
-
     ms = st.session_state
     if "themes" not in ms: 
         ms.themes = {"current_theme": "light",
@@ -63,7 +62,7 @@ def sidebar():
 
 def main():
     #configuracion de pagina
-    st.set_page_config(layout="wide", page_title='Cotizaciones', page_icon="src\\img\\logo-servicena.png")
+    st.set_page_config(layout="wide", page_title='Clientes', page_icon="src\\img\\logo-servicena.png")
     #cs.increase_page()
     st.markdown("""
         <style>
@@ -87,20 +86,33 @@ def main():
                 }
         </style>
         """, unsafe_allow_html=True)
-    st.markdown("<h1>"+"Cotizaciones"+"</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>"+"Repuestos"+"</h1>", unsafe_allow_html=True)
     sidebar()
 
-    df_ejemplo = pd.DataFrame({
-        "Id": ["AAAAA", "BBBBB", "CCCCC", "DDDDD", "EEEEE", "FFFFF", "GGGGG"],
-        "Item": ["Pastillas","Amortiguadores","Uno","Fish","Cincuenta","Error","Botella"],
-        "Cantidad": [74,82,1,5,50,11,2],
-        "Precio Total": ["$1.555","222.444","$1","$666.666","$50","$321.123","$500"]
+    c,d = st.columns((1,1))
+
+    df_repuestos_ot = pd.DataFrame({
+        "Item":[""],
+        "Descripción":[""]
     })
 
-    st.button(label="Nueva Cotizacion", key="new_cotiz")
+    with c.container(height=700):
+        st.dataframe(df_repuestos_ot, hide_index=True, height=200)
+        st.button(label="Agregar repuesto", key="new_rep")
 
-    with st.container(height=500):
-        st.dataframe(df_ejemplo, hide_index=True, height=200)
+    with d.container(height=700):
+        with st.form('repuestos_form'):
+            rut = st.text_input("ID Repuesto")
+            nombre = st.text_input("Proovedor")
+            correo = st.text_input("Descripción")
+            telefono = st.text_input("Cantidad")
+            direccion = st.text_input("Precio Compra")
+            venta = st.text_input("Precio Venta")
+            margen = st.text_input("Margen")
+            submit_button = st.form_submit_button(label='Finalizar',type="primary")
+            if submit_button:
+                st.switch_page("pages//ots.py")
+
     st.image("src\\img\\taller.png",use_container_width=True)
 
 
@@ -111,3 +123,4 @@ if __name__ == "__main__":
 #    cs.control_login(page,allow=True)
 
     main()
+

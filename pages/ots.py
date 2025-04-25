@@ -7,6 +7,17 @@ from time import sleep
 import os
 
 
+def ChangeTheme():
+    ms = st.session_state
+    previous_theme = ms.themes["current_theme"]
+    tdict = ms.themes["light"] if ms.themes["current_theme"] == "light" else ms.themes["dark"]
+    for vkey, vval in tdict.items(): 
+        if vkey.startswith("theme"): st._config.set_option(vkey, vval)
+
+    ms.themes["refreshed"] = False
+    if previous_theme == "dark": ms.themes["current_theme"] = "light"
+    elif previous_theme == "light": ms.themes["current_theme"] = "dark"
+
 def filtros_detalles(df, rut=None, cod_nubox=None, nombre=None, fecha=None, patente=None, estado=None, rut_name=None) -> pd.DataFrame:
     if rut_name != None:
         #df = df[df['RUT Cliente']==rut]
@@ -41,8 +52,36 @@ def sidebar():
         st.switch_page("pages\\clientes.py")
     if st.sidebar.button("Cobranza"):
         st.switch_page("pages\\cobranza.py")
+    if st.sidebar.button("Inventario"):
+        st.switch_page("pages\\inventario.py")
     if st.sidebar.button("Negocio"):
         st.switch_page("pages\\negocio.py")
+
+    ms = st.session_state
+    if "themes" not in ms: 
+        ms.themes = {"current_theme": "light",
+                            "refreshed": True,
+                            
+                            "light": {"theme.base": "dark",
+                                    "theme.backgroundColor": "#0E1117",
+                                    "theme.primaryColor": "#FF4B4B",
+                                    "theme.secondaryBackgroundColor": "#262730",
+                                    "theme.textColor": "#FAFAFA",
+                                    "button_face": "🌜"},
+
+                            "dark":  {"theme.base": "light",
+                                    "theme.backgroundColor": "#FFFFFF",
+                                    "theme.primaryColor": "#FF4B4B",
+                                    "theme.secondaryBackgroundColor": "#F0F2F6",
+                                    "theme.textColor": "#31333F",
+                                    "button_face": "🌞"},
+                            }
+    btn_face = ms.themes["light"]["button_face"] if ms.themes["current_theme"] == "light" else ms.themes["dark"]["button_face"]
+    st.sidebar.button(btn_face, on_click=ChangeTheme)
+
+    if ms.themes["refreshed"] == False:
+        ms.themes["refreshed"] = True
+        st.rerun()
 
 def main():
     #configuracion de pagina
@@ -72,8 +111,6 @@ def main():
         """, unsafe_allow_html=True)
     st.markdown("<h1>"+"Órdenes de Trabajo"+"</h1>", unsafe_allow_html=True)
     sidebar()
-
-
 
     df_ots = pd.DataFrame({
         "Id Orden": [11111, 22222, 33333, 44444, 55555, 66666, 77777],
@@ -175,7 +212,7 @@ def main():
             data = st.dataframe(detalle, hide_index=True)
     with tab2:
         if st.button(label="Agregar"):
-            st.markdown("pog")
+            st.switch_page("pages\\repuestos.py")
         data = st.dataframe(df_ejemplo, hide_index=True, height=200)
     with tab3:
         if st.button(label="Agregar",key="a1"):
@@ -197,8 +234,7 @@ def main():
         df_ejemplo      
     #st.write(st.session_state)
 
-    #left_co, cent_co,last_co = st.columns([0.5,1,0.5])
-    cent_co = st.image("src\\img\\taller.png",use_container_width=True)
+    st.image("src\\img\\taller.png",use_container_width=True)
     #cent_co
 
 

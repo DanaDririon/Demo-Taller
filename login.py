@@ -17,9 +17,11 @@ def main():
 
     if submit_button:
         st.switch_page("pages\\ots.py")
+    
+    st.image("src\\img\\taller.png",use_container_width=True)
 
 
-#if __name__ == "__main__":
+if __name__ == "__main__":
 #    import importlib
 #    importlib.reload(cs)
-main()
+    main()

@@ -34,7 +34,6 @@ def sidebar():
         st.switch_page("pages\\inventario.py")
     if st.sidebar.button("Negocio"):
         st.switch_page("pages\\negocio.py")
-
     ms = st.session_state
     if "themes" not in ms: 
         ms.themes = {"current_theme": "light",
@@ -63,7 +62,7 @@ def sidebar():
 
 def main():
     #configuracion de pagina
-    st.set_page_config(layout="wide", page_title='Cotizaciones', page_icon="src\\img\\logo-servicena.png")
+    st.set_page_config(layout="wide", page_title='Clientes', page_icon="src\\img\\logo-servicena.png")
     #cs.increase_page()
     st.markdown("""
         <style>
@@ -87,20 +86,18 @@ def main():
                 }
         </style>
         """, unsafe_allow_html=True)
-    st.markdown("<h1>"+"Cotizaciones"+"</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>"+"Nuevo Cliente"+"</h1>", unsafe_allow_html=True)
     sidebar()
 
-    df_ejemplo = pd.DataFrame({
-        "Id": ["AAAAA", "BBBBB", "CCCCC", "DDDDD", "EEEEE", "FFFFF", "GGGGG"],
-        "Item": ["Pastillas","Amortiguadores","Uno","Fish","Cincuenta","Error","Botella"],
-        "Cantidad": [74,82,1,5,50,11,2],
-        "Precio Total": ["$1.555","222.444","$1","$666.666","$50","$321.123","$500"]
-    })
+    
+    with st.form('cliente_form'):
+        rut = st.text_input("RUT")
+        nombre = st.text_input("Nombre")
+        correo = st.text_input("Correo")
+        telefono = st.text_input("Telefóno")
+        direccion = st.text_input("Dirección")
+        submit_button = st.form_submit_button(label='Agregar',type="primary")
 
-    st.button(label="Nueva Cotizacion", key="new_cotiz")
-
-    with st.container(height=500):
-        st.dataframe(df_ejemplo, hide_index=True, height=200)
     st.image("src\\img\\taller.png",use_container_width=True)
 
 
@@ -111,3 +108,4 @@ if __name__ == "__main__":
 #    cs.control_login(page,allow=True)
 
     main()
+
