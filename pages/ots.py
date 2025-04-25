@@ -46,7 +46,7 @@ def sidebar():
 
 def main():
     #configuracion de pagina
-    st.set_page_config(layout="wide", page_title='Inicio - Taller', page_icon="src\\img\\logo-servicena.png")
+    st.set_page_config(layout="wide", page_title='Ordenes de Trabajo', page_icon="src\\img\\logo-servicena.png")
     #cs.increase_page()
     st.markdown("""
         <style>
@@ -160,31 +160,41 @@ def main():
     #             })
     #         data = st.dataframe(detalle, hide_index=True)
     
+    df_ejemplo = pd.DataFrame({
+        "Id": ["AAAAA", "BBBBB", "CCCCC", "DDDDD", "EEEEE", "FFFFF", "GGGGG"],
+        "Item": ["Pastillas","Amortiguadores","Uno","Fish","Cincuenta","Error","Botella"],
+        "Cantidad": [74,82,1,5,50,11,2],
+        "Precio Total": ["$1.555","222.444","$1","$666.666","$50","$321.123","$500"]
+    })
+    
     with st.container(height=400):
         tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["Info General", "Repuestos", "Servicios Extras", "Imágenes", "Cotizaciones", "Cobranza", "Registro Estados"])
     with tab1:
-        st.header("Info General")
         if selected_row:
             detalle = df_detalle.iloc[[selected_row]]
             data = st.dataframe(detalle, hide_index=True)
     with tab2:
-        st.header("Repuestos")
-        st.image("https://static.streamlit.io/examples/dog.jpg", width=200)
+        if st.button(label="Agregar"):
+            st.markdown("pog")
+        data = st.dataframe(df_ejemplo, hide_index=True, height=200)
     with tab3:
-        st.header("Servicios Extras")
-        st.image("https://static.streamlit.io/examples/owl.jpg", width=200)
+        if st.button(label="Agregar",key="a1"):
+            st.markdown("pog")
+        df_ejemplo
     with tab4:
-        st.header("Imágenes")
         st.image(image='C:\slak.jpg', use_container_width =True)
     with tab5:
-        st.header("Cotizaciones")
-        st.image("https://static.streamlit.io/examples/dog.jpg", width=200)
+        if st.button(label="Agregar",key="a2"):
+            st.markdown("pog")
+        df_ejemplo
     with tab6:
-        st.header("Cobranza")
-        st.image("https://static.streamlit.io/examples/owl.jpg", width=200)
+        if st.button(label="Agregar",key="a3"):
+            st.markdown("pog")
+        df_ejemplo
     with tab7:
-        st.header("Registro Estados")
-        st.image("https://static.streamlit.io/examples/owl.jpg", width=200)       
+        if st.button(label="Agregar",key="a4"):
+            st.markdown("pog")
+        df_ejemplo      
     #st.write(st.session_state)
 
     #left_co, cent_co,last_co = st.columns([0.5,1,0.5])

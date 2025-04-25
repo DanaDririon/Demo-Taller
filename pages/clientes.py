@@ -77,26 +77,26 @@ def main():
             submit_button = st.form_submit_button(label='Agregar',type="primary")
 
 
-
-    df_clientes = pd.DataFrame ({
-                "RUT":["15.898.932-9","6.622.912-0","7.930.134-5","19.334.061-4","18.887.218-K"],
-                "Nombre":["María","José","Daniel","Eladio","Felipe"],
-                "Correo":["María@gmail.com" ,"José@gmail.com","Daniel@gmail.com","Eladio@gmail.com","Felipe@gmail.com"],
-                "Teléfono":["+56954735358","+56930920520","+56937668224","+56915858981","+56959068833"],
-                "Dirección":["Santiago 111", "La Florida 222", "Peñalolén 333", "Maipú 444", "Las Condes 555"]
-                })
+    with st.container(height=400):
+        df_clientes = pd.DataFrame ({
+                    "RUT":["15.898.932-9","6.622.912-0","7.930.134-5","19.334.061-4","18.887.218-K"],
+                    "Nombre":["María","José","Daniel","Eladio","Felipe"],
+                    "Correo":["María@gmail.com" ,"José@gmail.com","Daniel@gmail.com","Eladio@gmail.com","Felipe@gmail.com"],
+                    "Teléfono":["+56954735358","+56930920520","+56937668224","+56915858981","+56959068833"],
+                    "Dirección":["Santiago 111", "La Florida 222", "Peñalolén 333", "Maipú 444", "Las Condes 555"]
+                    })
     
-    col1, col2, col3, col4 = st.columns((0.5,0.5,1,0.5))
+        col1, col2, col3, col4 = st.columns((0.5,0.5,1,0.5))
 
-    rut_filter = col1.selectbox("Buscar RUT", df_clientes['RUT'].unique() , index=None, placeholder='RUT')
-    if rut_filter:
-        df_clientes = filtros_detalles(df_clientes, rut=rut_filter)
+        rut_filter = col1.selectbox("Buscar RUT", df_clientes['RUT'].unique() , index=None, placeholder='RUT')
+        if rut_filter:
+            df_clientes = filtros_detalles(df_clientes, rut=rut_filter)
 
-    nombre_filter = col2.selectbox("Buscar Nombre", df_clientes['Nombre'].unique() , index=None, placeholder='Nombre')
-    if nombre_filter:
-        df_clientes = filtros_detalles(df_clientes, nombre=nombre_filter)
+        nombre_filter = col2.selectbox("Buscar Nombre", df_clientes['Nombre'].unique() , index=None, placeholder='Nombre')
+        if nombre_filter:
+            df_clientes = filtros_detalles(df_clientes, nombre=nombre_filter)
 
-    st.dataframe(df_clientes, hide_index=True)
+        st.dataframe(df_clientes, hide_index=True)
     #left_co, cent_co,last_co = st.columns([0.5,1,0.5])
     cent_co = st.image("src\\img\\taller.png",use_container_width=True)
     #cent_co
