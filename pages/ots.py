@@ -219,7 +219,13 @@ def main():
             st.markdown("pog")
         df_ejemplo
     with tab4:
-        st.image(image='C:\slak.jpg', use_container_width =True)
+        st.columns((1,1))
+        st.image("src\\img\\auto (1).jpg")
+        st.image("src\\img\\auto (2).jpg")
+        st.image("src\\img\\auto (3).jpg")
+        st.image("src\\img\\auto (4).jpg")
+        st.image("src\\img\\auto (5).jpg")
+        st.image("src\\img\\auto (6).jpg")
     with tab5:
         if st.button(label="Agregar",key="a2"):
             st.markdown("pog")
