@@ -1,0 +1,219 @@
+import pandas as pd
+import mysql.connector
+from pandas.api.types import (
+    is_categorical_dtype,
+    is_datetime64_any_dtype,
+    is_numeric_dtype,
+    is_object_dtype
+)
+import streamlit as st
+from time import sleep
+from sqlalchemy import create_engine
+import pymysql
+from streamlit_javascript import st_javascript
+import numpy as np
+import janitor
+pd.options.mode.chained_assignment = None
+
+
+def connection():
+    try:
+        mydb = mysql.connector.connect(
+            host = "localhost",
+            user = "root",
+            password = "daniel125",
+            database = "taller"
+        )
+        return mydb
+    except:
+        mydb = mysql.connector.connect(
+            host = "100.72.37.4",
+            user = "esanmartin",
+            password = "servicena2022",
+            database = "intranet"
+        )
+        return mydb
+    
+def get_data(query: str) -> pd.DataFrame:
+    mydb = connection()
+    mycursor = mydb.cursor()
+    mycursor.execute(query)
+    myresult = mycursor.fetchall()
+    df = pd.DataFrame(myresult, columns=mycursor.column_names, index=None)
+    return df
+
+def select_data(tabla: str, columns=None, where=None, group=None, order=None, limit=None) -> pd.DataFrame:
+    """
+    Obtiene los datos de la base de datos y los retorna en un dataframe
+
+    Argumentos:
+        tabla (str): Nombre de la tabla
+        columns (str): Columnas a seleccionar
+        where (str): Condicion de la consulta
+        group (str): Agrupar por
+        order (str): Ordenar por
+        limit (str): Limite de registros
+
+    Retorna:
+        pd.DataFrame: Dataframe con los datos de la consulta
+    """
+    mydb = connection()
+    mycursor = mydb.cursor()
+    query = "SELECT "
+    if columns==None:
+        query += "*"
+    else:
+        query += columns
+    query += " FROM "+tabla
+    if where!=None:
+        query += " WHERE "+where        
+    if group!=None:
+        query += " GROUP BY "+group       
+    if order!=None:
+        query += " ORDER BY "+order
+    if limit!=None:
+        query += " LIMIT "+limit
+
+    #print(query)
+    
+    mycursor.execute(query)
+    myresult = mycursor.fetchall()
+    df = pd.DataFrame(myresult, columns=mycursor.column_names, index=None)
+    return df
+
+def delete_data(table: str, fecha_modificacion, user: str, id):
+    mydb = connection()
+    mycursor = mydb.cursor()
+    query = "UPDATE "+table+" SET date_mod = '{}', mod_by = '{}', deleted=1 WHERE id = {}".format(fecha_modificacion, user, id)
+    print(query)
+    mycursor.execute(query)
+    mydb.commit()
+
+def insert_data(table, campos_insertar: list, valores_insertar: list, check_duplicado=False, campo_contar=None, campos_check_duplicado: list = None, valores_check_duplicado: list = None):
+    if check_duplicado:
+        check_query_add = ""
+        for i in range(len(campos_check_duplicado)):
+            check_query_add += " AND {} = '{}'".format(campos_check_duplicado[i], valores_check_duplicado[i])
+        if select_data(table, columns='count({}) as contar'.format(campo_contar), where='deleted = 0 {}'.format(check_query_add))['contar'][0] > 0:                
+            return False
+    else:
+        pass
+
+    mydb = connection()
+    mycursor = mydb.cursor()
+    query = "INSERT INTO "+table+" ("
+    for i in range(len(campos_insertar)):
+        if i == len(campos_insertar)-1:
+            query += campos_insertar[i]+") VALUES ("
+        else:
+            query += ""+campos_insertar[i]+","
+    
+    for i in range(len(valores_insertar)):
+        if i == len(valores_insertar)-1:
+            query += "'"+str(valores_insertar[i])+"')"
+        else:
+            query += "'"+str(valores_insertar[i])+"',"
+    mycursor.execute(query)
+    mydb.commit()
+    return True
+
+def update_data(table: str, campos_modificar: list, valores_modificar: list, campos_id: list, valores_id: list):
+    mydb = connection()
+    mycursor = mydb.cursor()
+    query = "UPDATE "+table+" SET "
+    for i in range(len(campos_modificar)):
+        if i == len(campos_modificar)-1:
+            query += campos_modificar[i]+" = '"+str(valores_modificar[i])+"' WHERE "
+        else:
+            query += campos_modificar[i]+" = '"+str(valores_modificar[i])+"', "
+    
+    for i in range(len(campos_id)):
+        if i == len(campos_id)-1:
+            query += campos_id[i]+" = '"+str(valores_id[i])+"'"
+        else:
+            query += campos_id[i]+" = '"+str(valores_id[i])+"' AND "
+
+    print(query)
+    mycursor.execute(query)
+    mydb.commit()
+    return True
+
+def sidebar():
+    st.sidebar.title("Menú")
+    if st.sidebar.button("Órdenes de Trabajo"):
+        st.switch_page("pages\\ots.py")
+    if st.sidebar.button("Cotizaciones"):
+        st.switch_page("pages\\cotiz.py")
+    #if st.sidebar.button("Inicio"):
+        #st.switch_page("pages\\home.py")
+    if st.sidebar.button("Clientes"):
+        st.switch_page("pages\\clientes.py")
+    if st.sidebar.button("Cobranza"):
+        st.switch_page("pages\\cobranza.py")
+    if st.sidebar.button("Inventario"):
+        st.switch_page("pages\\inventario.py")
+    if st.sidebar.button("Negocio"):
+        st.switch_page("pages\\negocio.py")
+
+    ms = st.session_state
+    if "theme" not in ms: 
+        ms.theme = {"current_theme": "light",
+                            "refreshed": True,
+                            
+                            "light": {"theme.base": "dark",
+                                    "theme.backgroundColor": "#0E1117",
+                                    "theme.primaryColor": "#FF4B4B",
+                                    "theme.secondaryBackgroundColor": "#262730",
+                                    "theme.textColor": "#FAFAFA",
+                                    "button_face": "🌜"},
+
+                            "dark":  {"theme.base": "light",
+                                    "theme.backgroundColor": "#FFFFFF",
+                                    "theme.primaryColor": "#FF4B4B",
+                                    "theme.secondaryBackgroundColor": "#F0F2F6",
+                                    "theme.textColor": "#31333F",
+                                    "button_face": "🌞"},
+                            }
+    btn_face = ms.theme["light"]["button_face"] if ms.theme["current_theme"] == "light" else ms.theme["dark"]["button_face"]
+    st.sidebar.button(btn_face, on_click=ChangeTheme)
+
+    if ms.theme["refreshed"] == False:
+        ms.theme["refreshed"] = True
+        st.rerun()
+
+def ChangeTheme():
+    ms = st.session_state
+    previous_theme = ms.theme["current_theme"]
+    tdict = ms.theme["light"] if ms.theme["current_theme"] == "light" else ms.theme["dark"]
+    for vkey, vval in tdict.items(): 
+        if vkey.startswith("theme"): st._config.set_option(vkey, vval)
+
+    ms.theme["refreshed"] = False
+    if previous_theme == "dark": ms.theme["current_theme"] = "light"
+    elif previous_theme == "light": ms.theme["current_theme"] = "dark"
+
+def increase_page():
+    return     st.markdown("""
+        <style>
+                .block-container {
+                    padding-top: 1rem;
+                    padding-bottom: 0rem;
+                    padding-left: 1rem;
+                    padding-right: 1rem;
+                }
+        </style>
+        """, unsafe_allow_html=True)
+
+def hide_deploy_button():
+    st.markdown("""
+        <style>
+            .reportview-container {
+                margin-top: -2em;
+            }
+            #MainMenu {visibility: hidden;}
+            .stAppDeployButton {display:none;}
+            .stDeployButton {display:none;}
+            footer {visibility: hidden;}
+            #stDecoration {display:none;}
+        </style>
+        """, unsafe_allow_html=True)

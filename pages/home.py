@@ -3,29 +3,16 @@ import mysql.connector
 import pandas as pd
 import numpy as np
 from time import sleep
-#from control_servicena import utils as cs
+from control_taller import utils as ct
 import os
 
-
-def sidebar():
-    st.sidebar.title("Menú")
-    if st.sidebar.button("Inicio"):
-        st.switch_page("pages\\home.py")
-    if st.sidebar.button("Clientes"):
-        st.switch_page("pages\\clientes.py")
-    if st.sidebar.button("Cotizaciones"):
-        st.switch_page("pages\\cotiz.py")
-    if st.sidebar.button("Órdenes de Trabajo"):
-        st.switch_page("pages\\ots.py")
-    if st.sidebar.button("Negocio"):
-        st.switch_page("pages\\negocio.py")
 
 def main():
     #configuracion de pagina
     st.set_page_config(layout="wide", page_title='Inicio - Taller', page_icon="src\\img\\logo-servicena.png")
     #cs.increase_page()
     st.markdown("<h1>"+"Taller - Inicio"+"</h1>", unsafe_allow_html=True)
-    sidebar()
+    ct.sidebar()
 
     left_co, cent_co,last_co = st.columns([0.5,1,0.5])
     cent_co.image("src\\img\\intranet_img.jpg", width=550)

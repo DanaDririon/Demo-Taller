@@ -3,7 +3,7 @@ import mysql.connector
 import pandas as pd
 import numpy as np
 from streamlit_extras.switch_page_button import switch_page
-#from control_servicena import utils as cs
+from control_taller import utils as ct
 
 
 def main():
