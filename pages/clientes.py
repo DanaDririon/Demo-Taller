@@ -34,26 +34,32 @@ def main():
     if st.button("Nuevo Cliente ➕"):
         st.switch_page("pages\\cliente_nuevo.py")
 
-    with st.container(height=525):
-        df_clientes = pd.DataFrame ({
-                    "RUT":["15.898.932-9","6.622.912-0","7.930.134-5","19.334.061-4","18.887.218-K"],
-                    "Nombre":["María","José","Daniel","Eladio","Felipe"],
-                    "Correo":["María@gmail.com" ,"José@gmail.com","Daniel@gmail.com","Eladio@gmail.com","Felipe@gmail.com"],
-                    "Teléfono":["+56954735358","+56930920520","+56937668224","+56915858981","+56959068833"],
-                    "Dirección":["Santiago 111", "La Florida 222", "Peñalolén 333", "Maipú 444", "Las Condes 555"]
-                    })
+    with st.container(height=530):
+        df_clientes = ct.select_data("clientes")
     
         col1, col2, col3, col4 = st.columns((0.5,0.5,1,0.5))
 
-        rut_filter = col1.selectbox("Buscar RUT", df_clientes['RUT'].unique() , index=None, placeholder='RUT')
+        rut_filter = col1.selectbox("Buscar RUT", df_clientes['cliente_rut'].unique() , index=None, placeholder='RUT')
         if rut_filter:
             df_clientes = filtros_detalles(df_clientes, rut=rut_filter)
 
-        nombre_filter = col2.selectbox("Buscar Nombre", df_clientes['Nombre'].unique() , index=None, placeholder='Nombre')
+        nombre_filter = col2.selectbox("Buscar Nombre", df_clientes['cliente_nombre'].unique() , index=None, placeholder='Nombre')
         if nombre_filter:
             df_clientes = filtros_detalles(df_clientes, nombre=nombre_filter)
 
-        st.dataframe(df_clientes, hide_index=True, height=400)
+        st.dataframe(df_clientes, hide_index=True, height=405, 
+                    column_order=((
+                        "cliente_rut",
+                        "cliente_nombre",
+                        "cliente_correo",
+                        "cliente_telefono",
+                        "cliente_direccion")),
+                    column_config={
+                        'cliente_rut': st.column_config.Column("RUT"),#,width
+                        'cliente_nombre':st.column_config.Column("Nombre"),
+                        'cliente_correo':st.column_config.Column("Correo"),
+                        'cliente_telefono':st.column_config.Column("Teléfono"),
+                        'cliente_direccion':st.column_config.Column("Dirección")})
 
     st.image("src\\img\\taller.png",use_container_width=True)
 

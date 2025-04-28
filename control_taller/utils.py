@@ -13,6 +13,7 @@ import pymysql
 from streamlit_javascript import st_javascript
 import numpy as np
 import janitor
+from itertools import cycle
 pd.options.mode.chained_assignment = None
 
 
@@ -81,10 +82,10 @@ def select_data(tabla: str, columns=None, where=None, group=None, order=None, li
     df = pd.DataFrame(myresult, columns=mycursor.column_names, index=None)
     return df
 
-def delete_data(table: str, fecha_modificacion, user: str, id):
+def delete_data(table: str, user: str, str_id: str, id):
     mydb = connection()
     mycursor = mydb.cursor()
-    query = "UPDATE "+table+" SET date_mod = '{}', mod_by = '{}', deleted=1 WHERE id = {}".format(fecha_modificacion, user, id)
+    query = "UPDATE "+table+" SET mod_by = '{}', deleted=1 WHERE "+str_id+" = {}".format(user, id)
     print(query)
     mycursor.execute(query)
     mydb.commit()
@@ -94,6 +95,7 @@ def insert_data(table, campos_insertar: list, valores_insertar: list, check_dupl
         check_query_add = ""
         for i in range(len(campos_check_duplicado)):
             check_query_add += " AND {} = '{}'".format(campos_check_duplicado[i], valores_check_duplicado[i])
+        print(check_query_add)
         if select_data(table, columns='count({}) as contar'.format(campo_contar), where='deleted = 0 {}'.format(check_query_add))['contar'][0] > 0:                
             return False
     else:
@@ -113,6 +115,8 @@ def insert_data(table, campos_insertar: list, valores_insertar: list, check_dupl
             query += "'"+str(valores_insertar[i])+"')"
         else:
             query += "'"+str(valores_insertar[i])+"',"
+
+    print(query)
     mycursor.execute(query)
     mydb.commit()
     return True
@@ -217,3 +221,9 @@ def hide_deploy_button():
             #stDecoration {display:none;}
         </style>
         """, unsafe_allow_html=True)
+
+def digito_verificador(rut: int):
+    reversed_digits = map(int, reversed(str(rut)))
+    factors = cycle(range(2, 8))
+    s = sum(d * f for d, f in zip(reversed_digits, factors))
+    return (-s) % 11 if (-s) % 11 < 10 else 'K'
