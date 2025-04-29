@@ -251,3 +251,10 @@ def check_int(x):
         except:
             st.warning("No es un número entero")
             return False
+
+def extract_digits_rut(x):
+    digits = re.findall(r'\d+', x)
+    string = digits[0]+digits[1]+digits[2]
+    # AGREGAR CICLO FOR
+    return string
+    
