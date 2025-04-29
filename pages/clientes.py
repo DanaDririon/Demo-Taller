@@ -31,8 +31,19 @@ def main():
     st.markdown("<h1>"+"Clientes"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
-    if st.button("Nuevo Cliente ➕"):
-        st.switch_page("pages\\cliente_nuevo.py")
+    col1, col2, col3, col4, col5, col6, col7 = st.columns((1.2,1.5,1,1,1.5,2,2))
+
+    if col1.button("Nuevo Cliente ➕", type="primary"):
+        st.switch_page("pages\\clientes_nuevo.py")
+
+    selected_row = None
+
+    if selected_row:
+        modificar = st.button("Modificar Cliente 🖊️", type="primary")
+        if modificar:
+            col2.switch_page("pages\\clientes_modificar.py")
+    else:
+        modificar = col2.button("Modificar Cliente 🖊️", type="primary", disabled=True)
 
     with st.container(height=530):
         df_clientes = ct.select_data("clientes")
@@ -47,7 +58,7 @@ def main():
         if nombre_filter:
             df_clientes = filtros_detalles(df_clientes, nombre=nombre_filter)
 
-        st.dataframe(df_clientes, hide_index=True, height=405, 
+        data = st.dataframe(df_clientes, hide_index=True, height=405, 
                     column_order=((
                         "cliente_rut",
                         "cliente_nombre",
@@ -59,7 +70,16 @@ def main():
                         'cliente_nombre':st.column_config.Column("Nombre"),
                         'cliente_correo':st.column_config.Column("Correo"),
                         'cliente_telefono':st.column_config.Column("Teléfono"),
-                        'cliente_direccion':st.column_config.Column("Dirección")})
+                        'cliente_direccion':st.column_config.Column("Dirección")},
+                    on_select='rerun',
+                    selection_mode='single-row')
+
+        if len(data.selection['rows']):
+            selected_row = data.selection['rows'][0]
+            print(selected_row)
+        else:
+            selected_row = None
+            st.session_state['selected_id_cliente'] = None
 
     st.image("src\\img\\taller.png",use_container_width=True)
 

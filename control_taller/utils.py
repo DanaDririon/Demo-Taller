@@ -13,6 +13,7 @@ import pymysql
 from streamlit_javascript import st_javascript
 import numpy as np
 import janitor
+import re
 from itertools import cycle
 pd.options.mode.chained_assignment = None
 
@@ -161,15 +162,8 @@ def sidebar():
 
     ms = st.session_state
     if "theme" not in ms: 
-        ms.theme = {"current_theme": "light",
+        ms.theme = {"current_theme": "dark",
                             "refreshed": True,
-                            
-                            "light": {"theme.base": "dark",
-                                    "theme.backgroundColor": "#0E1117",
-                                    "theme.primaryColor": "#FF4B4B",
-                                    "theme.secondaryBackgroundColor": "#262730",
-                                    "theme.textColor": "#FAFAFA",
-                                    "button_face": "🌜"},
 
                             "dark":  {"theme.base": "light",
                                     "theme.backgroundColor": "#FFFFFF",
@@ -177,8 +171,15 @@ def sidebar():
                                     "theme.secondaryBackgroundColor": "#F0F2F6",
                                     "theme.textColor": "#31333F",
                                     "button_face": "🌞"},
+                            
+                            "light": {"theme.base": "dark",
+                                    "theme.backgroundColor": "#0E1117",
+                                    "theme.primaryColor": "#FF4B4B",
+                                    "theme.secondaryBackgroundColor": "#262730",
+                                    "theme.textColor": "#FAFAFA",
+                                    "button_face": "🌜"},
                             }
-    btn_face = ms.theme["light"]["button_face"] if ms.theme["current_theme"] == "light" else ms.theme["dark"]["button_face"]
+    btn_face = ms.theme["dark"]["button_face"] if ms.theme["current_theme"] == "dark" else ms.theme["light"]["button_face"]
     st.sidebar.button(btn_face, on_click=ChangeTheme)
 
     if ms.theme["refreshed"] == False:
@@ -188,7 +189,7 @@ def sidebar():
 def ChangeTheme():
     ms = st.session_state
     previous_theme = ms.theme["current_theme"]
-    tdict = ms.theme["light"] if ms.theme["current_theme"] == "light" else ms.theme["dark"]
+    tdict = ms.theme["dark"] if ms.theme["current_theme"] == "dark" else ms.theme["light"]
     for vkey, vval in tdict.items(): 
         if vkey.startswith("theme"): st._config.set_option(vkey, vval)
 
@@ -227,3 +228,26 @@ def digito_verificador(rut: int):
     factors = cycle(range(2, 8))
     s = sum(d * f for d, f in zip(reversed_digits, factors))
     return (-s) % 11 if (-s) % 11 < 10 else 'K'
+
+def validate_email_syntax(email):
+    if email == "" or email == None:
+        return False
+    else:
+        pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+
+        if re.match(pattern, email) is not None:
+            return True
+        else:
+            st.warning("Correo Electronico invalido")
+            return False
+
+def check_int(x):
+    if x == "" or x == None:
+        return False
+    else:
+        try:
+            int(x)
+            return True
+        except:
+            st.warning("No es un número entero")
+            return False

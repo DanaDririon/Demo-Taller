@@ -37,9 +37,9 @@ def main():
     st.markdown("<h1>"+"Órdenes de Trabajo"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
-    col1, col2, col3, col4, col5, col6, col7 = st.columns((1,1,2,2,2,2,2))
-    agregar = col1.button("Agregar OT", type="primary")
-    modificar = col2.button("Modificar OT", type="primary")
+    col1, col2, col3, col4, col5, col6, col7 = st.columns((1,1,1,1,1.5,2,2))
+    agregar = col1.button("Nueva OT ➕", type="primary")
+    modificar = col2.button("Modificar OT 🖊️", type="primary")
     
     df_ots = pd.DataFrame({
         "Id Orden": [11111, 22222, 33333, 44444, 55555, 66666, 77777],
@@ -112,14 +112,16 @@ def main():
                 detalle = df_detalle.iloc[[selected_row]]
                 data = st.dataframe(detalle, hide_index=True)
         with tab2:
-            if st.button(label="Agregar"):
-                st.switch_page("pages\\repuestos.py")
+            if st.button(label="Agregar ➕", type="primary"):
+                st.switch_page("pages\\repuestos_agregar.py")
             data = st.dataframe(df_ejemplo, hide_index=True, height=200)
         with tab3:
-            if st.button(label="Agregar",key="a1"):
+            if st.button(label="Agregar ➕",key="a1", type="primary"):
                 st.markdown("pog")
             df_ejemplo
         with tab4:
+            if st.button(label="Agregar 📷",key="a5", type="primary"):
+                st.markdown("pog")
             st.columns((1,1))
             st.image("src\\img\\auto (1).jpg")
             st.image("src\\img\\auto (2).jpg")
@@ -128,15 +130,15 @@ def main():
             st.image("src\\img\\auto (5).jpg")
             st.image("src\\img\\auto (6).jpg")
         with tab5:
-            if st.button(label="Agregar",key="a2"):
+            if st.button(label="Agregar ➕",key="a2", type="primary"):
                 st.markdown("pog")
             df_ejemplo
         with tab6:
-            if st.button(label="Agregar",key="a3"):
+            if st.button(label="Agregar ➕",key="a3", type="primary"):
                 st.markdown("pog")
             df_ejemplo
         with tab7:
-            if st.button(label="Agregar",key="a4"):
+            if st.button(label="Agregar ➕",key="a4", type="primary"):
                 st.markdown("pog")
             df_ejemplo      
         #st.write(st.session_state)

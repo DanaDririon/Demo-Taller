@@ -22,7 +22,7 @@ def main():
         "Precio Total": ["$1.555","222.444","$1","$666.666","$50","$321.123","$500"]
     })
 
-    st.button(label="Nueva Cotizacion", key="new_cotiz")
+    st.button(label="Nueva Cotizacion ➕", type="primary")
 
     with st.container(height=500):
         st.dataframe(df_ejemplo, hide_index=True, height=200)
