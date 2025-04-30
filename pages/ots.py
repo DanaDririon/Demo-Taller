@@ -122,13 +122,13 @@ def main():
         with tab4:
             if st.button(label="Agregar 📷",key="a5", type="primary"):
                 st.markdown("pog")
-            st.columns((1,1))
-            st.image("src\\img\\auto (1).jpg")
-            st.image("src\\img\\auto (2).jpg")
-            st.image("src\\img\\auto (3).jpg")
-            st.image("src\\img\\auto (4).jpg")
-            st.image("src\\img\\auto (5).jpg")
-            st.image("src\\img\\auto (6).jpg")
+            col1, col2 = st.columns((1,1))
+            col1.image("src\\img\\auto (1).jpg")
+            col2.image("src\\img\\auto (2).jpg")
+            col1.image("src\\img\\auto (3).jpg")
+            col2.image("src\\img\\auto (4).jpg")
+            col1.image("src\\img\\auto (5).jpg")
+            col2.image("src\\img\\auto (6).jpg")
         with tab5:
             if st.button(label="Agregar ➕",key="a2", type="primary"):
                 st.markdown("pog")
@@ -143,7 +143,7 @@ def main():
             df_ejemplo      
         #st.write(st.session_state)
 
-    st.image("src\\img\\taller.png",use_container_width=True)
+    #st.image("src\\img\\taller.png",use_container_width=True)
     #cent_co
 
 

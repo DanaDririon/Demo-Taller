@@ -11,20 +11,27 @@ def main():
     st.session_state['login'] = False
     st.markdown("<h1 style='text-align: center;'>"+"Inicio de Sesión"+"</h1>", unsafe_allow_html=True)
     user_profile = ct.select_data(tabla='usuarios')
-    metodo_login = ct.select_data(tabla='login')['login_metodo']
+    metodo_login = ct.select_data(tabla='login')['login_metodo'][0]
+    metodo_login = int(metodo_login)
     with st.container():
-        if metodo_login == (1 or 3):
-            user = st.selectbox("Usuario",user_profile['usuario_nombre'].unique)
+        if metodo_login == 1 or metodo_login == 3:
+            user = st.selectbox("Selecciona tu Usuario",user_profile['usuario_nombre'].unique(), index=None, placeholder='')
+            password = None
         else:
             user = st.text_input("Usuario")
+            password = st.text_input("Contraseña", type="password")
 
-        password = st.text_input("Contraseña", type="password")
         submit_button = st.button(label='Ingresar')
 
     if submit_button:
-        st.switch_page("pages\\ots.py")
-    
-    st.image("src\\img\\taller.png",use_container_width=True)
+        if ct.login_check(user, password, metodo_login):
+            st.session_state['login'] = True
+            st.session_state['user'] = user
+            #st.success("Login correcto")
+            st.switch_page("pages\\ots.py")
+        else:
+            st.error("Usuario o contraseña incorrectos")
+
 
 
 if __name__ == "__main__":

@@ -29,10 +29,10 @@ def connection():
         return mydb
     except:
         mydb = mysql.connector.connect(
-            host = "100.72.37.4",
-            user = "esanmartin",
-            password = "servicena2022",
-            database = "intranet"
+            host = "192.168.1.148",
+            user = "eladio",
+            password = "taller123",
+            database = "taller"
         )
         return mydb
     
@@ -143,15 +143,13 @@ def update_data(table: str, campos_modificar: list, valores_modificar: list, cam
     mydb.commit()
     return True
 
-def login_check(user: str, password:str):
+def login_check(user: str, password:str, metodo_login: int):
     #df = get_data(querys.query_data_login)
-    user_profile = select_data(tabla='usuarios')
-    usuario_login = user_profile[user_profile['usuario_nombre']==user].reset_index(drop=True)
-    metodo_login = select_data(tabla='login')['login_metodo']
     if metodo_login == 1:
-
         return True
     else:
+        user_profile = select_data(tabla='usuarios')
+        usuario_login = user_profile[user_profile['usuario_nombre']==user].reset_index(drop=True)
         if usuario_login['pass'][0] == password:
             st.session_state['login'] = True
             for i in range(len(usuario_login.columns.sort_values())):
