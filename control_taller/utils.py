@@ -143,6 +143,57 @@ def update_data(table: str, campos_modificar: list, valores_modificar: list, cam
     mydb.commit()
     return True
 
+def login_check(user: str, password:str):
+    #df = get_data(querys.query_data_login)
+    user_profile = select_data(tabla='usuarios')
+    usuario_login = user_profile[user_profile['usuario_nombre']==user].reset_index(drop=True)
+    metodo_login = select_data(tabla='login')['login_metodo']
+    if metodo_login == 1:
+
+        return True
+    else:
+        if usuario_login['pass'][0] == password:
+            st.session_state['login'] = True
+            for i in range(len(usuario_login.columns.sort_values())):
+                usuario_login.columns[i]
+                st.session_state[usuario_login.columns[i]] = usuario_login[usuario_login.columns[i]][0]
+            del st.session_state['pass']
+            return True       
+        else:
+            return False
+
+def control_login(page: str = None, allow: bool = False):
+    #if 'login' in st.session_state or len(st.session_state) > 0 or st.session_state['login']==True:
+    if allow==True:
+        pass
+    else:
+        if len(st.session_state) > 0:
+            if 'login' in st.session_state or st.session_state['login']==True:
+                if allow==True:
+                    pass
+                else:
+                    modulo_check = select_data(tabla='usuarios')
+                    modulo_check = modulo_check[modulo_check['user']==st.session_state['user']]['rol_'+page].reset_index(drop=True)
+                    modulo_check = modulo_check[0]
+                    if st.session_state['rol_'+page]>0:
+                        pass
+                    else:
+                        st.warning("Usted no tiene permisos para acceder a esta pagina")
+                        st.warning("será redirigido a la página de inicio")
+                        #Redirigir a la pagina de inicio con contador visual de 5 segundos
+                        sleep(3)
+                        st.switch_page("pages\\home.py")
+            else:
+                st.warning("Usted no se ha logueado, será redirigido a la página de inicio")
+                #Redirigir a la pagina de inicio con contador visual de 5 segundos
+                sleep(3)
+                st.switch_page("pages\\login.py")
+        else:
+            st.warning("Usted no se ha logueado, será redirigido a la página de inicio")
+            #Redirigir a la pagina de inicio con contador visual de 5 segundos
+            sleep(3)
+            st.switch_page("pages\\login.py")
+
 def sidebar():
     st.sidebar.title("Menú")
     if st.sidebar.button("Órdenes de Trabajo"):

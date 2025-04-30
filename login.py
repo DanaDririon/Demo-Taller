@@ -7,13 +7,19 @@ from control_taller import utils as ct
 
 
 def main():
-    st.set_page_config(layout="centered", page_title='Login - Intranet Servicena', page_icon="src\\img\\logo-servicena.png")
+    st.set_page_config(layout="centered", page_title='Login - Intranet Taller', page_icon="src\\img\\logo-servicena.png")
     st.session_state['login'] = False
     st.markdown("<h1 style='text-align: center;'>"+"Inicio de Sesión"+"</h1>", unsafe_allow_html=True)
-    with st.form('login_form'):
-        user = st.text_input("Usuario")
+    user_profile = ct.select_data(tabla='usuarios')
+    metodo_login = ct.select_data(tabla='login')['login_metodo']
+    with st.container():
+        if metodo_login == (1 or 3):
+            user = st.selectbox("Usuario",user_profile['usuario_nombre'].unique)
+        else:
+            user = st.text_input("Usuario")
+
         password = st.text_input("Contraseña", type="password")
-        submit_button = st.form_submit_button(label='Ingresar')
+        submit_button = st.button(label='Ingresar')
 
     if submit_button:
         st.switch_page("pages\\ots.py")
