@@ -14,8 +14,6 @@ def main():
     st.markdown("<h1>"+"Clientes"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
-    st.write('danagei')
-
     st.write(st.session_state)
 
 if __name__ == "__main__":
