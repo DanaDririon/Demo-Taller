@@ -11,10 +11,10 @@ import os
 
 def main():
     #configuracion de pagina
-    st.set_page_config(layout="wide", page_title='Inicio - Taller', page_icon="src\\img\\logo-servicena.png")
+    st.set_page_config(layout="wide", page_title='Dashboard - Taller', page_icon="src\\img\\logo-servicena.png")
     ct.increase_page()
     ct.hide_deploy_button()
-    st.markdown("<h1>"+"Negocio"+"</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>"+"Dashboard"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
 
@@ -99,10 +99,10 @@ def main():
     #cent_co
 
 
-#if __name__ == "__main__":
+if __name__ == "__main__":
 #    import importlib
 #    importlib.reload(cs)
 
-#    cs.control_login(page,allow=True)
+#    ct.control_login(page,allow=True)
 
-main()
+    main()

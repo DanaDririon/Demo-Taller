@@ -18,7 +18,7 @@ def main():
 
     #set_png_as_page_bg('src\\img\\taller.png')
 
-    col1, col2, col3, col4 = st.columns((3,1,1,1))
+    col1, col2, col3, col99 = st.columns((3,1,2,0.3))
 
     if col1.button(label="⬅Volver"):
         st.switch_page("pages\\clientes.py")
@@ -27,22 +27,37 @@ def main():
         rut_1, rut_3, rut_2 = st.columns((9, 0.8, 1.8))
         rut = None
         dig_ver = None
-        x = rut_1.text_input("RUT", max_chars=10, placeholder="Ingresar RUT sin puntos ni dígito verificador")
+        x = rut_1.text_input("RUT", max_chars=8, placeholder="Ingresar RUT sin puntos ni dígito verificador")
         check_rut = ct.check_int(x)
+        rut_clean = ""
         if check_rut:
             rut_clean = int(x)
             dig_ver = ct.digito_verificador(x)
             rut_clean = str(rut_clean)+'-'+str(dig_ver)
         rut_2.text_input(label="Digito Verificador", disabled=True, value=dig_ver)
-        nombre = st.text_input("Nombre cliente", placeholder="Ingresar nombre de cliente")
+        nombre = st.text_input("Nombre cliente", placeholder="Ingresar nombre de cliente").upper()
+        check_nombre = nombre.isupper()
         correo = st.text_input("Correo Electronico", placeholder="Formato de correo es 'xxxx@xxxx.xx'")
         check_correo = ct.validate_email_syntax(correo)
         telefono = st.text_input("Telefóno",max_chars=9,placeholder="Ingresar sólo los últimos 9 dígitos")
         check_telefono = ct.check_int(telefono)
+        telefono_clean = 0
         if check_telefono:
             telefono_clean = int(x)
-        direccion = st.text_input("Dirección", placeholder="Ingresar dirección")
-        if check_correo and check_rut and check_telefono:
+        direccion = st.text_input("Dirección", placeholder="Ingresar dirección").upper()
+        check_direccion = direccion.isupper()
+    
+    col3.markdown("<h4>"+"Preview"+"</h4>", unsafe_allow_html=True)
+    with col3.container(height=570):
+        tel_ini = ""
+        if telefono_clean: tel_ini = "+56"
+        resumen = pd.DataFrame({
+            "Preview": ["RUT","Nombre","Correo","Teléfono","Dirección"],
+            " ": [rut_clean,nombre,correo,tel_ini+telefono,direccion],
+        },index=None)
+
+        st.dataframe(resumen,hide_index=True)
+        if check_rut and check_nombre and check_correo and check_telefono and check_direccion:
             agregar = st.button(label='Agregar',type="primary")
             if agregar:
                 if ct.insert_data('clientes',

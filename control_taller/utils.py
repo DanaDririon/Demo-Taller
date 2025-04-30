@@ -29,7 +29,7 @@ def connection():
         return mydb
     except:
         mydb = mysql.connector.connect(
-            host = "192.168.1.148",
+            host = "100.72.37.8",
             user = "eladio",
             password = "taller123",
             database = "taller"
@@ -176,18 +176,18 @@ def control_login(page: str = None, allow: bool = False):
                     if st.session_state['rol_'+page]>0:
                         pass
                     else:
-                        st.warning("Usted no tiene permisos para acceder a esta pagina")
-                        st.warning("será redirigido a la página de inicio")
+                        st.warning("Usted no tiene permisos para acceder a esta página.")
+                        st.warning("será redirigido a la página de inicio.")
                         #Redirigir a la pagina de inicio con contador visual de 5 segundos
                         sleep(3)
                         st.switch_page("pages\\home.py")
             else:
-                st.warning("Usted no se ha logueado, será redirigido a la página de inicio")
+                st.warning("Usted no se ha logueado, será redirigido a la página de inicio.")
                 #Redirigir a la pagina de inicio con contador visual de 5 segundos
                 sleep(3)
                 st.switch_page("pages\\login.py")
         else:
-            st.warning("Usted no se ha logueado, será redirigido a la página de inicio")
+            st.warning("Usted no se ha logueado, será redirigido a la página de inicio.")
             #Redirigir a la pagina de inicio con contador visual de 5 segundos
             sleep(3)
             st.switch_page("pages\\login.py")
@@ -206,8 +206,10 @@ def sidebar():
         st.switch_page("pages\\cobranza.py")
     if st.sidebar.button("Inventario"):
         st.switch_page("pages\\inventario.py")
-    if st.sidebar.button("Negocio"):
-        st.switch_page("pages\\negocio.py")
+    if st.sidebar.button("Dashboard"):
+        st.switch_page("pages\\dashboard.py")
+    if st.sidebar.button("Reportes"):
+        st.switch_page("pages\\reportes.py")
 
     ms = st.session_state
     if "theme" not in ms: 
@@ -287,7 +289,7 @@ def validate_email_syntax(email):
         if re.match(pattern, email) is not None:
             return True
         else:
-            st.warning("Correo Electronico invalido")
+            st.warning("Formato de correo inválido.")
             return False
 
 def check_int(x):
@@ -298,7 +300,7 @@ def check_int(x):
             int(x)
             return True
         except:
-            st.warning("No es un número entero")
+            st.warning("No es un número entero.")
             return False
 
 def extract_digits_rut(x):
