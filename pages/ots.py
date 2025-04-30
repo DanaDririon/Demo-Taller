@@ -84,7 +84,8 @@ def main():
                 on_select='rerun',
                 selection_mode='single-row',
                 hide_index=True,
-                height=220)
+                height=220,
+                use_container_width=True)
         
         if len(data.selection['rows']):
             selected_row = data.selection['rows'][0]
