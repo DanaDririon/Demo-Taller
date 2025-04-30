@@ -29,7 +29,7 @@ def connection():
         return mydb
     except:
         mydb = mysql.connector.connect(
-            host = "192.168.1.148",
+            host = "100.72.37.8",
             user = "eladio",
             password = "taller123",
             database = "taller"

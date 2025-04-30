@@ -7,26 +7,16 @@ from control_taller import utils as ct
 import os
 
 
-def filtros_detalles(df, rut=None, cod_nubox=None, nombre=None, fecha=None, patente=None, estado=None, rut_name=None) -> pd.DataFrame:
+def filtros_detalles(df: pd.DataFrame, rut_name=None, patente=None, estado=None) -> pd.DataFrame:
     if rut_name != None:
-        #df = df[df['RUT Cliente']==rut]
         df = df[df['rut_name']==rut_name]
     if patente != None:
-        df = df[df['Patente']==patente]
-    if nombre != None:
-        df = df[df['Nombre Cliente']==nombre]
+        df = df[df['ots_v_patente']==patente]
     if estado != None:
         if estado=="Finalizadas":
-            df = df[df['Estado']=="Finalizada"]
+            df = df[df['estado_tipo_nombre']=="Finalizada"]
         else:
-            df = df[df['Estado']!="Finalizada"]
-    if fecha != None:
-        if len(fecha) == 2:
-            df = df[(pd.to_datetime(df['Fecha'])>=pd.to_datetime(fecha[0])) & (pd.to_datetime(df['Fecha'])<=pd.to_datetime(fecha[1]))]
-        elif len(fecha) == 1:
-            df = df[(pd.to_datetime(df['Fecha'])==pd.to_datetime(fecha[0]))]
-        else:
-            df = df
+            df = df[df['estado_tipo_nombre']!="Finalizada"]
     return df
 
 def main():
@@ -37,50 +27,120 @@ def main():
     st.markdown("<h1>"+"Órdenes de Trabajo"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
+    if 'selected_id_ot' not in st.session_state:
+        st.session_state['selected_id_ot'] = None
+
     col1, col2, col3, col4, col5, col6, col7 = st.columns((1,1,1,1,1.5,2,2))
     agregar = col1.button("Nueva OT ➕", type="primary")
     modificar = col2.button("Modificar OT 🖊️", type="primary")
-    
-    df_ots = pd.DataFrame({
-        "Id Orden": [11111, 22222, 33333, 44444, 55555, 66666, 77777],
-        "RUT Cliente": ["19.334.061-4","19.334.061-4","19.334.061-4","7.930.134-5","18.887.218-K","6.622.912-0","15.898.932-9"],
-        "Nombre Cliente": ["Eladio","Eladio","Eladio","Daniel","Felipe","José","María"],
-        "Patente": ["ABCD12","ABCD12","ABCD12","XYZW99","FGHJ55","PQRS88","LMNO44"],
-        "Marca": ["Hyundai","Hyundai","Hyundai","Toyota","BMW","Ford","Suzuki"],
-        "Modelo": ["Modelo1","Modelo1","Modelo1","Modelo2","Modelo3","Modelo4","Modelo5",],
-        #"Año"
-        #VIN
-        #Descripcion
-        #"Tipo Trabajo"
-        "Estado":["Finalizada", "Desarme", "Armado", "Para entrega", "Proc. de repuesto","En preparación","Facturada"],
-        "Fecha Ingreso":["03-MAR-2025", "05-ABR-2025", "05-ABR-2025", "20-MAR-2025", "28-MAR-2025","02-ABR-2025","23-ABR-2025"],
-        "Fecha Entrega":["20-MAR-2025","-","-","-","-","-","22-ABR-2025"]
-    },index=None).reset_index()
 
-    df_detalle = df_ots    
+    df_ots = ct.select_data(tabla="ots", where="deleted = 0", order="date_created DESC")
+
+    df_clientes = ct.select_data(tabla="clientes", columns='cliente_rut, cliente_nombre, cliente_correo, cliente_telefono, cliente_direccion', where="deleted = 0")
+    df_ots_clientes_1 = pd.merge(df_ots, df_clientes, how='left', left_on='ots_rut_cliente', right_on='cliente_rut')
+    df_ots_clientes_1 = df_ots_clientes_1.drop(columns=['cliente_rut'])
+    df_ots_clientes_1['rut_name'] = df_ots_clientes_1['ots_rut_cliente'] +' | '+df_ots_clientes_1['cliente_nombre']
+
+    df_log_ots = ct.select_data(tabla="log_ots", columns='log_ots_id, log_estado_ots_id, date_created, created_by', where="deleted = 0", order="date_created DESC")
+    df_nombres_estados_ots = ct.select_data(tabla="estado_tipo", columns='estado_tipo_id, estado_tipo_nombre', where="deleted = 0")
+
+    df_log_ots_2 = pd.merge(df_log_ots, df_nombres_estados_ots, how='left', left_on='log_estado_ots_id', right_on='estado_tipo_id')
+    df_log_ots_2 = df_log_ots_2.drop(columns=['log_estado_ots_id', 'estado_tipo_id'])
+    df_log_ots_3 = df_log_ots_2[['log_ots_id', 'estado_tipo_nombre', 'date_created', 'created_by']]
+
+    max_log_ots = df_log_ots_3.groupby('log_ots_id').agg({'date_created': 'max'}).reset_index()
+    max_log_ots = max_log_ots[['log_ots_id', 'date_created']]
+    df_max_log_ots = pd.merge(df_log_ots_3, max_log_ots, how='inner', left_on=['log_ots_id', 'date_created'], right_on=['log_ots_id', 'date_created'])
+    df_max_log_ots = df_max_log_ots.drop(columns=['date_created', 'created_by'])
+
+    df_ots_clientes_2= pd.merge(df_ots_clientes_1, df_max_log_ots, how='left', left_on='ots_id', right_on='log_ots_id')
+    df_ots_clientes_2 = df_ots_clientes_2.drop(columns=['log_ots_id'])
+
+    df_cat_ots = ct.select_data(tabla="categorias_ots", columns='cat_id, cat_nombre', where="deleted = 0")
+
+    df_ots_clientes_final = pd.merge(df_ots_clientes_2, df_cat_ots, how='left', left_on='ots_cat_id', right_on='cat_id')
+    df_ots_clientes_final = df_ots_clientes_final.drop(columns=['cat_id', 'ots_cat_id'])
+
+    df_ots_cabecera = df_ots_clientes_final[['ots_id', 
+                                        'rut_name',
+                                       'ots_rut_cliente', 
+                                       'cliente_nombre', 
+                                       'ots_v_patente', 
+                                       "ots_v_marca", 
+                                       "ots_v_modelo",
+                                        'cat_nombre',
+                                       'estado_tipo_nombre',
+                                       'date_created',
+                                       'created_by']]
+
+    df_ots_detalle = df_ots_clientes_final[['ots_id', 
+                                           'ots_rut_cliente', 
+                                           'cliente_nombre', 
+                                           'cliente_correo', 
+                                           'cliente_telefono', 
+                                           'cliente_direccion',
+                                           'ots_v_patente', 
+                                           'ots_v_marca',
+                                           'ots_v_modelo', 
+                                           'ots_v_año', 
+                                           'ots_v_vin', 
+                                           'ots_descripcion',
+                                           'cat_nombre',
+                                           'date_created', 
+                                           'estado_tipo_nombre',
+                                           'date_mod', 
+                                           'created_by', 
+                                           'mod_por']]
 
 
-    
     with st.container(height=320): # Cabecera OT
-        df_ots['rut_name'] = df_ots['RUT Cliente'] +' | '+df_ots['Nombre Cliente']
+        # df_ots['rut_name'] = df_ots['RUT Cliente'] +' | '+df_ots['Nombre Cliente']
         col1, col2 , col3 , col4= st.columns((1,0.5,0.5,1))
         #rut_filter = col1.selectbox("Buscar RUT", df_ots['RUT Cliente'].unique() , index=None, placeholder='RUT')
-        rut_filter = col1.selectbox("Buscar Cliente", df_ots['rut_name'].sort_values().unique() , index=None, placeholder='Cliente',label_visibility="collapsed")
-        if rut_filter:
+        rut_name_filter = col1.selectbox("Buscar Cliente", df_ots_cabecera['rut_name'].sort_values().unique() , index=None, placeholder='Cliente',label_visibility="collapsed")
+        if rut_name_filter is not None:
             #df_ots = filtros_detalles(df_ots, rut=rut_filter)
-            df_ots = filtros_detalles(df_ots, rut_name=rut_filter)
+            df_ots_cabecera = filtros_detalles(df_ots_cabecera, rut_name=rut_name_filter)
 
-        
-        patente_filter = col2.selectbox("Buscar Patente", df_ots['Patente'].unique() , index=None, placeholder='Patente',label_visibility="collapsed")
+        patente_filter = col2.selectbox("Buscar Patente", df_ots_cabecera['ots_v_patente'].unique() , index=None, placeholder='Patente',label_visibility="collapsed")
         if patente_filter:
-            df_ots = filtros_detalles(df_ots, patente=patente_filter)
+            df_ots_cabecera = filtros_detalles(df_ots_cabecera, patente=patente_filter)
 
         estado_filter = col3.selectbox("Buscar Estado", ("Abiertas","Finalizadas") , index=None, placeholder='Estado',label_visibility="collapsed")
         if estado_filter:
-            df_ots = filtros_detalles(df_ots, estado=estado_filter)
+            df_ots_cabecera = filtros_detalles(df_ots_cabecera, estado=estado_filter)
 
-        df_ots=df_ots[['Id Orden', 'RUT Cliente','Nombre Cliente', 'Patente', "Marca", "Estado"]]
-        data = st.dataframe(df_ots,
+        df_ots_cabecera = df_ots_cabecera.rename(columns={'ots_id':'ID OT',
+                                                        'ots_rut_cliente':'RUT Cliente',
+                                                        'cliente_nombre':'Nombre Cliente',
+                                                        'ots_v_patente':'Patente',
+                                                        'ots_v_marca':'Marca',
+                                                        'ots_v_modelo':'Modelo',
+                                                        'cat_nombre':'Tipo Reparación',
+                                                        'estado_tipo_nombre':'Estado OT',
+                                                        'date_created':'Fecha Creación',
+                                                        'created_by':'Creado Por'})
+
+        df_ots_detalle = df_ots_detalle.rename(columns={'ots_id':'ID OT',
+                                                        'ots_rut_cliente':'RUT Cliente',
+                                                        'cliente_nombre':'Nombre Cliente',
+                                                        'cliente_correo':'Correo Cliente',
+                                                        'cliente_telefono':'Teléfono Cliente',
+                                                        'cliente_direccion':'Dirección Cliente',
+                                                        'ots_v_patente':'Patente',
+                                                        'ots_v_marca':'Marca',
+                                                        'ots_v_modelo':'Modelo',
+                                                        'ots_v_año':'Año',
+                                                        'ots_v_vin':'VIN',
+                                                        'ots_descripcion':'Descripción',
+                                                        'cat_nombre':'Tipo Reparación',
+                                                        'estado_tipo_nombre':'Estado OT',
+                                                        'date_created':'Fecha Creación',
+                                                        'date_mod':'Fecha Modificación',
+                                                        'created_by':'Creado Por', 
+                                                        'mod_por':"Modificado Por"})
+
+        data = st.dataframe(df_ots_cabecera,
                 on_select='rerun',
                 selection_mode='single-row',
                 hide_index=True,
@@ -89,9 +149,12 @@ def main():
         
         if len(data.selection['rows']):
             selected_row = data.selection['rows'][0]
+            selected_id_ot = df_ots_cabecera.iloc[selected_row]['ID OT']
+            st.session_state['selected_id_ot'] = selected_id_ot
         else:
-             selected_row = None
-             st.session_state['selected_id_ot'] = None
+            selected_row = None
+            selected_id_ot = None
+            st.session_state['selected_id_ot'] = None
         
     
     with st.container(height=400):
@@ -110,38 +173,43 @@ def main():
                                                             "Registro Estados"])
         with tab1:
             if selected_row is not None:
-                detalle = df_detalle.iloc[[selected_row]]
+                detalle = df_ots_detalle.iloc[[selected_row]]
                 data = st.dataframe(detalle, hide_index=True)
+            else:
+                st.write("No hay OT seleccionada")
         with tab2:
-            if st.button(label="Agregar ➕", type="primary"):
-                st.switch_page("pages\\repuestos_agregar.py")
-            data = st.dataframe(df_ejemplo, hide_index=True, height=200)
-        with tab3:
-            if st.button(label="Agregar ➕",key="a1", type="primary"):
-                st.markdown("pog")
-            df_ejemplo
-        with tab4:
-            if st.button(label="Agregar 📷",key="a5", type="primary"):
-                st.markdown("pog")
-            col1, col2 = st.columns((1,1))
-            col1.image("src\\img\\auto (1).jpg")
-            col2.image("src\\img\\auto (2).jpg")
-            col1.image("src\\img\\auto (3).jpg")
-            col2.image("src\\img\\auto (4).jpg")
-            col1.image("src\\img\\auto (5).jpg")
-            col2.image("src\\img\\auto (6).jpg")
-        with tab5:
-            if st.button(label="Agregar ➕",key="a2", type="primary"):
-                st.markdown("pog")
-            df_ejemplo
-        with tab6:
-            if st.button(label="Agregar ➕",key="a3", type="primary"):
-                st.markdown("pog")
-            df_ejemplo
-        with tab7:
-            if st.button(label="Agregar ➕",key="a4", type="primary"):
-                st.markdown("pog")
-            df_ejemplo      
+            if selected_row is not None:
+                agregar_repuesto = st.button(label="Agregar ➕", type="primary")
+                data = st.dataframe(df_ejemplo, hide_index=True, height=200)
+            else:
+                st.write("No hay OT seleccionada")
+
+        # with tab3:
+        #     if st.button(label="Agregar ➕",key="a1", type="primary"):
+        #         st.markdown("pog")
+        #     df_ejemplo
+        # with tab4:
+        #     if st.button(label="Agregar 📷",key="a5", type="primary"):
+        #         st.markdown("pog")
+        #     col1, col2 = st.columns((1,1))
+        #     col1.image("src\\img\\auto (1).jpg")
+        #     col2.image("src\\img\\auto (2).jpg")
+        #     col1.image("src\\img\\auto (3).jpg")
+        #     col2.image("src\\img\\auto (4).jpg")
+        #     col1.image("src\\img\\auto (5).jpg")
+        #     col2.image("src\\img\\auto (6).jpg")
+        # with tab5:
+        #     if st.button(label="Agregar ➕",key="a2", type="primary"):
+        #         st.markdown("pog")
+        #     df_ejemplo
+        # with tab6:
+        #     if st.button(label="Agregar ➕",key="a3", type="primary"):
+        #         st.markdown("pog")
+        #     df_ejemplo
+        # with tab7:
+        #     if st.button(label="Agregar ➕",key="a4", type="primary"):
+        #         st.markdown("pog")
+        #     df_ejemplo      
         #st.write(st.session_state)
 
     #st.image("src\\img\\taller.png",use_container_width=True)
