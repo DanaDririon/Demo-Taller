@@ -39,7 +39,9 @@ def imagenes():
     pass
 
 def cotizaciones():
-    pass
+    df_cotizaciones_cab = ct.select_data(tabla="cotiz_cab",
+                                        columns='cotiz_id, cotiz_ots_id, cotiz_rut_cliente, cotiz_rut_facturacion',
+                                        where="deleted = 0")
 
 def cobranza():
     pass
@@ -158,6 +160,10 @@ def main():
                                            'cliente_correo', 
                                            'cliente_telefono', 
                                            'cliente_direccion',
+                                           'ots_rut_facturacion',
+                                           'ots_nombre_facturacion',
+                                           'ots_dir_facturacion',
+                                           'ots_telefono_facturacion',
                                            'ots_v_patente', 
                                            'ots_v_marca',
                                            'ots_v_modelo', 
@@ -208,6 +214,10 @@ def main():
                                                         'cliente_correo':'Correo Cliente',
                                                         'cliente_telefono':'Teléfono Cliente',
                                                         'cliente_direccion':'Dirección Cliente',
+                                                        'ots_rut_facturacion':'RUT Facturación',
+                                                        'ots_nombre_facturacion':'Nombre Facturación',
+                                                        'ots_dir_facturacion':'Dirección Facturación',
+                                                        'ots_telefono_facturacion':'Teléfono Facturación',
                                                         'ots_v_patente':'Patente',
                                                         'ots_v_marca':'Marca',
                                                         'ots_v_modelo':'Modelo',
@@ -256,7 +266,15 @@ def main():
             if selected_row is not None:
                 detalle = df_ots_detalle.iloc[[selected_row]]
                 #data = st.dataframe(detalle, hide_index=True, height=300)
-                cliente_info = detalle[['RUT Cliente','Nombre Cliente','Correo Cliente','Teléfono Cliente','Dirección Cliente']].transpose()
+                cliente_info = detalle[['RUT Cliente',
+                                        'Nombre Cliente',
+                                        'Correo Cliente',
+                                        'Teléfono Cliente',
+                                        'Dirección Cliente',
+                                        'RUT Facturación',
+                                        'Nombre Facturación',
+                                        'Dirección Facturación',
+                                        'Teléfono Facturación']].transpose()
                 vehiculo_info = detalle[['Patente','Marca','Modelo','Año','VIN']].transpose()
                 ot_info = detalle[['ID OT','Descripción','Tipo Reparación','Estado OT','Fecha Creación','Creado Por']].transpose()
                 
@@ -375,7 +393,9 @@ def main():
             col2.image("src\\img\\auto (6).jpg")
         with tab5:
             st.button(label="Vincular Cotizacion ➕",key="a3", type="primary")
-            df_ejemplo
+            
+
+
         with tab6:
             st.button(label="Añadir Pagos ➕",key="a4", type="primary")
         #     df_ejemplo
