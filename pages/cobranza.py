@@ -29,9 +29,6 @@ def main():
     
         st.dataframe(df_cobranza, hide_index=True)  
 
-    st.image("src\\img\\taller.png",use_container_width=True)
-
-
 if __name__ == "__main__":
 #    import importlib
 #    importlib.reload(cs)

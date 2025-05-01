@@ -340,9 +340,6 @@ def main():
             st.dataframe(df_log_filtered, hide_index=True, width=700)
         #st.write(st.session_state)
 
-    #st.image("src\\img\\taller.png",use_container_width=True)
-    #cent_co
-
 
 if __name__ == "__main__":
 #    import importlib

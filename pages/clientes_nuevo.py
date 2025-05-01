@@ -16,8 +16,6 @@ def main():
     st.markdown("<h1>"+"Nuevo Cliente"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
-    #set_png_as_page_bg('src\\img\\taller.png')
-
     col1, col2, col3, col99 = st.columns((3,1,2,0.3))
 
     if col1.button(label="⬅Volver"):

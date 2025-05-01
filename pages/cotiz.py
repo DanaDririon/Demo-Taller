@@ -26,7 +26,6 @@ def main():
 
     with st.container(height=500):
         st.dataframe(df_ejemplo, hide_index=True, height=200)
-    st.image("src\\img\\taller.png",use_container_width=True)
 
 
 if __name__ == "__main__":
