@@ -69,7 +69,7 @@ def main():
                         'cliente_telefono':st.column_config.Column("Teléfono"),
                         'cliente_direccion':st.column_config.Column("Dirección")},
                     on_select='rerun',
-                    selection_mode='single-row')
+                    selection_mode='single-row', use_container_width=True)
 
         if len(data.selection['rows']):
             selected_row = data.selection['rows'][0]
