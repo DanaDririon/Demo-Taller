@@ -40,8 +40,27 @@ def imagenes():
 
 def cotizaciones():
     df_cotizaciones_cab = ct.select_data(tabla="cotiz_cab",
-                                        columns='cotiz_id, cotiz_ots_id, cotiz_rut_cliente, cotiz_rut_facturacion',
+                                        columns='cotiz_id, cotiz_ots_id',
                                         where="deleted = 0")
+    df_cotizaciones_cab['cotiz_ots_id'] = df_cotizaciones_cab['cotiz_ots_id'].astype(int)
+    df_cotizaciones_det = ct.select_data(tabla="cotiz_det",
+                                        columns='cotiz_cab_id, cotiz_tipo_prod, cotiz_costo, cotiz_precio_venta',
+                                        where="deleted = 0")
+    df_cotizaciones_det['cotiz_tipo_prod'] = df_cotizaciones_det['cotiz_tipo_prod'].astype(int)
+    df_cotizaciones_det = df_cotizaciones_det.groupby(['cotiz_cab_id','cotiz_tipo_prod']).agg({'cotiz_costo':'sum',
+                                                                'cotiz_precio_venta':'sum',}).reset_index()
+    df_cotiz = pd.merge(df_cotizaciones_cab, df_cotizaciones_det, how='left', left_on='cotiz_id', right_on='cotiz_cab_id').drop(columns=['cotiz_cab_id'])
+    df_cotiz['margen'] = df_cotiz['cotiz_precio_venta'] - df_cotiz['cotiz_costo']
+    df_cotiz['porc_margen'] = round((df_cotiz['margen'] / df_cotiz['cotiz_precio_venta']) * 100,2)
+
+    df_tipo_prod = ct.select_data(tabla="tipo_prod",
+                                  columns='tipo_prod_id, tipo_prod_descripcion',
+                                  where="deleted = 0")
+    df_tipo_prod['tipo_prod_id'] = df_tipo_prod['tipo_prod_id'].astype(int)
+    df_cotiz = pd.merge(df_cotiz, df_tipo_prod, how='left', left_on='cotiz_tipo_prod', right_on='tipo_prod_id')
+    df_cotiz = df_cotiz.drop(columns=['cotiz_tipo_prod', 'tipo_prod_id'])
+
+    return df_cotiz
 
 def cobranza():
     pass
@@ -138,6 +157,7 @@ def main():
 
     df_repuestos = repuestos()
     df_serv_extras = servicios_extras()
+    df_cotizaciones = cotizaciones()
     df_sum_repuestos = df_repuestos.groupby(['repuesto_ots_id']).agg({'repuesto_precio_compra':'sum',
                                                                 'repuesto_precio_venta':'sum',}).reset_index()
 
@@ -392,7 +412,31 @@ def main():
             col1.image("src\\img\\auto (5).jpg")
             col2.image("src\\img\\auto (6).jpg")
         with tab5:
-            st.button(label="Vincular Cotizacion ➕",key="a3", type="primary")
+            st.button(label="Ir a Detalle",key="a3", type="primary")
+
+            df_cotizaciones_filtered = df_cotizaciones[df_cotizaciones['cotiz_ots_id'] == selected_id_ot]
+            df_cotizaciones_filtered = df_cotizaciones_filtered[['cotiz_id',
+                                                                'cotiz_ots_id',
+                                                        'tipo_prod_descripcion',
+                                                        'cotiz_costo',
+                                                        'cotiz_precio_venta',
+                                                        'margen',
+                                                        'porc_margen']]
+            df_cotizaciones_filtered = df_cotizaciones_filtered.rename(columns={'cotiz_id':'ID Cotización',
+                                        'cotiz_ots_id':'ID OT',
+                                        'tipo_prod_descripcion':'Tipo Producto',
+                                        'cotiz_costo':'Costo Unitario',
+                                        'cotiz_precio_venta':'Precio Venta Unit',
+                                        'margen':'Margen',
+                                        'porc_margen':'% Margen'})
+            
+            df_cotizaciones_filtered = df_cotizaciones_filtered.style.format({'Costo Unitario':'${:,.0f}',
+                                                                        'Precio Venta Unit':'${:,.0f}',
+                                                                        'Margen':'${:,.0f}',
+                                                                        '% Margen':'{:.2f}%'})
+
+            st.dataframe(df_cotizaciones_filtered, hide_index=True, width=1000, on_select='rerun', selection_mode='single-row')
+
             
 
 
