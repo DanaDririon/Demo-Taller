@@ -7,7 +7,16 @@ from control_taller import utils as ct
 import os
 
 def repuestos():
-    pass
+    df_repuestos = ct.select_data(tabla="repuestos", 
+                                  columns='repuesto_id, ' \
+                                    'repuesto_proveedor, ' \
+                                    'repuesto_item, ' \
+                                    'repuesto_cantidad, ' \
+                                    'repuesto_precio_compra,' \
+                                    'repuesto_precio_venta,' \
+                                    'repuesto_ots_id' , 
+                                    where="deleted = 0")
+    return df_repuestos
 
 def servicios_extras():
     pass
@@ -99,6 +108,8 @@ def main():
     max_log_ots = df_log_ots_3.groupby('log_ots_id').agg({'date_created': 'max'}).reset_index()
     max_log_ots = max_log_ots[['log_ots_id', 'date_created']]
     df_max_log_ots = pd.merge(df_log_ots_3, max_log_ots, how='inner', left_on=['log_ots_id', 'date_created'], right_on=['log_ots_id', 'date_created'])
+    # fill NA from estado_tipo_nombre
+    df_max_log_ots['estado_tipo_nombre'] = df_max_log_ots['estado_tipo_nombre'].fillna('En preparación')
     df_max_log_ots = df_max_log_ots.drop(columns=['date_created', 'created_by'])
 
     df_ots_clientes_2= pd.merge(df_ots_clientes_1, df_max_log_ots, how='left', left_on='ots_id', right_on='log_ots_id')
@@ -108,6 +119,11 @@ def main():
 
     df_ots_clientes_final = pd.merge(df_ots_clientes_2, df_cat_ots, how='left', left_on='ots_cat_id', right_on='cat_id')
     df_ots_clientes_final = df_ots_clientes_final.drop(columns=['cat_id', 'ots_cat_id'])
+
+    df_repuestos = repuestos()
+    df_sum_repuestos = df_repuestos.groupby(['repuesto_ots_id']).agg({'repuesto_precio_compra':'sum',
+                                                                'repuesto_precio_venta':'sum',}).reset_index()
+
 
     df_ots_cabecera = df_ots_clientes_final[['ots_id', 
                                         'rut_name',
@@ -252,10 +268,43 @@ def main():
         with tab2:
             if selected_row is not None:
                 agregar_repuesto = st.button(label="Agregar ➕", type="primary")
+                repuestos_filtered = df_repuestos[df_repuestos['repuesto_ots_id'] == selected_id_ot]
+                repuestos_filtered['margen'] = repuestos_filtered['repuesto_precio_venta'] - repuestos_filtered['repuesto_precio_compra']
+                repuestos_filtered['porc_margen'] = round((repuestos_filtered['margen'] / repuestos_filtered['repuesto_precio_venta']) * 100,2)
+                
+                df_sum_repuestos = pd.DataFrame(repuestos_filtered.rename(columns={'repuesto_precio_compra':'Total Compra',
+                                                                       'repuesto_precio_venta':'Total Venta'}))
+                sum_valores_repuestos = df_sum_repuestos.agg({'Total Compra':'sum',
+                                                           'Total Venta':'sum'} ).reset_index()
+                sum_valores_repuestos = sum_valores_repuestos.rename(columns={'index':'Datos', 0:'Valores'})
+                #set Datos as columns and Valores as values
+                sum_valores_repuestos = sum_valores_repuestos.set_index('Datos').T
+                sum_valores_repuestos['$ Margen'] = sum_valores_repuestos['Total Venta'] - sum_valores_repuestos['Total Compra']
+                sum_valores_repuestos['% Margen'] = round((sum_valores_repuestos['$ Margen'] / sum_valores_repuestos['Total Venta']) * 100,2)
+                #set format to currency
+                sum_valores_repuestos = sum_valores_repuestos.style.format({'Total Compra':'${:,.0f}',
+                                                                            'Total Venta':'${:,.0f}',
+                                                                            '$ Margen':'${:,.0f}',
+                                                                            '% Margen':'{:.2f}%'})
 
-                repuestos
+                repuestos_filtered = repuestos_filtered.drop(columns=['repuesto_ots_id'])
+                repuestos_filtered = repuestos_filtered.rename(columns={'repuesto_id':'ID Repuesto',
+                                                                        'repuesto_proveedor':'Proveedor',
+                                                                        'repuesto_item':'Item',
+                                                                        'repuesto_cantidad':'Cantidad',
+                                                                        'repuesto_precio_compra':'Precio Compra',
+                                                                        'repuesto_precio_venta':'Precio Venta',
+                                                                        'margen':'Margen',
+                                                                        'porc_margen':'% Margen'})
+                #set format to currency
+                repuestos_filtered = repuestos_filtered.style.format({'Precio Compra':'${:,.0f}',
+                                                                    'Precio Venta':'${:,.0f}',
+                                                                    'Margen':'${:,.0f}',
+                                                                    '% Margen':'{:.2f}%'})
 
-                data = st.dataframe(df_ejemplo, hide_index=True, height=300)
+                col1, col2 = st.columns((3,2))
+                col1.dataframe(repuestos_filtered, hide_index=True, use_container_width=True)
+                col2.dataframe(sum_valores_repuestos, hide_index=True, use_container_width=True)
             else:
                 st.write("No hay OT seleccionada")
 
@@ -281,10 +330,14 @@ def main():
         #     if st.button(label="Agregar ➕",key="a3", type="primary"):
         #         st.markdown("pog")
         #     df_ejemplo
-        # with tab7:
-        #     if st.button(label="Agregar ➕",key="a4", type="primary"):
-        #         st.markdown("pog")
-        #     df_ejemplo      
+        with tab7:
+            #filtrar por id
+            df_log_filtered = df_log_ots_3[df_log_ots_3['log_ots_id']==selected_id_ot]
+            df_log_filtered = df_log_filtered.rename(columns={'log_ots_id':'ID OT',
+                                                        'estado_tipo_nombre':'Estado OT',
+                                                        'date_created':'Fecha',
+                                                        'created_by':'Creado Por'})
+            st.dataframe(df_log_filtered, hide_index=True, width=700)
         #st.write(st.session_state)
 
     #st.image("src\\img\\taller.png",use_container_width=True)
