@@ -437,12 +437,9 @@ def main():
 
             st.dataframe(df_cotizaciones_filtered, hide_index=True, width=1000, on_select='rerun', selection_mode='single-row')
 
-            
-
-
         with tab6:
             st.button(label="Añadir Pagos ➕",key="a4", type="primary")
-        #     df_ejemplo
+
         with tab7:
             #filtrar por id
             df_log_filtered = df_log_ots_3[df_log_ots_3['log_ots_id']==selected_id_ot]
@@ -451,10 +448,10 @@ def main():
                                                         'date_created':'Fecha',
                                                         'created_by':'Creado Por'})
             st.dataframe(df_log_filtered, hide_index=True, width=700)
-        #st.write(st.session_state)
 
 
 if __name__ == "__main__":
+    
 #    import importlib
 #    importlib.reload(cs)
 

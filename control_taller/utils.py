@@ -81,6 +81,25 @@ def select_data(tabla: str, columns=None, where=None, group=None, order=None, li
     mycursor.execute(query)
     myresult = mycursor.fetchall()
     df = pd.DataFrame(myresult, columns=mycursor.column_names, index=None)
+
+    # Cambiar el tipo de dato de las columnas a su tipo original
+    df_types = get_data("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'taller' AND TABLE_NAME = '{}'".format(tabla))
+    df_types
+    for i in range(len(df_types)):
+        if df_types['COLUMN_NAME'][i] in df.columns:
+            if df_types['DATA_TYPE'][i] == 'int' or df_types['DATA_TYPE'][i] == 'bigint' or df_types['DATA_TYPE'][i] == 'smallint' or df_types['DATA_TYPE'][i] == 'tinyint':
+                df[df_types['COLUMN_NAME'][i]] = df[df_types['COLUMN_NAME'][i]].astype(int)
+            elif df_types['DATA_TYPE'][i] == 'float':
+                df[df_types['COLUMN_NAME'][i]] = df[df_types['COLUMN_NAME'][i]].astype(float)
+            elif df_types['DATA_TYPE'][i] == 'datetime' or df_types['DATA_TYPE'][i] == 'timestamp':
+                df[df_types['COLUMN_NAME'][i]] = pd.to_datetime(df[df_types['COLUMN_NAME'][i]])
+            elif df_types['DATA_TYPE'][i] == 'varchar' or df_types['DATA_TYPE'][i] == 'text' or df_types['DATA_TYPE'][i] == 'char':
+                df[df_types['COLUMN_NAME'][i]] = df[df_types['COLUMN_NAME'][i]].astype('object')
+            else:
+                pass
+        else:
+            pass
+
     return df
 
 def delete_data(table: str, user: str, str_id: str, id):
