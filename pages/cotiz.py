@@ -15,18 +15,34 @@ def main():
     st.markdown("<h1>"+"Cotizaciones"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
-    df_ejemplo = pd.DataFrame({
-        "Id": ["AAAAA", "BBBBB", "CCCCC", "DDDDD", "EEEEE", "FFFFF", "GGGGG"],
-        "Item": ["Pastillas","Amortiguadores","Uno","Fish","Cincuenta","Error","Botella"],
-        "Cantidad": [74,82,1,5,50,11,2],
-        "Precio Total": ["$1.555","222.444","$1","$666.666","$50","$321.123","$500"]
-    })
+    col1, col2, col3 = st.columns((1,1,7))
+    col1.button(label="Nueva Cotizacion ➕", type="primary")
+    col2.button(label="Modificar Cotizacion", type="primary",disabled=True)
+    col3.button(label="Finalizar Cotizacion", type="primary",disabled=True)
 
-    st.button(label="Nueva Cotizacion ➕", type="primary")
+    col11, col22 = st.columns((1,1))
 
-    with st.container(height=500):
-        st.dataframe(df_ejemplo, hide_index=True, height=200)
+    df_cotiz = ct.select_data('cotiz_cab')
 
+    df_detalles = ct.select_data('cotiz_det')
+
+    with col11.container(height=400):
+        st.markdown("Cotizaciones")
+        st.dataframe(df_cotiz,
+                    hide_index=True, 
+                    height=200,
+                    use_container_width=True,
+                    on_select='rerun',
+                    selection_mode='single-row')
+
+    with col22.container(height=400):
+        st.markdown("Resumen")
+    
+    with col11.container(height=350):
+        st.markdown("Detalles")
+    
+    with col22.container(height=350):
+        st.markdown("Datos Cliente")
 
 if __name__ == "__main__":
 #    import importlib

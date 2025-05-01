@@ -15,17 +15,15 @@ def main():
     st.markdown("<h1>"+"Inventario"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
-    df_ejemplo = pd.DataFrame({
-        "Id": ["AAAAA", "BBBBB", "CCCCC", "DDDDD", "EEEEE", "FFFFF", "GGGGG"],
-        "Item": ["Pastillas","Amortiguadores","Uno","Fish","Cincuenta","Error","Botella"],
-        "Cantidad": [74,82,1,5,50,11,2],
-        "Precio Total": ["$1.555","222.444","$1","$666.666","$50","$321.123","$500"]
-    })
+    df_inv = ct.select_data('inventario')
 
-    st.button(label="Agregar Item", key="new_item")
+    col1, col2, col3 = st.columns((1,1,8))
+
+    col1.button(label="Nuevo Producto", key="new_item",type="primary")
+    col2.button(label="Agregar Inventario", key="add",type="primary")
 
     with st.container(height=500):
-        st.dataframe(df_ejemplo, hide_index=True, height=200)
+        st.dataframe(df_inv, hide_index=True, height=200, use_container_width=True)
 
 
 if __name__ == "__main__":
