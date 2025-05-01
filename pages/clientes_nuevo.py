@@ -54,7 +54,7 @@ def main():
         resumen = pd.DataFrame({
             "Preview": ["RUT","Nombre","Correo","Teléfono","Dirección"],
             " ": [rut_clean,nombre,correo,tel_ini+telefono,direccion],
-        },index=None)
+        })
 
         st.dataframe(resumen,hide_index=True)
         if check_rut and check_nombre and check_correo and check_telefono and check_direccion:
@@ -67,8 +67,8 @@ def main():
                                 campo_contar='cliente_id',
                                 campos_check_duplicado=['cliente_rut'],
                                 valores_check_duplicado=[rut]):
-                    st.success("Registro Creado Exitosamente")
-                    sleep(1.5)
+                    st.success("Registro creado exitosamente.")
+                    sleep(1.2)
                     st.switch_page("pages\\clientes.py")
                 else:
                     st.error("Ya existe un registro con el RUT ingresado.")
