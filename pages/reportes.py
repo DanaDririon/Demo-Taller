@@ -16,8 +16,32 @@ def main():
     st.markdown("<h1>"+"Reportes"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
-    st.image("src\\img\\taller.png",use_container_width=True)
     #cent_co
+    col1, col2, col3, col4 = st.columns((1,1,1,1)) 
+
+    df_ventas = pd.DataFrame({
+        "Meses": ["Enero", "Febrero", "Marzo", "Abril","Mayo","Junio", "Julio"],
+        #"Ventas":["$9.685.415", "$8.754.361", "16.487.591", "13.548.794","$0","$0","$0"]
+        "Ventas":[9685415, 8754361, 16487591, 13548794,0,0,0]
+    })
+    col1.markdown("**Ventas Mensuales**")
+    col1.dataframe(df_ventas,hide_index=True, use_container_width=True)
+
+    df_proovedores = pd.DataFrame({
+        "Proovedor": ["Imperial", "3M", "Mobil", "Otros"],
+        #"Compras": ["$6.789.012", "$4.456.789", "$1.862.486", "$765.432"]
+        "Compras": [6789012, 4456789, 1862486, 765432]
+    })
+    col3.markdown("**Compras por proovedor mensuales**")
+    col3.dataframe(df_proovedores,hide_index=True,use_container_width=True)
+
+    df_ots =  pd.DataFrame({
+        "Mes": ["Enero","Enero","Febrero","Febrero","Marzo","Marzo","Abril","Abril","Mayo","Mayo","Junio","Junio"],
+        "Tipos de OTs": ["Mantención","Específica","Mantención","Específica","Mantención","Específica","Mantención","Específica","Mantención","Específica","Mantención","Específica"],
+        "# Órdenes de Trabajo": [23,12,19,7,38,22,33,15,25,15,21,9]
+        })
+    col1.markdown("**Órdenes de trabajo por tipo por mes**")
+    col1.dataframe(df_ots,hide_index=True,use_container_width=True)
 
 
 if __name__ == "__main__":

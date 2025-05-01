@@ -20,8 +20,6 @@ def main():
     st.markdown("<h1>"+"Modificar Cliente"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
-    #set_png_as_page_bg('src\\img\\taller.png')
-
     if 'rut_selected' not in st.session_state:
         st.session_state.rut_selected = '0'
 
@@ -47,9 +45,9 @@ def main():
             dig_ver = ct.digito_verificador(x)
             rut_clean = str(rut_clean)+'-'+str(dig_ver)
         rut_2.text_input(label="Digito Verificador",disabled=True,value=dig_ver)
-        nombre = st.text_input("Nombre cliente",value=df_clientes['cliente_nombre'][0].upper()).upper()
-        check_nombre = nombre.isupper()
-        correo = st.text_input("Correo Electronico",value=df_clientes['cliente_correo'][0].lower()).lower()
+        nombre = st.text_input("Nombre cliente",value=df_clientes['cliente_nombre'][0].upper()).upper()     # Puede que el upper/lower 
+        check_nombre = nombre.isupper()                                                                     # de afuera no sea necesario 
+        correo = st.text_input("Correo Electronico",value=df_clientes['cliente_correo'][0].lower()).lower() # pero no quiero probar xd - Dana
         check_correo = ct.validate_email_syntax(correo)
         telefono = st.text_input("Telefóno",max_chars=9,value=df_clientes['cliente_telefono'][0])
         tel_ini = "+56"
