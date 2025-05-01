@@ -31,8 +31,8 @@ def servicios_extras() -> pd.DataFrame:
                                     'serv_extra_precio_venta',
                                     where="deleted = 0")
 
-    df['total_compra'] = df['serv_extra_costo'].sum()
-    df['total_venta'] = df['serv_extra_precio_venta'].sum()
+    #df['total_compra'] = df['serv_extra_costo'].sum()
+    #df['total_venta'] = df['serv_extra_precio_venta'].sum()
     return df
 
 def imagenes():
@@ -62,8 +62,12 @@ def cotizaciones():
 
     return df_cotiz
 
-def cobranza():
-    pass
+def pagos():
+    df = ct.select_data(tabla="pagos",
+                        columns='pagos_id, pagos_ots_id, pagos_tipo_pago, pagos_monto, pagos_num_comprobante,pagos_fecha_pago,created_by,date_created',
+                        where="deleted = 0")
+    #df['pagos_ots_id'] = df['pagos_ots_id'].astype(int)
+    return df
 
 def registro_estados() -> pd.DataFrame:
     df_1 = pd.DataFrame({
@@ -158,6 +162,7 @@ def main():
     df_repuestos = repuestos()
     df_serv_extras = servicios_extras()
     df_cotizaciones = cotizaciones()
+    df_pagos = pagos()
     df_sum_repuestos = df_repuestos.groupby(['repuesto_ots_id']).agg({'repuesto_precio_compra':'sum',
                                                                 'repuesto_precio_venta':'sum',}).reset_index()
 
@@ -439,6 +444,15 @@ def main():
 
         with tab6:
             st.button(label="Añadir Pagos ➕",key="a4", type="primary")
+            df_pagos_filtered = df_pagos[df_pagos['pagos_ots_id'] == selected_id_ot]
+            df_pagos_filtered = df_pagos_filtered.drop(columns=['pagos_ots_id'])
+            df_pagos_filtered = df_pagos_filtered.rename(columns={'pagos_id':'ID Pago',
+                                                        'pagos_tipo_pago':'Tipo Pago',
+                                                        'pagos_monto':'Monto',
+                                                        'pagos_num_comprobante':'Num Comprobante',
+                                                        'pagos_fecha_pago':'Fecha Pago',
+                                                        'created_by':'Creado Por'})
+            st.dataframe(df_pagos_filtered, hide_index=True, width=1500)
 
         with tab7:
             #filtrar por id
