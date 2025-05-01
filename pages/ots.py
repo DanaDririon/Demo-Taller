@@ -6,6 +6,54 @@ from time import sleep
 from control_taller import utils as ct
 import os
 
+def repuestos():
+    pass
+
+def servicios_extras():
+    pass
+
+def imagenes():
+    pass
+
+def cotizaciones():
+    pass
+
+def cobranza():
+    pass
+
+def registro_estados() -> pd.DataFrame:
+    df_1 = pd.DataFrame({
+        "Id": ["AAAAA", "BBBBB", "CCCCC", "DDDDD", "EEEEE", "FFFFF", "GGGGG"],
+        "Item": ["Pastillas","Amortiguadores","Uno","Fish","Cincuenta","Error","Botella"],
+        "Cantidad": [74,82,1,5,50,11,2],
+        "Precio Total": ["$1.555","222.444","$1","$666.666","$50","$321.123","$500"]
+    })
+    df_2 = pd.DataFrame({
+        "Id": ["AAAAA", "BBBBB", "CCCCC", "DDDDD", "EEEEE", "FFFFF", "GGGGG"],
+        "Item": ["Pastillas","Amortiguadores","Uno","Fish","Cincuenta","Error","Botella"],
+        "Cantidad": [74,82,1,5,50,11,2],
+        "Precio Total": ["$1.555","222.444","$1","$666.666","$50","$321.123","$500"]
+    })
+
+    return df_1, df_2
+
+col1, col2 = registro_estados()
+
+
+def clientes(df: pd.DataFrame) -> pd.DataFrame:
+    df_clientes = ct.select_data(tabla="clientes", columns='cliente_rut, cliente_nombre, cliente_correo, cliente_telefono, cliente_direccion', where="deleted = 0")
+    df_ots_clientes_1 = pd.merge(df, df_clientes, how='left', left_on='ots_rut_cliente', right_on='cliente_rut')
+    df_ots_clientes_1 = df_ots_clientes_1.drop(columns=['cliente_rut'])
+    df_ots_clientes_1['rut_name'] = df_ots_clientes_1['ots_rut_cliente'] +' | '+df_ots_clientes_1['cliente_nombre']
+    return df_ots_clientes_1
+
+def vehiculos():
+    pass
+
+def ots() -> pd.DataFrame:
+    df_ots = ct.select_data(tabla="ots", where="deleted = 0", order="date_created DESC")
+    return df_ots
+
 
 def filtros_detalles(df: pd.DataFrame, rut_name=None, patente=None, estado=None) -> pd.DataFrame:
     if rut_name != None:
@@ -110,6 +158,8 @@ def main():
         if estado_filter:
             df_ots_cabecera = filtros_detalles(df_ots_cabecera, estado=estado_filter)
 
+        df_ots_cabecera = df_ots_cabecera.drop(columns=['rut_name'])
+
         df_ots_cabecera = df_ots_cabecera.rename(columns={'ots_id':'ID OT',
                                                         'ots_rut_cliente':'RUT Cliente',
                                                         'cliente_nombre':'Nombre Cliente',
@@ -157,7 +207,7 @@ def main():
             st.session_state['selected_id_ot'] = None
         
     
-    with st.container(height=400):
+    with st.container(height=600):
         df_ejemplo = pd.DataFrame({
         "Id": ["AAAAA", "BBBBB", "CCCCC", "DDDDD", "EEEEE", "FFFFF", "GGGGG"],
         "Item": ["Pastillas","Amortiguadores","Uno","Fish","Cincuenta","Error","Botella"],
@@ -174,13 +224,38 @@ def main():
         with tab1:
             if selected_row is not None:
                 detalle = df_ots_detalle.iloc[[selected_row]]
-                data = st.dataframe(detalle, hide_index=True)
+                #data = st.dataframe(detalle, hide_index=True, height=300)
+                cliente_info = detalle[['RUT Cliente','Nombre Cliente','Correo Cliente','Teléfono Cliente','Dirección Cliente']].transpose()
+                vehiculo_info = detalle[['Patente','Marca','Modelo','Año','VIN']].transpose()
+                ot_info = detalle[['ID OT','Descripción','Tipo Reparación','Estado OT','Fecha Creación','Creado Por']].transpose()
+                
+                cliente_info = cliente_info.rename(columns={selected_row:'Detalle'})
+                vehiculo_info = vehiculo_info.rename(columns={selected_row:'Detalle'})
+                ot_info = ot_info.rename(columns={selected_row:'Detalle'})
+
+                col1, col2, col3, col4= st.columns((1,1,1,1))
+                with col1:
+                    st.markdown("<h4>"+"Cliente"+"</h4>", unsafe_allow_html=True)
+                    st.dataframe(cliente_info, use_container_width=True)
+                with col2:
+                    st.markdown("<h4>"+"Vehículo"+"</h4>", unsafe_allow_html=True)
+                    st.dataframe(vehiculo_info, use_container_width=True)
+                with col3:
+                    st.markdown("<h4>"+"OT"+"</h4>", unsafe_allow_html=True)
+                    st.dataframe(ot_info, use_container_width=True)
+                with col4:
+                    st.markdown("<h4>"+"Info Venta"+"</h4>", unsafe_allow_html=True)
+                    st.dataframe(detalle[['Estado OT','Fecha Modificación','Modificado Por']].transpose(), use_container_width=True)
+                
             else:
                 st.write("No hay OT seleccionada")
         with tab2:
             if selected_row is not None:
                 agregar_repuesto = st.button(label="Agregar ➕", type="primary")
-                data = st.dataframe(df_ejemplo, hide_index=True, height=200)
+
+                repuestos
+
+                data = st.dataframe(df_ejemplo, hide_index=True, height=300)
             else:
                 st.write("No hay OT seleccionada")
 
