@@ -6,7 +6,7 @@ from time import sleep
 from control_taller import utils as ct
 import os
 
-def repuestos():
+def repuestos() -> pd.DataFrame:
     df_repuestos = ct.select_data(tabla="repuestos", 
                                   columns='repuesto_id, ' \
                                     'repuesto_proveedor, ' \
@@ -16,10 +16,24 @@ def repuestos():
                                     'repuesto_precio_venta,' \
                                     'repuesto_ots_id' , 
                                     where="deleted = 0")
+    df_repuestos['total_compra'] = df_repuestos['repuesto_precio_compra'] * df_repuestos['repuesto_cantidad']
+    df_repuestos['total_venta'] = df_repuestos['repuesto_precio_venta'] * df_repuestos['repuesto_cantidad']
     return df_repuestos
 
-def servicios_extras():
-    pass
+def servicios_extras() -> pd.DataFrame:
+
+    df = ct.select_data(tabla="serv_extra", 
+                                  columns='serv_extra_id,' \
+                                  'serv_ots_id, ' \
+                                    'serv_extra_desc, ' \
+                                    'serv_extra_proveedor, ' \
+                                    'serv_extra_costo,' \
+                                    'serv_extra_precio_venta',
+                                    where="deleted = 0")
+
+    df['total_compra'] = df['serv_extra_costo'].sum()
+    df['total_venta'] = df['serv_extra_precio_venta'].sum()
+    return df
 
 def imagenes():
     pass
@@ -121,6 +135,7 @@ def main():
     df_ots_clientes_final = df_ots_clientes_final.drop(columns=['cat_id', 'ots_cat_id'])
 
     df_repuestos = repuestos()
+    df_serv_extras = servicios_extras()
     df_sum_repuestos = df_repuestos.groupby(['repuesto_ots_id']).agg({'repuesto_precio_compra':'sum',
                                                                 'repuesto_precio_venta':'sum',}).reset_index()
 
@@ -269,11 +284,11 @@ def main():
             if selected_row is not None:
                 agregar_repuesto = st.button(label="Agregar ➕", type="primary")
                 repuestos_filtered = df_repuestos[df_repuestos['repuesto_ots_id'] == selected_id_ot]
-                repuestos_filtered['margen'] = repuestos_filtered['repuesto_precio_venta'] - repuestos_filtered['repuesto_precio_compra']
-                repuestos_filtered['porc_margen'] = round((repuestos_filtered['margen'] / repuestos_filtered['repuesto_precio_venta']) * 100,2)
+                repuestos_filtered['margen'] = repuestos_filtered['total_venta'] - repuestos_filtered['total_compra']
+                repuestos_filtered['porc_margen'] = round((repuestos_filtered['margen'] / repuestos_filtered['total_venta']) * 100,2)
                 
-                df_sum_repuestos = pd.DataFrame(repuestos_filtered.rename(columns={'repuesto_precio_compra':'Total Compra',
-                                                                       'repuesto_precio_venta':'Total Venta'}))
+                df_sum_repuestos = pd.DataFrame(repuestos_filtered.rename(columns={'total_compra':'Total Compra',
+                                                                       'total_venta':'Total Venta'}))
                 sum_valores_repuestos = df_sum_repuestos.agg({'Total Compra':'sum',
                                                            'Total Venta':'sum'} ).reset_index()
                 sum_valores_repuestos = sum_valores_repuestos.rename(columns={'index':'Datos', 0:'Valores'})
@@ -292,15 +307,19 @@ def main():
                                                                         'repuesto_proveedor':'Proveedor',
                                                                         'repuesto_item':'Item',
                                                                         'repuesto_cantidad':'Cantidad',
-                                                                        'repuesto_precio_compra':'Precio Compra',
-                                                                        'repuesto_precio_venta':'Precio Venta',
+                                                                        'repuesto_precio_compra':'Precio Compra Unit',
+                                                                        'repuesto_precio_venta':'Precio Venta Unit',
+                                                                        'total_compra':'Precio Total Compra',
+                                                                        'total_venta':'Precio Total Venta',
                                                                         'margen':'Margen',
                                                                         'porc_margen':'% Margen'})
                 #set format to currency
-                repuestos_filtered = repuestos_filtered.style.format({'Precio Compra':'${:,.0f}',
-                                                                    'Precio Venta':'${:,.0f}',
-                                                                    'Margen':'${:,.0f}',
-                                                                    '% Margen':'{:.2f}%'})
+                repuestos_filtered = repuestos_filtered.style.format({'Precio Compra Unit':'${:,.0f}',
+                                                                        'Precio Venta Unit':'${:,.0f}',
+                                                                        'Precio Total Compra':'${:,.0f}',
+                                                                        'Precio Total Venta':'${:,.0f}',
+                                                                        'Margen':'${:,.0f}',
+                                                                        '% Margen':'{:.2f}%'})
 
                 col1, col2 = st.columns((3,2))
                 col1.dataframe(repuestos_filtered, hide_index=True, use_container_width=True)
@@ -308,27 +327,57 @@ def main():
             else:
                 st.write("No hay OT seleccionada")
 
-        # with tab3:
-        #     if st.button(label="Agregar ➕",key="a1", type="primary"):
-        #         st.markdown("pog")
-        #     df_ejemplo
-        # with tab4:
-        #     if st.button(label="Agregar 📷",key="a5", type="primary"):
-        #         st.markdown("pog")
-        #     col1, col2 = st.columns((1,1))
-        #     col1.image("src\\img\\auto (1).jpg")
-        #     col2.image("src\\img\\auto (2).jpg")
-        #     col1.image("src\\img\\auto (3).jpg")
-        #     col2.image("src\\img\\auto (4).jpg")
-        #     col1.image("src\\img\\auto (5).jpg")
-        #     col2.image("src\\img\\auto (6).jpg")
-        # with tab5:
-        #     if st.button(label="Agregar ➕",key="a2", type="primary"):
-        #         st.markdown("pog")
-        #     df_ejemplo
-        # with tab6:
-        #     if st.button(label="Agregar ➕",key="a3", type="primary"):
-        #         st.markdown("pog")
+        with tab3:
+            st.button(label="Agregar Serv Extra ➕",key="serv_extra_button", type="primary")
+            serv_extras_filtered = df_serv_extras[df_serv_extras['serv_ots_id'] == selected_id_ot]
+            
+            serv_extras_filtered = serv_extras_filtered[serv_extras_filtered['serv_ots_id'] == selected_id_ot]
+            serv_extras_filtered['margen'] = serv_extras_filtered['serv_extra_precio_venta'] - serv_extras_filtered['serv_extra_costo']
+            serv_extras_filtered['porc_margen'] = round((serv_extras_filtered['margen'] / serv_extras_filtered['serv_extra_precio_venta']) * 100,2)
+            serv_extras_filtered = pd.DataFrame(serv_extras_filtered)
+            serv_extras_filtered = serv_extras_filtered.drop(columns=['serv_ots_id'])
+            serv_extras_filtered = serv_extras_filtered.rename(columns={'serv_extra_id':'ID Serv Extra',
+                                                                        'serv_extra_desc':'Descripción',
+                                                                        'serv_extra_proveedor':'Proveedor',
+                                                                        'serv_extra_costo':'Costo Unitario',
+                                                                        'serv_extra_precio_venta':'Precio Venta Unit',
+                                                                        'margen':'Margen',
+                                                                        'porc_margen':'% Margen'})
+
+
+            sum_valores_serv_extras = serv_extras_filtered.agg({'Costo Unitario':'sum',
+                                                           'Precio Venta Unit':'sum'} ).reset_index()
+            sum_valores_serv_extras = sum_valores_serv_extras.rename(columns={'index':'Datos', 0:'Valores'})
+            #set Datos as columns and Valores as values
+            sum_valores_serv_extras = sum_valores_serv_extras.set_index('Datos').T
+            sum_valores_serv_extras = sum_valores_serv_extras.rename(columns={'Costo Unitario':'Total Costo',
+                                                                          'Precio Venta Unit':'Total Venta'})
+            sum_valores_serv_extras['$ Margen'] = sum_valores_serv_extras['Total Venta'] - sum_valores_serv_extras['Total Costo']
+            sum_valores_serv_extras['% Margen'] = round((sum_valores_serv_extras['$ Margen'] / sum_valores_serv_extras['Total Venta']) * 100,2)
+            #set format to currency
+            sum_valores_serv_extras = sum_valores_serv_extras.style.format({'Total Costo':'${:,.0f}',
+                                                                        'Total Venta':'${:,.0f}',
+                                                                        '$ Margen':'${:,.0f}',
+                                                                        '% Margen':'{:.2f}%'})
+            
+            col1, col2 = st.columns((3,2))
+            col1.dataframe(serv_extras_filtered, hide_index=True, use_container_width=True)
+            col2.dataframe(sum_valores_serv_extras, hide_index=True, use_container_width=True)
+        with tab4:
+            st.button(label="Agregar 📷",key="a5", type="primary")
+
+            col1, col2 = st.columns((1,1))
+            col1.image("src\\img\\auto (1).jpg")
+            col2.image("src\\img\\auto (2).jpg")
+            col1.image("src\\img\\auto (3).jpg")
+            col2.image("src\\img\\auto (4).jpg")
+            col1.image("src\\img\\auto (5).jpg")
+            col2.image("src\\img\\auto (6).jpg")
+        with tab5:
+            st.button(label="Vincular Cotizacion ➕",key="a3", type="primary")
+            df_ejemplo
+        with tab6:
+            st.button(label="Añadir Pagos ➕",key="a4", type="primary")
         #     df_ejemplo
         with tab7:
             #filtrar por id
