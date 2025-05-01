@@ -83,7 +83,6 @@ def main():
     if col02.button("Modificar Cliente 🖊️", type="primary", disabled=st.session_state.button_disabled):
         st.switch_page("pages\\clientes_modificar.py")
 
-    st.image("src\\img\\taller.png",use_container_width=True)
 
 if __name__ == "__main__":
 #    import importlib
