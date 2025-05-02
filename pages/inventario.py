@@ -22,8 +22,8 @@ def main():
     col1.button(label="Nuevo Producto", key="new_item",type="primary")
     col2.button(label="Agregar Inventario", key="add",type="primary")
 
-    with st.container(height=500):
-        st.dataframe(df_inv, hide_index=True, height=200, use_container_width=True)
+    # with st.container(height=500):
+    st.dataframe(df_inv, hide_index=True, use_container_width=True)
 
 
 if __name__ == "__main__":
