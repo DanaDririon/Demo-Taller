@@ -9,11 +9,11 @@ import os
 
 def filtros_detalles(df, rut=None, cod_nubox=None, nombre=None, fecha=None) -> pd.DataFrame:
     if rut != None:
-        df = df[df['RUT']==rut]
+        df = df[df['cliente_rut']==rut]
     #if cod_nubox != None:
     #    df = df[df['Cod Nubox']==cod_nubox]
     if nombre != None:
-        df = df[df['Nombre']==nombre]
+        df = df[df['cliente_nombre']==nombre]
     if fecha != None:
         if len(fecha) == 2:
             df = df[(pd.to_datetime(df['Fecha'])>=pd.to_datetime(fecha[0])) & (pd.to_datetime(df['Fecha'])<=pd.to_datetime(fecha[1]))]

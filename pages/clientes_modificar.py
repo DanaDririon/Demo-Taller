@@ -30,8 +30,9 @@ def main():
         st.switch_page("pages\\clientes.py")
 
     clean_rut = extract_digits_rut(st.session_state.rut_selected)
-    
+
     df_clientes = ct.select_data("clientes", where="cliente_rut = '{}'".format(st.session_state.rut_selected))
+    df_clientes = df_clientes[df_clientes['cliente_rut'] == st.session_state.rut_selected]
 
 
     with col1.container(height=570):
@@ -58,16 +59,17 @@ def main():
         if check_rut and check_nombre and check_correo and check_telefono and check_direccion:
             modificar = st.button(label='Modificar',type="primary")
             if modificar:
-                if ct.update_data('clientes',
-                                campos_modificar = ['cliente_nombre','cliente_correo','cliente_telefono','cliente_direccion','mod_by'],
-                                valores_modificar = [nombre, correo, tel_ini+telefono, direccion, 'dana'],
-                                campos_id=['cliente_rut'],
-                                valores_id=[rut_clean]):
-                    st.success("Registro modificado exitosamente.")
-                    sleep(1.2)
-                    st.switch_page("pages\\clientes.py")
-                else:
-                    st.error("Ya existe un registro con el RUT ingresado.")
+                # if ct.update_data('clientes',
+                #                 campos_modificar = ['cliente_nombre','cliente_correo','cliente_telefono','cliente_direccion','mod_by'],
+                #                 valores_modificar = [nombre, correo, tel_ini+telefono, direccion, 'dana'],
+                #                 campos_id=['cliente_rut'],
+                #                 valores_id=[rut_clean]):
+                #     st.success("Registro modificado exitosamente.")
+                #     sleep(1.2)
+                #     st.switch_page("pages\\clientes.py")
+                # else:
+                #     st.error("Ya existe un registro con el RUT ingresado.")
+                st.switch_page("pages\\clientes.py")
         else:
             modificar = st.button(label='Modificar',type="primary", disabled=True)
 
