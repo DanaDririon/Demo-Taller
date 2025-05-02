@@ -266,9 +266,10 @@ def main():
         "Cantidad": [74,82,1,5,50,11,2],
         "Precio Total": ["$1.555","222.444","$1","$666.666","$50","$321.123","$500"]
         })
-        tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["Info General", 
+        tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["Info General", 
                                                             "Repuestos", 
-                                                            "Servicios Extras", 
+                                                            "Servicios Extras",
+                                                            "Mano de Obra", 
                                                             "Imágenes", 
                                                             "Cotizaciones", 
                                                             "Cobranza", 
@@ -398,6 +399,9 @@ def main():
             else:
                 st.write("No hay OT seleccionada")
         with tab4:
+            st.write("En proceso de desarrollo")
+
+        with tab5:
             if selected_row is not None:
                 st.button(label="Agregar 📷",key="a5", type="primary")
                 col1, col2 = st.columns((1,1))
@@ -409,7 +413,7 @@ def main():
                 col2.image("src\\img\\auto (6).jpg")
             else:
                 st.write("No hay OT seleccionada")
-        with tab5:
+        with tab6:
             if selected_row is not None:
                 st.button(label="Ir a Detalle",key="a3", type="primary")
                 df_cotizaciones = cotizaciones(selected_id_ot)
@@ -438,7 +442,7 @@ def main():
             else:
                 st.write("No hay OT seleccionada")
 
-        with tab6:
+        with tab7:
             if selected_row is not None:
                 df_pagos = pagos(selected_id_ot)
                 st.button(label="Añadir Pagos ➕",key="a4", type="primary")
@@ -452,7 +456,7 @@ def main():
                                                             'created_by':'Creado Por'})
                 st.dataframe(df_pagos_filtered, hide_index=True, width=1500)
 
-        with tab7:
+        with tab8:
             if selected_row is not None:
                 df_log_filtered = df_log_ots_3[df_log_ots_3['log_ots_id']==selected_id_ot]
                 df_log_filtered = df_log_filtered.rename(columns={'log_ots_id':'ID OT',
