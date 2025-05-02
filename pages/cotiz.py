@@ -7,7 +7,7 @@ from control_taller import utils as ct
 import os
 def cotizaciones():
     df_cotizaciones_cab = ct.select_data(tabla="cotiz_cab",
-                                        columns='cotiz_id, cotiz_ots_id',
+                                        columns='cotiz_id, cotiz_ots_id, cotiz_rut_cliente, cotiz_nombre_facturacion, date_created',
                                         where="deleted = 0")
     df_cotizaciones_cab['cotiz_ots_id'] = df_cotizaciones_cab['cotiz_ots_id'].astype(int)
     df_cotizaciones_det = ct.select_data(tabla="cotiz_det",
