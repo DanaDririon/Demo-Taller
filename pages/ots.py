@@ -105,7 +105,7 @@ def filtros_detalles(df: pd.DataFrame, rut_name=None, patente=None, estado=None)
 def main():
     
     #configuracion de pagina
-    st.set_page_config(layout="wide", page_title='Ordenes de Trabajo', page_icon="src\\img\\logo-servicena.png")
+    st.set_page_config(layout="wide", page_title='Órdenes de Trabajo', page_icon="src\\img\\logo-servicena.png")
     ct.increase_page()
     ct.hide_deploy_button()
     st.markdown("<h1>"+"Órdenes de Trabajo"+"</h1>", unsafe_allow_html=True)
@@ -114,9 +114,12 @@ def main():
     if 'selected_id_ot' not in st.session_state:
         st.session_state['selected_id_ot'] = None
 
-    col1, col2, col3, col4, col5, col6, col7 = st.columns((1,1,1,1,1.5,2,2))
-    agregar = col1.button("Nueva OT ➕", type="primary")
-    modificar = col2.button("Modificar OT 🖊️", type="primary")
+    if 'button_disabled' not in st.session_state:
+        st.session_state.button_disabled = True
+
+    col111, col222, col333, col444, col555, col666, col777 = st.columns((1,1,1,1,2,2,2))
+    if col111.button("Nueva OT ➕", type="primary"):
+        st.switch_page("pages\\ots_nueva.py")
 
     df_ots = ct.select_data(tabla="ots", where="deleted = 0", order="date_created DESC")
 
@@ -256,10 +259,15 @@ def main():
             selected_row = data.selection['rows'][0]
             selected_id_ot = df_ots_cabecera.iloc[selected_row]['ID OT']
             st.session_state['selected_id_ot'] = selected_id_ot
+            st.session_state.button_disabled = False
         else:
             selected_row = None
             selected_id_ot = None
             st.session_state['selected_id_ot'] = None
+            st.session_state.button_disabled = True
+
+    modificar = col222.button("Modificar OT 🖊️", type="primary", disabled=st.session_state.button_disabled)
+    descargar = col333.button("Descargar 📥", type="primary", disabled=st.session_state.button_disabled)
         
     
     with st.container(height=600):
@@ -275,7 +283,7 @@ def main():
                                                             "Mano de Obra", 
                                                             "Imágenes", 
                                                             "Cotizaciones", 
-                                                            "Cobranza", 
+                                                            "Pagos", 
                                                             "Registro Estados"])
         with tab1:
             if selected_row is not None:

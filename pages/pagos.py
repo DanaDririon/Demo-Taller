@@ -9,17 +9,17 @@ import os
 
 def main():
     #configuracion de pagina
-    st.set_page_config(layout="wide", page_title='Cobranza', page_icon="src\\img\\logo-servicena.png")
+    st.set_page_config(layout="wide", page_title='Pagos', page_icon="src\\img\\logo-servicena.png")
     ct.increase_page()
     ct.hide_deploy_button()
-    st.markdown("<h1>"+"Cobranza"+"</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>"+"Pagos"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
     
-    if st.button(label="Nueva Cobranza",key="nuevo_cobro"):
+    if st.button(label="Ingresar Pago",key="nuevo_cobro", type="primary"):
         st.markdown("pog")
     with st.container(height=400):
-        df_cobranza = pd.DataFrame({
+        df_pagos = pd.DataFrame({
             "Id": ["AAAAA", "BBBBB", "CCCCC", "DDDDD", "EEEEE", "FFFFF", "GGGGG"],
             "Item": ["Pastillas","Amortiguadores","Uno","Fish","Cincuenta","Error","Botella"],
             "Cantidad": [74,82,1,5,50,11,2],
@@ -27,7 +27,7 @@ def main():
         })
 
     
-        st.dataframe(df_cobranza, hide_index=True)  
+        st.dataframe(df_pagos, hide_index=True)  
 
 if __name__ == "__main__":
 #    import importlib

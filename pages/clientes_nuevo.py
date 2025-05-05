@@ -39,16 +39,13 @@ def main():
         check_correo = ct.validate_email_syntax(correo)
         telefono = st.text_input("Telefóno",max_chars=9,placeholder="Ingresar sólo los últimos 9 dígitos")
         check_telefono = ct.check_int(telefono)
-        telefono_clean = 0
-        if check_telefono:
-            telefono_clean = int(x)
         direccion = st.text_input("Dirección", placeholder="Ingresar dirección").upper()
         check_direccion = direccion.isupper()
     
     col3.markdown("<h4>"+"Preview"+"</h4>", unsafe_allow_html=True)
     with col3.container(height=570):
         tel_ini = ""
-        if telefono_clean: tel_ini = "+56"
+        if check_telefono: tel_ini = "+56"
         resumen = pd.DataFrame({
             "Preview": ["RUT","Nombre","Correo","Teléfono","Dirección"],
             " ": [rut_clean,nombre,correo,tel_ini+telefono,direccion],
@@ -60,7 +57,7 @@ def main():
             if agregar:
                 if ct.insert_data('clientes',
                                 campos_insertar = ['cliente_rut','cliente_nombre','cliente_correo','cliente_telefono','cliente_direccion','created_by','mod_by'],
-                                valores_insertar = [rut_clean, nombre, correo, telefono_clean, direccion, 'dana', 'dana'],
+                                valores_insertar = [rut_clean, nombre, correo, tel_ini+telefono, direccion, 'dana', 'dana'],
                                 check_duplicado=True,
                                 campo_contar='cliente_id',
                                 campos_check_duplicado=['cliente_rut'],

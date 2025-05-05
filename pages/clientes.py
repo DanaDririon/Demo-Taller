@@ -43,7 +43,7 @@ def main():
         st.switch_page("pages\\clientes_nuevo.py")
 
     with st.container(height=530):
-        df_clientes = ct.select_data("clientes")
+        df_clientes = ct.select_data(tabla="clientes", columns='cliente_rut, cliente_nombre, cliente_correo, cliente_telefono, cliente_direccion', where="deleted = 0")
     
         col1, col2, col3, col4 = st.columns((0.5,0.5,1,0.5))
 
