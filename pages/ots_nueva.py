@@ -22,14 +22,20 @@ def main():
 
     with col1.container(height=570):
         df_clientes = ct.select_data(tabla="clientes", columns='cliente_rut, cliente_nombre, cliente_correo, cliente_telefono, cliente_direccion', where="deleted = 0")
-        df_clientes_1 = df_clientes
-        df_clientes_1 = df_clientes_1.drop(columns=['cliente_rut'])        
-        df_clientes_1['rut_name'] = df_clientes_1['cliente_rut'] +' | '+df_clientes_1['cliente_nombre']
+        # df_clientes_1 = df_clientes
+        # df_clientes_1 = df_clientes_1.drop(columns=['cliente_rut'])        
+        # df_clientes_1['rut_name'] = df_clientes_1['cliente_rut'] +' | '+df_clientes_1['cliente_nombre']
 
-        cliente, rut_3, rut_2 = st.columns((9, 0.8, 1.8))
+        rut_1, rut_3, rut_2 = st.columns((9, 0.8, 1.8))
 
-        rut_nombre = cliente.selectbox("Cliente", df_clientes_1['rut_name'], placeholder="Buscar Cliente")
-        patente = st.text_input("Nombre cliente", placeholder="Ingresar Patente").upper()
+        rut_cliente = rut_1.selectbox("Cliente", df_clientes['cliente_rut'], placeholder="RUT Cliente", index=None)
+
+        fact_rut = st.text_input("RUT Facturación", placeholder="Ingrese RUT para la factura")
+        fact_nomb = st.text_input("Nombre Facturación", placeholder="Ingrese Nombre para la factura")
+        fact_dir = st.text_input("Dirección Facturación", placeholder="Ingrese Dirección para la factura")
+        fact_telf = st.text_input("Teléfono Facturación", placeholder="Ingrese Teféfono para la factura")
+
+        patente = st.text_input("Patente", placeholder="Ingresar Patente").upper()
         check_patente = patente.isupper()
         marca = st.text_input("Marca", placeholder="Marca")
         modelo = st.text_input("Modelo", placeholder="Modelo")
@@ -49,20 +55,20 @@ def main():
         if check_telefono: tel_ini = "+56"
         resumen = pd.DataFrame({
             "Preview": ["RUT Nombre","Patente","Correo","Teléfono","Dirección"],
-            " ": [rut_clean,nombre,correo,tel_ini+telefono,direccion],
+            " ": [rut_cliente,fact_nomb,fact_dir,tel_ini+telefono,direccion],
         })
 
         st.dataframe(resumen,hide_index=True)
-        if check_rut and check_nombre and check_correo and check_telefono and check_direccion:
+        if check_telefono and check_direccion:
             agregar = st.button(label='Agregar',type="primary")
             if agregar:
                 if ct.insert_data('clientes',
                                 campos_insertar = ['cliente_rut','cliente_nombre','cliente_correo','cliente_telefono','cliente_direccion','created_by','mod_by'],
-                                valores_insertar = [rut_clean, nombre, correo, tel_ini+telefono, direccion, 'dana', 'dana'],
+                                valores_insertar = [rut_cliente, fact_nomb, fact_dir, tel_ini+telefono, direccion, 'dana', 'dana'],
                                 check_duplicado=True,
                                 campo_contar='cliente_id',
                                 campos_check_duplicado=['cliente_rut'],
-                                valores_check_duplicado=[rut]):
+                                valores_check_duplicado=[rut_cliente]):
                     st.success("Registro creado exitosamente.")
                     sleep(1.2)
                     st.switch_page("pages\\clientes.py")

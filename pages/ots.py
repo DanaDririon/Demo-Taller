@@ -116,7 +116,8 @@ def main():
         st.session_state.button_disabled = True
 
     col111, col222, col333, col444, col555, col666, col777 = st.columns((1,1,1,1,2,2,2))
-    agregar = col111.button("Nueva OT ➕", type="primary")
+    if col111.button("Nueva OT ➕", type="primary"):
+        st.switch_page("pages\\ots_nueva.py")
 
     df_ots = ct.select_data(tabla="ots", where="deleted = 0", order="date_created DESC")
 
