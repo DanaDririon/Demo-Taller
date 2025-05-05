@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Presupuesto Automotriz</title>
+    <style>
+        @page {
+            margin-top: 2cm;
+            margin-bottom: 2cm;
+            margin-left: 1.2cm;
+            margin-right: 1.2cm;
+        }
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0px;
+            font-size: 14px;}
+        .encabezado, .datos, .tabla, .totales, .nota { 
+            margin-bottom: 20px; }
+        table { 
+            width: 100%;  
+            border-collapse: collapse; }
+        th, td { 
+            border: 1px solid #000; 
+            padding: 8px; text-align: left; }
+        h2 {
+             margin-top: 40px; }
+        .contenedor {
+            display: flex; /* Cambia a tu diseño deseado */
+            /*align-items: center;  Centra verticalmente */
+        }
+        .contenedor img {
+            width: 320px;  /* Cambia a tu tamaño deseado */
+            height: 120px;  /* Mantiene proporción */
+            margin-right: 15px; /* Espacio entre imagen y texto */
+        }
+        .contenedor .texto {
+            font-size: 14px;
+            line-height: 0.5; /* Cambia el valor de Interlineado según sea necesario */
+        }
+        .pago {
+            font-style: italic; /* cursiva */
+            font-weight: bold; /* negrita */
+        }
+        .debe {
+            font-weight: bold; /* negrita */
+            color: #FF0000; /* Rojo */
+        }
+        .azul-correo {
+            color: #0000FF; /* Azul */
+            text-decoration: underline; /* Subrayado */
+        }
+        .cliente-info {
+            font-weight: bold;
+            text-decoration: underline;
+            display: inline-block;
+            line-height: 0.5; /* Cambia el valor de Interlineado según sea necesario */
+        }
+        .cliente-config {
+            display: inline-block;
+            font-weight: bold;
+            line-height: 0.5; /* Cambia el valor de Interlineado según sea necesario */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Espacio para el logo -->
+    <div class="contenedor">
+        <img src="file:///C:\Users\EladioNB\OneDrive\Documents\GitHub\Demo-Taller\src\img\taller_sya.jpg" alt="Logo Automotriz S&A">
+        <div class="texto">
+            <div class="encabezado">
+                <p>Automotriz S&A SPA - R.U.T 77.179.354-1</p>
+                <p>Servicio Automotriz - Compra y venta de repuestos</p>
+                <div class='azul-correo'>contacto@automotrizsya.cl</div></p>
+                <p>Cel: +56 9 74943408 / +56 9 63065231</p>
+                <p>Dirección: Los Cerezos 6122, Peñalolén</p>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <!-- <p><div class="cliente-config">Nombre: </div><div class="cliente-info">{{ nombre_cliente }}</div></p> -->
+         <!-- double div in same row -->
+        <p><div class="cliente-config">Numero de {{ tipo_documento }} </div> <div class="cliente-info"> {{ num_documento }}</div></p>
+        <p><div class="cliente-config">Nombre: </div><div class="cliente-info">{{ nombre_cliente }}</div></p>
+        <p><div class="cliente-config">Fecha Ingreso: </div><div class="cliente-info">{{ fecha_ingreso }}</div>
+            <div class="cliente-config">Fecha Entrega: </div><div class="cliente-info">{{ fecha_entrega }}</div>
+        </p>
+        <p><div class="cliente-config">Vehículo: </div><div class="cliente-info">{{ marca }} {{ modelo }}</div></p>
+        <p><div class="cliente-config">Patente: </div><div class="cliente-info">{{ patente }}</div>
+            <div class="cliente-config">Kilometraje: </div><div class="cliente-info">{{ kilometraje }}</div>
+        </p>
+    </div>
+
+    <!-- <h2>Repuestos</h2> -->
+    <table>
+        <thead>
+            <tr>
+                <th>Repuesto</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for repuesto in repuestos %}
+            <tr>
+                <td>{{ repuesto.repuesto }}</td>
+                <td>{{ repuesto.cantidad }}</td>
+                <td>{{ repuesto.precio }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="2">Total Repuestos</td>
+                <td >{{ total_repuestos }}</td>
+        </tbody>
+    </table>
+    <p></p>
+    <!-- <h2>Mano de Obra</h2> -->
+    <table>
+        <thead>
+            <tr>
+                <th>Detalle Mano de Obra</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mo in mano_obra %}
+            <tr>
+                <td>{{ mo.detalle }}</td>
+                <td>{{ mo.precio }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td >Total Mano de Obra</td>
+                <td>{{ total_mano_obra }}</td>
+        </tbody>
+    </table>
+    <p></p>
+    <!-- <h2>Servicios Adicionales</h2> -->
+    <table>
+        <thead>
+            <tr>
+                <th>Detalle Servicios Adicionales</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sa in serv_adic %}
+            <tr>
+                <td>{{ sa.detalle }}</td>
+                <td>{{ sa.precio }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td >Total Servicios Adicionales</td>
+                <td>{{ total_serv_adicionales }}</td>
+        </tbody>
+    </table>
+
+    <p></p>
+
+    <div class="totales">
+        <table>
+            <tbody>
+                <tr>
+                    <td>Abono</td>
+                    <td>{{ abonado }}</td>
+                </tr>
+                <tr>
+                    <td>Precio Neto</td>
+                    <td>{{ precio_venta }}</td>
+                </tr>
+                <tr>
+                    <td>I.V.A.</td>
+                    <td>{{ precio_iva }}</td>
+                </tr>
+                <tr>
+                    <td>Total</td>
+                    <td>{{ precio_total }}</td>
+                </tr>
+                <tr class="debe">
+                    <td>Debe</td>
+                    <td>{{ precio_pagar }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="debe">
+        <p>Nota: {{ comentarios_adic }}</p>
+    </div>
+    <div class="pago">
+        <p>Formas de pago: Efectivo - Débito - Tarjetas de Crédito (se suma un 4% al total).</p>
+    </div>
+
+</body>
+</html>

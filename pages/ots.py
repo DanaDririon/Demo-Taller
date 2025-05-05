@@ -6,6 +6,8 @@ from time import sleep
 from control_taller import utils as ct
 import os
 
+def seleccionar():
+    pass
 
 def repuestos(id_ots) -> pd.DataFrame:
     df_repuestos = ct.select_data(tabla="repuestos", 
@@ -243,7 +245,8 @@ def main():
                                                         'mod_por':"Modificado Por"})
 
         data = st.dataframe(df_ots_cabecera,
-                on_select='rerun',
+                on_select=seleccionar,
+                #on_select='rerun',
                 selection_mode='single-row',
                 hide_index=True,
                 height=220,

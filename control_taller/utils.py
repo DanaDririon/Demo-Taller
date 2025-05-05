@@ -15,8 +15,10 @@ import numpy as np
 import janitor
 import re
 from itertools import cycle
-pd.options.mode.chained_assignment = None
+from jinja2 import Environment, FileSystemLoader
+from weasyprint import HTML
 
+pd.options.mode.chained_assignment = None
 
 def connection():
     try:
@@ -101,6 +103,7 @@ def select_data(tabla: str, columns=None, where=None, group=None, order=None, li
             pass
 
     return df
+
 
 def delete_data(table: str, user: str, str_id: str, id):
     mydb = connection()
@@ -321,3 +324,24 @@ def check_int(x):
         except:
             st.warning("No es un número entero.")
             return False
+        
+def generador_pdf(template: None | str, datos: None | dict) -> bytes:
+    """
+    Genera un PDF a partir de una plantilla HTML y datos proporcionados.
+
+    Args:
+        template (str): Nombre de la plantilla HTML.
+        datos (dict): Datos para renderizar la plantilla.
+
+    Returns:
+        None
+    """
+    # Cargar plantilla
+    env = Environment(loader=FileSystemLoader(['./templates']))
+    template = env.get_template(template)
+    # Renderizar HTML
+    html_rendered = template.render(**datos)
+    
+    # Generar PDF
+    pdf = HTML(string=html_rendered, base_url='.').write_pdf()
+    return pdf

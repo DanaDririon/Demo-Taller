@@ -1,22 +1,25 @@
 import streamlit as st
 import pandas as pd
+from control_taller import utils as ct
+from jinja2 import Environment, FileSystemLoader
+from weasyprint import HTML
 
-@st.cache(allow_output_mutation=True)
-def create():
-    d = {'id': ['a', 'b', 'c'], 'data': [3, 4,6]}
-    df = pd.DataFrame(data=d)
-    return df
-df = create()
-#create sidebar input
-with st.sidebar.form("my_form"):
-    a = st.slider('sidebar for testing', 5, 10, 9)
-    calculate = st.form_submit_button('Calculate') 
- 
-if calculate:
-    df['result'] = df['data'] + a 
-    st.write(df)
+# Datos de ejemplo
+datos_ot_cotiz = {
+    'tipo_documento': 'valor_tipo_documento',
+    'responsable': 'Juan Pérez',
+    'descripcion': 'Mantenimiento general de equipos',
+    'tareas': [
+        {'actividad': 'Revisión de motor', 'tiempo': '2 horas'},
+        {'actividad': 'Cambio de aceite', 'tiempo': '30 minutos'}
+    ]
+}
 
-filter = st.selectbox('filter data', df['id'].unique())
-st.write(df[df['id'] == filter])
-# Displaying the result consistently to be sure
-st.table(df)
+# Cargar plantilla
+env = Environment(loader=FileSystemLoader(['/templates/']))
+template = env.get_template('template_cotizacion_ot.html')
+html_rendered = template.render(**datos_ot_cotiz)
+html_rendered = template.render()
+
+# Generar PDF
+HTML(string=html_rendered, base_url='.').write_pdf('C:\\Users\\EladioNB\\OneDrive\\Documents\\GitHub\\Demo-Taller\\template_cotizacion_2.pdf')
