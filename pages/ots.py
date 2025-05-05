@@ -272,7 +272,7 @@ def main():
                                                             "Mano de Obra", 
                                                             "Imágenes", 
                                                             "Cotizaciones", 
-                                                            "Cobranza", 
+                                                            "Pagos", 
                                                             "Registro Estados"])
         with tab1:
             if selected_row is not None:

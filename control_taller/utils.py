@@ -221,8 +221,8 @@ def sidebar():
         #st.switch_page("pages\\home.py")
     if st.sidebar.button("Clientes"):
         st.switch_page("pages\\clientes.py")
-    if st.sidebar.button("Cobranza"):
-        st.switch_page("pages\\cobranza.py")
+    if st.sidebar.button("Pagos"):
+        st.switch_page("pages\\pagos.py")
     if st.sidebar.button("Inventario"):
         st.switch_page("pages\\inventario.py")
     if st.sidebar.button("Dashboard"):
