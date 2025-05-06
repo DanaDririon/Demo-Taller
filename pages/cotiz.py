@@ -59,7 +59,8 @@ def main():
     ct.sidebar()
 
     col1_a, col2_a, col3_a = st.columns((1,1,7))
-    col1_a.button(label="Nueva Cotizacion ➕", type="primary")
+    if col1_a.button(label="Nueva Cotización ➕", type="primary"):
+        st.switch_page("pages\\cotiz_nueva.py")
 
 
     #df_cotizaciones
