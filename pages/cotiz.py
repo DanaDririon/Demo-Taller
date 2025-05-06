@@ -58,7 +58,7 @@ def main():
     st.markdown("<h1>"+"Cotizaciones"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
-    col1_a, col2_a, col3_a, col4_a, col5_a = st.columns((1,1,1,1,7))
+    col1_a, col2_a, col3_a, col4_a, col5_a, col6_a = st.columns((1,1,1,1,1,4))
     nueva_cotiz = col1_a.button(label="Nueva Cotizacion ➕", type="primary")
     if nueva_cotiz:
         st.switch_page("pages//cotiz_nueva.py")
@@ -80,12 +80,14 @@ def main():
         selected_id_cotiz = df_cotizaciones.iloc[selected_row]['ID Cotizacion']
         st.session_state['selected_id_ctoiz'] = selected_id_cotiz
         modificar_cotiz = col2_a.button(label="Modificar Cotizacion", type="primary",disabled=False)
-        generar_ot = col3_a.button(label="Generar OT", type="primary",disabled=False)
-        generar_pdf = col4_a.button(label="Generar PDF", type="primary",disabled=False)
+        add_items = col3_a.button(label="Añadir Items ➕", type="primary",disabled=False)
+        generar_ot = col4_a.button(label="Generar OT", type="primary",disabled=False)
+        generar_pdf = col5_a.button(label="Generar PDF", type="primary",disabled=False)
     else:
         col2_a.button(label="Modificar Cotizacion", type="primary",disabled=True)
-        col3_a.button(label="Generar OT", type="primary",disabled=True)
-        col4_a.button(label="Generar PDF", type="primary",disabled=True)
+        col3_a.button(label="Añadir Items ➕", type="primary",disabled=True)
+        col4_a.button(label="Generar OT", type="primary",disabled=True)
+        col5_a.button(label="Generar PDF", type="primary",disabled=True)
         selected_row = None
         selected_id_cotiz = None
         st.session_state['selected_id_ctoiz'] = None
@@ -110,6 +112,10 @@ def main():
 
     if generar_pdf:
         pass
+
+    if add_items:
+        st.session_state['selected_id_cotiz'] = selected_id_cotiz
+        st.switch_page("pages//cotiz_items.py")
         
 
 
