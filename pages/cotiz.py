@@ -7,18 +7,23 @@ from control_taller import utils as ct
 import os
 def cotizaciones_cabecera():
     df_cotizaciones_cab = ct.select_data(tabla="cotiz_cab",
-                                        columns='cotiz_id, cotiz_ots_id, cotiz_rut_cliente, cotiz_nombre_facturacion, date_created',
+                                        columns='cotiz_id, cotiz_ots_id, cotiz_rut_cliente, cotiz_nombre_facturacion, cotiz_patente, cotiz_marca, cotiz_modelo, cotiz_year, date_created',
                                         where="deleted = 0")
     df_cotizaciones_cab['cotiz_ots_id'] = df_cotizaciones_cab['cotiz_ots_id'].astype(int)
+    df_cotizaciones_cab = df_cotizaciones_cab.fillna('')
     df_cotizaciones_det = ct.select_data(tabla="cotiz_det",
                                         columns='cotiz_cab_id, cotiz_costo, cotiz_precio_venta',
                                         where="deleted = 0")
+    
     df_cotiz = pd.merge(df_cotizaciones_cab, df_cotizaciones_det, how='left', left_on='cotiz_id', right_on='cotiz_cab_id').drop(columns=['cotiz_cab_id'])
-    df_cotiz = df_cotiz.groupby(['cotiz_id', 'cotiz_ots_id', 'cotiz_rut_cliente', 'cotiz_nombre_facturacion', 'date_created'], as_index=False).agg({'cotiz_costo': 'sum', 'cotiz_precio_venta': 'sum'})
+    df_cotiz = df_cotiz.groupby(['cotiz_id', 'cotiz_ots_id', 'cotiz_rut_cliente', 'cotiz_nombre_facturacion','cotiz_patente', 'cotiz_marca','cotiz_modelo','cotiz_year', 'date_created'], as_index=False).agg({'cotiz_costo': 'sum', 'cotiz_precio_venta': 'sum'})
+    
     df_cotiz['margen'] = df_cotiz['cotiz_precio_venta'] - df_cotiz['cotiz_costo']
     df_cotiz['porc_margen'] = round((df_cotiz['margen'] / df_cotiz['cotiz_precio_venta']) * 100,2)
     df_cotiz = df_cotiz.rename(columns={'cotiz_id': 'ID Cotizacion', 'cotiz_ots_id': 'OT Asociada', 'cotiz_rut_cliente': 'Rut Cliente',
-                                        'cotiz_nombre_facturacion': 'Nombre Facturacion', 'date_created': 'Fecha Creacion',
+                                        'cotiz_nombre_facturacion': 'Nombre Facturacion', 'cotiz_patente': 'Patente',
+                                         'cotiz_marca': 'Marca', 'cotiz_modelo': 'Modelo', 'cotiz_year': 'Año',
+                                          'date_created': 'Fecha Creacion',
                                         'cotiz_costo': 'Costo', 'cotiz_precio_venta': 'Precio Venta', 'margen': 'Margen',
                                         'porc_margen': '% Margen'})
     df_cotiz = df_cotiz.sort_values(by=['Fecha Creacion'], ascending=False)
@@ -82,12 +87,11 @@ def main():
         modificar_cotiz = col2_a.button(label="Modificar Cotizacion", type="primary",disabled=False)
         add_items = col3_a.button(label="Añadir Items ➕", type="primary",disabled=False)
         generar_ot = col4_a.button(label="Generar OT", type="primary",disabled=False)
-        generar_pdf = col5_a.button(label="Generar PDF", type="primary",disabled=False)
     else:
         col2_a.button(label="Modificar Cotizacion", type="primary",disabled=True)
         col3_a.button(label="Añadir Items ➕", type="primary",disabled=True)
         col4_a.button(label="Generar OT", type="primary",disabled=True)
-        col5_a.button(label="Generar PDF", type="primary",disabled=True)
+        col5_a.button(label="Descargar PDF", type="primary",disabled=True)
         selected_row = None
         selected_id_cotiz = None
         st.session_state['selected_id_ctoiz'] = None
@@ -105,17 +109,67 @@ def main():
                                     'Margen': '${:,.0f}'.format,
                                     '% Margen': '{:,.2f}%'.format})
             col1, col2 = st.columns((3,1.5))
+
             col1.dataframe(df_cotizaciones_det_styler, hide_index=True, use_container_width=True)
             col2.dataframe(df_cotiz_det_resumen_styler, hide_index=True, use_container_width=True)
+
+            datos = {
+                'tipo_documento': 'Cotizacion',
+                'num_documento' : selected_id_cotiz,
+                'nombre_cliente': df_cotizaciones.iloc[selected_row]['Nombre Facturacion'],
+                'fecha_ingreso': pd.to_datetime(df_cotizaciones.iloc[selected_row]['Fecha Creacion']).strftime('%d-%m-%Y'),
+                'fecha_entrega' : '',
+                'marca': df_cotizaciones.iloc[selected_row]['Marca'],
+                'modelo': df_cotizaciones.iloc[selected_row]['Modelo'],
+                'year': df_cotizaciones.iloc[selected_row]['Año'],
+                'patente': df_cotizaciones.iloc[selected_row]['Patente'],
+                'kilometraje' : '',
+                'repuestos' : df_cotizaciones_det[df_cotizaciones_det['Tipo Producto'] == 'REPUESTO'][['Item','Cantidad','Precio Venta']]\
+                                .rename(columns={'Item': 'item', 'Cantidad': 'cantidad', 'Precio Venta': 'precio'})\
+                                .assign(precio = lambda x: x['precio'].apply(lambda y: '${:,.0f}'.format(y)).replace(',','.'))\
+                                .to_dict(orient='records'),
+                'mano_obra' : df_cotizaciones_det[df_cotizaciones_det['Tipo Producto'] == 'MANO DE OBRA'][['Item','Precio Venta']]\
+                                .rename(columns={'Item': 'detalle', 'Precio Venta': 'precio'})\
+                                .assign(precio = lambda x: x['precio'].apply(lambda y: '${:,.0f}'.format(y)).replace(',','.'))\
+                                .to_dict(orient='records'),
+                'serv_adic' : df_cotizaciones_det[df_cotizaciones_det['Tipo Producto'] == 'SERVICIOS EXTRAS'][['Item','Precio Venta']]\
+                                .rename(columns={'Item': 'detalle', 'Precio Venta': 'precio'})\
+                                .assign(precio = lambda x: x['precio'].apply(lambda y: '${:,.0f}'.format(y)).replace(',','.'))\
+                                .to_dict(orient='records'),
+
+                'abonado': '${:,.0f}'.format(0),
+                'precio_venta': '${:,.0f}'.format(\
+                                    df_cotizaciones.iloc[selected_row]['Precio Venta'].sum()).replace(',','.'),
+                'precio_iva': "${:,.0f}".format(\
+                                    round(df_cotizaciones.iloc[selected_row]['Precio Venta'].sum() * 1.19 - df_cotizaciones.iloc[selected_row]['Precio Venta'].sum(),0))\
+                                    .replace(',','.'),
+                'precio_total': "${:,.0f}".format(\
+                                    df_cotizaciones.iloc[selected_row]['Precio Venta'].sum() + round(df_cotizaciones.iloc[selected_row]['Precio Venta'].sum() * 1.19 - df_cotizaciones.iloc[selected_row]['Precio Venta'].sum(),0))\
+                                    .replace(',','.'),
+                'precio_pagar': "${:,.0f}".format(\
+                                    df_cotizaciones.iloc[selected_row]['Precio Venta'].sum() + round(df_cotizaciones.iloc[selected_row]['Precio Venta'].sum() * 1.19 - df_cotizaciones.iloc[selected_row]['Precio Venta'].sum(),0))\
+                                    .replace(',','.'),
+                'comentarios_adic' : ''
+            }      
+
+
+            col5_a.download_button(label="Descargar PDF", 
+                    data=ct.generador_pdf(template="template_cotizacion_ot.html", datos=datos), 
+                    file_name="cotizacion_{}.pdf".format(str(selected_id_cotiz)), 
+                    mime="application/pdf", 
+                    disabled=False,
+                    type="primary")
+            if add_items:
+                st.session_state['selected_id_cotiz'] = selected_id_cotiz
+                st.switch_page("pages//cotiz_items.py")
         else:
             st.write("Seleccione una cotizacion para ver los detalles")
 
-    if generar_pdf:
-        pass
+            datos = {}
 
-    if add_items:
-        st.session_state['selected_id_cotiz'] = selected_id_cotiz
-        st.switch_page("pages//cotiz_items.py")
+
+
+
         
 
 

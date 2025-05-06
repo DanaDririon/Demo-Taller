@@ -86,7 +86,7 @@
         <p><div class="cliente-config">Fecha Ingreso: </div><div class="cliente-info">{{ fecha_ingreso }}</div>
             <div class="cliente-config">Fecha Entrega: </div><div class="cliente-info">{{ fecha_entrega }}</div>
         </p>
-        <p><div class="cliente-config">Vehículo: </div><div class="cliente-info">{{ marca }} {{ modelo }}</div></p>
+        <p><div class="cliente-config">Vehículo: </div><div class="cliente-info">{{ marca }} {{ modelo }} {{ year }}</div></p>
         <p><div class="cliente-config">Patente: </div><div class="cliente-info">{{ patente }}</div>
             <div class="cliente-config">Kilometraje: </div><div class="cliente-info">{{ kilometraje }}</div>
         </p>
@@ -104,7 +104,7 @@
         <tbody>
             {% for repuesto in repuestos %}
             <tr>
-                <td>{{ repuesto.repuesto }}</td>
+                <td>{{ repuesto.item }}</td>
                 <td>{{ repuesto.cantidad }}</td>
                 <td>{{ repuesto.precio }}</td>
             </tr>
