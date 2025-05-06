@@ -44,9 +44,9 @@ def imagenes():
 def cotizaciones(id_ots):
     df_cotizaciones_cab = ct.select_data(tabla="cotiz_cab",
                                         columns='cotiz_id, cotiz_ots_id',
-                                        where="deleted = 0 and cotiz_ots_id = {}".format(id_ots))
+                                        where="deleted = 0 and cotiz_ots_id = {}".format(id_ots)).reset_index()
     df_cotizaciones_cab['cotiz_ots_id'] = df_cotizaciones_cab['cotiz_ots_id'].astype(int)
-    id_cabecera = df_cotizaciones_cab['cotiz_id'].values[0]
+    id_cabecera = df_cotizaciones_cab['cotiz_id'][0]
     df_cotizaciones_det = ct.select_data(tabla="cotiz_det",
                                         columns='cotiz_cab_id, cotiz_tipo_prod, cotiz_costo, cotiz_precio_venta',
                                         where="deleted = 0 and cotiz_cab_id = {}".format(id_cabecera))

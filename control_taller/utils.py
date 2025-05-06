@@ -325,7 +325,7 @@ def check_int(x):
             st.warning("No es un número entero.")
             return False
         
-def generador_pdf(template: None | str, datos: None | dict) -> bytes:
+def generador_pdf(template: str, datos: dict) -> bytes:
     """
     Genera un PDF a partir de una plantilla HTML y datos proporcionados.
 

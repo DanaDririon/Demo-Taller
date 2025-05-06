@@ -77,8 +77,8 @@ def main():
         selected_row = data.selection['rows'][0]
         selected_id_cotiz = df_cotizaciones.iloc[selected_row]['ID Cotizacion']
         st.session_state['selected_id_ctoiz'] = selected_id_cotiz
-        col2_a.button(label="Modificar Cotizacion", type="primary",disabled=False)
-        col3_a.button(label="Generar OT", type="primary",disabled=False)
+        modificar_cotiz = col2_a.button(label="Modificar Cotizacion", type="primary",disabled=False)
+        generar_cotiz = col3_a.button(label="Generar OT", type="primary",disabled=False)
     else:
         col2_a.button(label="Modificar Cotizacion", type="primary",disabled=True)
         col3_a.button(label="Generar OT", type="primary",disabled=True)
@@ -104,6 +104,9 @@ def main():
         else:
             st.write("Seleccione una cotizacion para ver los detalles")
 
+    if generar_cotiz:
+        pass
+        
 
 
 if __name__ == "__main__":

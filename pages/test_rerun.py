@@ -1,25 +1,26 @@
 import streamlit as st
-import pandas as pd
 from control_taller import utils as ct
 from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML
 
-# Datos de ejemplo
-datos_ot_cotiz = {
-    'tipo_documento': 'valor_tipo_documento',
-    'responsable': 'Juan Pérez',
-    'descripcion': 'Mantenimiento general de equipos',
-    'tareas': [
-        {'actividad': 'Revisión de motor', 'tiempo': '2 horas'},
-        {'actividad': 'Cambio de aceite', 'tiempo': '30 minutos'}
-    ]
-}
+def generador_pdf(template: None | str, datos: None | dict) -> bytes:
+    """
+    Genera un PDF a partir de una plantilla HTML y datos proporcionados.
 
-# Cargar plantilla
-env = Environment(loader=FileSystemLoader(['/templates/']))
-template = env.get_template('template_cotizacion_ot.html')
-html_rendered = template.render(**datos_ot_cotiz)
-html_rendered = template.render()
+    Args:
+        template (str): Nombre de la plantilla HTML.
+        datos (dict): Datos para renderizar la plantilla.
 
-# Generar PDF
-HTML(string=html_rendered, base_url='.').write_pdf('C:\\Users\\EladioNB\\OneDrive\\Documents\\GitHub\\Demo-Taller\\template_cotizacion_2.pdf')
+    Returns:
+        None
+    """
+    # Cargar plantilla
+    env = Environment(loader=FileSystemLoader(['./templates']))
+    template = env.get_template(template)
+    # Renderizar HTML
+    html_rendered = template.render(**datos)
+    
+    # Generar PDF
+    pdf = HTML(string=html_rendered, base_url='.').write_pdf()
+    return pdf
+
