@@ -22,14 +22,21 @@ def main():
 
     col1, col2, col3, col99 = st.columns((1,1,2,0.3))
 
+    # Este valor viene de la cotizacion. Si es que se recarga la página, no tira error 
+    if 'selected_id_cotiz' not in st.session_state:
+        st.session_state.selected_id_cotiz = 0
+
     # Tabla temporal de nuevos items
     if 'tabla_nuevos' not in st.session_state:
-        st.session_state.tabla_nuevos =  pd.DataFrame({'Tipo Producto':[],
-                                     'Descripcion Producto':[],
+        st.session_state.tabla_nuevos = pd.DataFrame({'Tipo Producto':[],
+                                     'Descripción':[],
                                      'Cantidad':[],
-                                     'Precio Venta':[],
-                                     'Precio Costo':[]
+                                     'Costo':[],
+                                     'Venta':[]
                                      })
+        st.session_state.tabla_nuevos['Costo'] = st.session_state.tabla_nuevos['Costo'].astype(int)
+        st.session_state.tabla_nuevos['Venta'] = st.session_state.tabla_nuevos['Venta'].astype(int)
+    
     # Llaves para resetear los valores del formulario
     if 'form_key1' not in st.session_state:
         st.session_state.form_key1 = str(uuid.uuid4())
@@ -61,6 +68,9 @@ def main():
     df_cotiz_det = pd.merge(df_cotizaciones_det, df_tipo_prod, how='left', left_on='cotiz_tipo_prod', right_on='tipo_prod_id')
     df_cotiz_det = df_cotiz_det.drop(columns=['cotiz_tipo_prod', 'tipo_prod_id', 'cotiz_cab_id'])
     df_cotiz_det = df_cotiz_det[['tipo_prod_descripcion', 'cotiz_item', 'cotiz_cantidad', 'cotiz_costo', 'cotiz_precio_venta']]
+    df_cotiz_det = df_cotiz_det.rename(columns={'tipo_prod_descripcion': 'Tipo Producto',
+                                                'cotiz_item': 'Descripción', 'cotiz_cantidad': 'Cantidad', 'cotiz_costo': 'Costo',
+                                                'cotiz_precio_venta': 'Venta'})
 
    
 
@@ -69,20 +79,22 @@ def main():
     
     with col1.container(height=600):
         tipo_item = st.selectbox("Tipo Producto",df_tipos_prod['tipo_prod_descripcion'],placeholder="Seleccionar tipo de producto",index=None,key=st.session_state.form_key1)
-        desc_item = st.text_input("Descripción Producto", placeholder="Añadir descripción del producto",key=st.session_state.form_key2).upper()
+        desc_item = st.text_input("Descripción", placeholder="Añadir descripción del producto",key=st.session_state.form_key2).upper()
         cant_item = st.number_input("Cantidad Producto",value=1,key=st.session_state.form_key3)
-        venta_item = st.text_input("Precio Venta Producto",placeholder="0",key=st.session_state.form_key4)
-        check_venta = ct.check_int(venta_item)
-        costo_item = st.text_input("Precio Costo Producto",placeholder="0",key=st.session_state.form_key5)
+        costo_item = st.text_input("Costo Producto",placeholder="0",key=st.session_state.form_key5)
         check_costo = ct.check_int(costo_item)
+        venta_item = st.text_input("Venta Producto",placeholder="0",key=st.session_state.form_key4)
+        check_venta = ct.check_int(venta_item)
 
         if tipo_item and desc_item and cant_item and check_venta and check_costo:
             agregar = st.button(label="Agregar",type="primary")
             nueva_fila = pd.DataFrame({'Tipo Producto':[tipo_item],
-                                     'Descripcion Producto':[desc_item],
+                                     'Descripción':[desc_item],
                                      'Cantidad':[cant_item],
-                                     'Precio Venta':[venta_item],
-                                     'Precio Costo':[costo_item]})
+                                     'Costo':[costo_item],
+                                     'Venta':[venta_item]})
+            nueva_fila['Costo'] = nueva_fila['Costo'].astype(int)
+            nueva_fila['Venta'] = nueva_fila['Venta'].astype(int)
             if agregar:
                 st.session_state.tabla_nuevos = pd.concat([st.session_state.tabla_nuevos, nueva_fila], ignore_index=True)
                 #st.session_state.form_key1 = str(uuid.uuid4()) # Aquí se resetea el tipo. Puede que sea más cómodo no resetearlo -> Preguntar - Dana
@@ -96,19 +108,39 @@ def main():
 
 
 
-    col3.markdown("<h4>"+" "+"</h4>", unsafe_allow_html=True)
+    col3.markdown("<h4>"+"Items cargados"+"</h4>", unsafe_allow_html=True)
 
-    with col3.container(height=300):
+    with col3.container(height=275):
         st.dataframe(df_cotiz_det,hide_index=True)
     
 
-    col3.markdown("<h4>"+" "+"</h4>", unsafe_allow_html=True)
+    col3.markdown("<h4>"+"Items a agregar"+"</h4>", unsafe_allow_html=True)
 
-    with col3.container(height=300):
-        st.dataframe(st.session_state.tabla_nuevos,hide_index=True,use_container_width=True,on_select=nuevo_prod_select,selection_mode="single-row")
+    with col3.container(height=275):
+        st.dataframe(st.session_state.tabla_nuevos,hide_index=True,use_container_width=True,on_select=nuevo_prod_select,selection_mode="single-row",height=175)
         
-    if col1.button(label="Finalizar",type='primary'):
-        st.session_state.tabla_nuevos.reset_index()
+        if st.button(label="Finalizar",type='primary'):
+            
+            if ct.insert_data('cotiz_det',
+                              campos_insertar=['cotiz_cab_id','cotiz_item','cotiz_tipo_prod','cotiz_prov_prod','cotiz_precio_venta','cotiz_costo','cotiz_cantidad','created_by','mod_by']):
+
+
+                
+                st.success("Campos agregados exitosamente.")
+
+
+                st.session_state.tabla_nuevos = pd.DataFrame({'Tipo Producto':[],
+                                        'Descripción':[],
+                                        'Cantidad':[],
+                                        'Costo':[],
+                                        'Venta':[]
+                                        })
+                st.session_state.tabla_nuevos['Costo'] = st.session_state.tabla_nuevos['Costo'].astype(int)
+                st.session_state.tabla_nuevos['Venta'] = st.session_state.tabla_nuevos['Venta'].astype(int)
+
+                st.rerun()
+            else:
+                st.error("Error de Query. Contactar desarrollador.")
 
 
 if __name__ == "__main__":
