@@ -24,7 +24,7 @@ def main():
     if col1.button(label="⬅Volver"):
         ct.switch_page("cotiz.py")
 
-    with col1.container(height=570):
+    with col1.container(height=700):
         rut_cliente = st.selectbox("RUT Cliente", df_clientes['cliente_rut'], placeholder="Seleccionar RUT Cliente", index=None)
         
         rut_1, rut_3, rut_2 = st.columns((9, 0.8, 1.8))
@@ -39,31 +39,41 @@ def main():
             rut_clean = str(rut_clean)+'-'+str(dig_ver)
         rut_2.text_input(label="Digito Verificador", disabled=True, value=dig_ver)
 
-        fact_nomb = st.text_input("Nombre Facturación", placeholder="Ingresar Nombre facturación")
+        fact_nomb = st.text_input("Nombre Facturación", placeholder="Ingresar nombre facturación").upper()
+
+        marca = st.text_input("Marca",placeholder="Marca vehículo").upper()
+        modelo = st.text_input("Modelo",placeholder="Modelo vehículo").upper()
+        año = st.text_input("Año",placeholder="XXXX",max_chars=4)
+        check_año = ct.check_int(año)
+        patente = st.text_input("Patente",placeholder="AAAA11").upper()
 
     col3.markdown("<h4>"+"Preview"+"</h4>", unsafe_allow_html=True)
-    with col3.container(height=570):
+    with col3.container(height=400):
         # tel_ini = ""
         # if check_telefono: tel_ini = "+56"
         resumen = pd.DataFrame({
-            "Preview": ["RUT Cliente","RUT Facturación","Nombre Facturación"],
-            " ": [rut_cliente,rut_clean,fact_nomb],
+            "Preview": ["RUT Cliente","RUT Facturación","Nombre Facturación","Marca","Modelo","Año","Patente"],
+            " ": [rut_cliente,rut_clean,fact_nomb,marca,modelo,año,patente],
         })
 
         st.dataframe(resumen,hide_index=True)
-        if check_rut:
+        if rut_cliente and check_rut and check_año and fact_nomb and marca and modelo and patente:
             agregar = st.button(label='Agregar',type="primary")
             if agregar:
                 #max_id = 1+int(ct.get_data('select MAX(cotiz_id) AS max_id FROM cotiz_cab')['max_id'])
                 
                 if ct.insert_data('cotiz_cab',
-                                campos_insertar = ['cotiz_rut_cliente','cotiz_rut_facturacion','cotiz_nombre_facturacion','created_by','mod_by'],
-                                valores_insertar = [rut_cliente, rut_clean, fact_nomb, 'dana', 'dana']):
+                                campos_insertar = ['cotiz_rut_cliente','cotiz_rut_facturacion','cotiz_nombre_facturacion',
+                                                   'cotiz_marca','cotiz_modelo','cotiz_year','cotiz_patente'
+                                                   'created_by','mod_by'],
+                                valores_insertar = [rut_cliente, rut_clean, fact_nomb,
+                                                    marca,modelo,año,patente,
+                                                     'dana', 'dana']):
                     st.success("Registro creado exitosamente.")
                     sleep(1.2)
                     ct.switch_page("cotiz.py")
                 else:
-                    st.error("Ya existe un registro con el RUT ingresado.")
+                    st.error("Error de Query. Contactar desarrollador.")
         else:
             agregar = st.button(label='Agregar',type="primary", disabled=True)
 
