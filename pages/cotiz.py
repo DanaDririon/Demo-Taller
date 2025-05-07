@@ -66,7 +66,7 @@ def main():
     col1_a, col2_a, col3_a, col4_a, col5_a, col6_a = st.columns((1,1,1,1,1,4))
     nueva_cotiz = col1_a.button(label="Nueva Cotizacion ➕", type="primary")
     if nueva_cotiz:
-        st.switch_page("pages//cotiz_nueva.py")
+        ct.switch_page("cotiz_nueva.py")
 
 
     #df_cotizaciones
@@ -161,7 +161,7 @@ def main():
                     type="primary")
             if add_items:
                 st.session_state['selected_id_cotiz'] = selected_id_cotiz
-                st.switch_page("pages//cotiz_items.py")
+                ct.switch_page("cotiz_items.py")
         else:
             st.write("Seleccione una cotizacion para ver los detalles")
 

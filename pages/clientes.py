@@ -40,7 +40,7 @@ def main():
         st.session_state.rut_selected = None
 
     if col01.button("Nuevo Cliente ➕", type="primary"):
-        st.switch_page("pages\\clientes_nuevo.py")
+        ct.switch_page("clientes_nuevo.py")
 
     with st.container(height=530):
         df_clientes = ct.select_data(tabla="clientes", columns='cliente_rut, cliente_nombre, cliente_correo, cliente_telefono, cliente_direccion', where="deleted = 0")
@@ -81,7 +81,7 @@ def main():
             st.session_state.button_disabled = True
 
     if col02.button("Modificar Cliente 🖊️", type="primary", disabled=st.session_state.button_disabled):
-        st.switch_page("pages\\clientes_modificar.py")
+        ct.switch_page("clientes_modificar.py")
 
 
 if __name__ == "__main__":

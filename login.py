@@ -28,7 +28,7 @@ def main():
             st.session_state['login'] = True
             st.session_state['user'] = user
             #st.success("Login correcto")
-            st.switch_page("pages\\ots.py")
+            ct.switch_page("ots.py")
         else:
             st.error("Usuario o contraseña incorrectos")
 

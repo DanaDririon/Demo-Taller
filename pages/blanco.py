@@ -66,7 +66,7 @@ def main():
         if col2.button("Guardar"):
             st.session_state['img'].save(img_path_save)
             st.success("Imagen guardada")
-            #st.switch_page("pages\\ots.py")
+            #ct.switch_page("ots.py")
 
     #st.image()
 

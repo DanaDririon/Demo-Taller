@@ -18,7 +18,7 @@ def main():
     col1, col2, col3, col99 = st.columns((3,1,2,0.3))
 
     if col1.button(label="⬅Volver"):
-        st.switch_page("pages\\ots.py")
+        ct.switch_page("ots.py")
 
     with col1.container(height=570):
         df_clientes = ct.select_data(tabla="clientes", columns='cliente_rut, cliente_nombre, cliente_correo, cliente_telefono, cliente_direccion', where="deleted = 0")
@@ -71,7 +71,7 @@ def main():
                                 valores_check_duplicado=[rut_cliente]):
                     st.success("Registro creado exitosamente.")
                     sleep(1.2)
-                    st.switch_page("pages\\clientes.py")
+                    ct.switch_page("clientes.py")
                 else:
                     st.error("Ya existe un registro con el RUT ingresado.")
         else:

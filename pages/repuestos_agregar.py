@@ -37,7 +37,7 @@ def main():
             margen = st.text_input("Margen")
             submit_button = st.form_submit_button(label='Finalizar',type="primary")
             if submit_button:
-                st.switch_page("pages//ots.py")
+                ct.switch_page("ots.py")
 
 
 if __name__ == "__main__":

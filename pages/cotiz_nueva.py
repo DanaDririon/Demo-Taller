@@ -22,7 +22,7 @@ def main():
     df_ids_cotiz = ct.select_data(tabla='cotiz_cab', columns='cotiz_id')
 
     if col1.button(label="⬅Volver"):
-        st.switch_page("pages\\cotiz.py")
+        ct.switch_page("cotiz.py")
 
     with col1.container(height=570):
         rut_cliente = st.selectbox("RUT Cliente", df_clientes['cliente_rut'], placeholder="Seleccionar RUT Cliente", index=None)
@@ -61,7 +61,7 @@ def main():
                                 valores_insertar = [rut_cliente, rut_clean, fact_nomb, 'dana', 'dana']):
                     st.success("Registro creado exitosamente.")
                     sleep(1.2)
-                    st.switch_page("pages\\cotiz.py")
+                    ct.switch_page("cotiz.py")
                 else:
                     st.error("Ya existe un registro con el RUT ingresado.")
         else:

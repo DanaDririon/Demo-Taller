@@ -17,6 +17,7 @@ import re
 from itertools import cycle
 from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML
+from pathlib import Path
 
 pd.options.mode.chained_assignment = None
 
@@ -202,36 +203,36 @@ def control_login(page: str = None, allow: bool = False):
                         st.warning("será redirigido a la página de inicio.")
                         #Redirigir a la pagina de inicio con contador visual de 5 segundos
                         sleep(3)
-                        st.switch_page("pages\\home.py")
+                        switch_page("home.py")
             else:
                 st.warning("Usted no se ha logueado, será redirigido a la página de inicio.")
                 #Redirigir a la pagina de inicio con contador visual de 5 segundos
                 sleep(3)
-                st.switch_page("pages\\login.py")
+                switch_page("login.py")
         else:
             st.warning("Usted no se ha logueado, será redirigido a la página de inicio.")
             #Redirigir a la pagina de inicio con contador visual de 5 segundos
             sleep(3)
-            st.switch_page("pages\\login.py")
+            switch_page("login.py")
 
 def sidebar():
     st.sidebar.title("Menú")
     if st.sidebar.button("Órdenes de Trabajo"):
-        st.switch_page("pages\\ots.py")
+        switch_page("ots.py")
     if st.sidebar.button("Cotizaciones"):
-        st.switch_page("pages\\cotiz.py")
+        switch_page("cotiz.py")
     #if st.sidebar.button("Inicio"):
-        #st.switch_page("pages\\home.py")
+        #switch_page("home.py")
     if st.sidebar.button("Clientes"):
-        st.switch_page("pages\\clientes.py")
+        switch_page("clientes.py")
     if st.sidebar.button("Pagos"):
-        st.switch_page("pages\\pagos.py")
+        switch_page("pagos.py")
     if st.sidebar.button("Inventario"):
-        st.switch_page("pages\\inventario.py")
+        switch_page("inventario.py")
     if st.sidebar.button("Dashboard"):
-        st.switch_page("pages\\dashboard.py")
+        switch_page("dashboard.py")
     if st.sidebar.button("Reportes"):
-        st.switch_page("pages\\reportes.py")
+        switch_page("reportes.py")
 
     ms = st.session_state
     if "theme" not in ms: 
@@ -269,6 +270,24 @@ def ChangeTheme():
     ms.theme["refreshed"] = False
     if previous_theme == "dark": ms.theme["current_theme"] = "light"
     elif previous_theme == "light": ms.theme["current_theme"] = "dark"
+
+def switch_page(page: str):
+    """
+    Cambia de página en Streamlit.
+
+    Argumentos:
+        page (str): Nombre de la página a la que se desea cambiar.
+    """
+    import os
+    #page = 'reportes.py'
+    path = Path("pages") / page
+    # if have / replace for // or if have \ replace for \\
+    #path = path.replace("\\", "\\\\")
+    path_str = str(path)
+    if path.exists():
+        st.switch_page(path_str)
+    else:
+        st.warning("La página no existe.")
 
 def increase_page():
     return     st.markdown("""

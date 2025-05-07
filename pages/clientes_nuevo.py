@@ -19,7 +19,7 @@ def main():
     col1, col2, col3, col99 = st.columns((3,1,2,0.3))
 
     if col1.button(label="⬅Volver"):
-        st.switch_page("pages\\clientes.py")
+        ct.switch_page("clientes.py")
 
     with col1.container(height=570):
         rut_1, rut_3, rut_2 = st.columns((9, 0.8, 1.8))
@@ -64,7 +64,7 @@ def main():
                                 valores_check_duplicado=[rut]):
                     st.success("Registro creado exitosamente.")
                     sleep(1.2)
-                    st.switch_page("pages\\clientes.py")
+                    ct.switch_page("clientes.py")
                 else:
                     st.error("Ya existe un registro con el RUT ingresado.")
         else:

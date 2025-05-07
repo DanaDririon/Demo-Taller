@@ -27,7 +27,7 @@ def main():
 
     if col1.button(label="⬅Volver"):
         st.session_state.rut_selected = None
-        st.switch_page("pages\\clientes.py")
+        ct.switch_page("clientes.py")
 
     clean_rut = extract_digits_rut(st.session_state.rut_selected)
 
@@ -66,10 +66,10 @@ def main():
                                 valores_id=[rut_clean]):
                     st.success("Registro modificado exitosamente.")
                     sleep(1.2)
-                    st.switch_page("pages\\clientes.py")
+                    ct.switch_page("clientes.py")
                 else:
                     st.error("Ya existe un registro con el RUT ingresado.")
-                st.switch_page("pages\\clientes.py")
+                ct.switch_page("clientes.py")
         else:
             modificar = st.button(label='Modificar',type="primary", disabled=True)
 
