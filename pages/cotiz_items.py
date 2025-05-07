@@ -14,10 +14,10 @@ def nuevo_prod_select():
 def main():
     
     #configuracion de pagina
-    st.set_page_config(layout="wide", page_title='Agregar Item', page_icon="src\\img\\logo-servicena.png")
+    st.set_page_config(layout="wide", page_title='Modificar Detalle', page_icon="src\\img\\logo-servicena.png")
     ct.increase_page()
     ct.hide_deploy_button()
-    st.markdown("<h1>"+"Agregar Item"+"</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>"+"Modificar Detalle Cotización"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
     col1, col2, col3, col99 = st.columns((1,1,2.5,0.3))
@@ -90,8 +90,8 @@ def main():
     
     with col1.container(height=650):
         tipo_item = st.selectbox("Tipo Producto",df_tipos_prod['tipo_prod_descripcion'],placeholder="Seleccionar tipo de producto",index=None,key=st.session_state.form_key1)
-        tipo_item_id = None 
-        if tipo_item: 
+        tipo_item_id = None
+        if tipo_item:
             tipo_item_id = int(df_tipo_prod[df_tipo_prod['tipo_prod_descripcion']==tipo_item]['tipo_prod_id'].iloc[0]) #Error si no exite tipo_item
         desc_item = st.text_input("Descripción", placeholder="Añadir descripción del producto",key=st.session_state.form_key2).upper()
         prov_item = st.text_input("Proovedor", placeholder="Proovedor producto",key=st.session_state.form_key6).upper()
@@ -130,13 +130,11 @@ def main():
 
 
     col3.markdown("<h4>"+"Items cargados"+"</h4>", unsafe_allow_html=True)
-
     with col3.container(height=275):
-        st.dataframe(df_cotiz_det,hide_index=True)
+        st.dataframe(df_cotiz_det,hide_index=True,use_container_width=True,height=250)
     
 
     col3.markdown("<h4>"+"Items a agregar"+"</h4>", unsafe_allow_html=True)
-
     with col3.container(height=275):
         st.dataframe(st.session_state.tabla_nuevos,hide_index=True,use_container_width=True,
                      on_select=nuevo_prod_select,selection_mode="single-row",height=175,
@@ -162,7 +160,8 @@ def main():
                                                     'dana','dana']):
                     pass
                 
-                st.success("Campos agregados exitosamente.")
+            st.success("Campos agregados exitosamente.")
+            sleep(1)
 
             st.session_state.tabla_nuevos = pd.DataFrame({'Tipo Producto':[],
                                     'Descripción':[],

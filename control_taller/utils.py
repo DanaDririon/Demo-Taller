@@ -343,6 +343,10 @@ def check_int(x):
         except:
             st.warning("No es un número entero.")
             return False
+
+def extract_digits_rut(x) -> str:
+    digits = re.findall(r'\d+', x)
+    return digits[0]
         
 def generador_pdf(template: str, datos: dict) -> bytes:
     """
