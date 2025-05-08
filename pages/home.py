@@ -9,7 +9,7 @@ import os
 
 def main():
     #configuracion de pagina
-    st.set_page_config(layout="wide", page_title='Inicio - Taller', page_icon="src\\img\\logo-servicena.png")
+    st.set_page_config(layout="wide", page_title='Inicio - Taller', page_icon="src\\img\\taller_img\\icon_taller.jpg")
     #cs.increase_page()
     st.markdown("<h1>"+"Taller - Inicio"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()

@@ -9,7 +9,7 @@ import os
 def main():
     
     #configuracion de pagina
-    st.set_page_config(layout="wide", page_title='Nueva Cotización', page_icon="src\\img\\logo-servicena.png")
+    st.set_page_config(layout="wide", page_title='Nueva Cotización', page_icon="src\\img\\taller_img\\icon_taller.jpg")
     ct.increase_page()
     ct.hide_deploy_button()
     st.markdown("<h1>"+"Nueva Cotización"+"</h1>", unsafe_allow_html=True)

@@ -10,7 +10,7 @@ import re
 
 def main():
     #configuracion de pagina
-    st.set_page_config(layout="wide", page_title='Modificar Cliente', page_icon="src\\img\\logo-servicena.png")
+    st.set_page_config(layout="wide", page_title='Modificar Cliente', page_icon="src\\img\\taller_img\\icon_taller.jpg")
     ct.increase_page()
     ct.hide_deploy_button()
     st.markdown("<h1>"+"Modificar Cliente"+"</h1>", unsafe_allow_html=True)
