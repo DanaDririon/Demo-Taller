@@ -64,7 +64,7 @@ def main():
     ct.sidebar()
 
     col1_a, col2_a, col3_a, col4_a, col5_a, col6_a = st.columns((1,1,1,0.8,1,2.5))
-    nueva_cotiz = col1_a.button(label="Nueva Cotización ➕", type="primary")
+    nueva_cotiz = col1_a.button(label="Nueva Cotización", type="primary",icon=":material/add:")
     if nueva_cotiz:
         ct.switch_page("cotiz_nueva.py")
 
