@@ -108,7 +108,7 @@ def select_data(tabla: str, columns=None, where=None, group=None, order=None, li
     if limit!=None:
         query += " LIMIT "+limit
 
-    st.write(query)
+    #st.write(query)
     
     mycursor.execute(query)
     myresult = mycursor.fetchall()
