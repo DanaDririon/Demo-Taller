@@ -21,7 +21,7 @@ def main():
     df_clientes = ct.select_data(tabla="clientes", columns='cliente_rut, cliente_nombre, cliente_correo, cliente_telefono, cliente_direccion', where="deleted = 0")
     df_ids_cotiz = ct.select_data(tabla='cotiz_cab', columns='cotiz_id')
 
-    if col1.button(label="⬅Volver"):
+    if col1.button(label="Volver",icon=":material/arrow_back:"):
         ct.switch_page("cotiz.py")
 
     with col1.container(height=700):

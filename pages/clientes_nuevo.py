@@ -18,7 +18,7 @@ def main():
 
     col1, col2, col3, col99 = st.columns((3,1,2,0.3))
 
-    if col1.button(label="⬅Volver"):
+    if col1.button(label="Volver",icon=":material/arrow_back:"):
         ct.switch_page("clientes.py")
 
     with col1.container(height=570):

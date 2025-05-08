@@ -21,7 +21,7 @@ def main():
 
     col1, col2, col3, col4 = st.columns((3,1,1,1))
 
-    if col1.button(label="⬅Volver"):
+    if col1.button(label="Volver",icon=":material/arrow_back:"):
         st.session_state.rut_selected = None
         ct.switch_page("clientes.py")
 

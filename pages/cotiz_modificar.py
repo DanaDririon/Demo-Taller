@@ -26,7 +26,7 @@ def main():
     
     col1, col2, col3, col99 = st.columns((2.5,1,2.5,0.3))
 
-    if col1.button(label="⬅Volver"):
+    if col1.button(label="Volver",icon=":material/arrow_back:"):
         ct.switch_page("cotiz.py")
     
     df_cotiz_cab = ct.select_data(tabla='cotiz_cab', columns="cotiz_rut_cliente, cotiz_rut_facturacion, cotiz_nombre_facturacion, cotiz_marca, cotiz_modelo, cotiz_year, cotiz_patente", where="cotiz_id = '{}'".format(st.session_state.selected_id_cotiz))
