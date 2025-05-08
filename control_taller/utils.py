@@ -44,29 +44,29 @@ def create_image_zip(zip_filename, image_dir, folder_temp):
     return zipfile_path
 
 def connection():
-    # try:
-    #     mydb = mysql.connector.connect(
+    try:
+        mydb = mysql.connector.connect(
+            host = "100.72.37.8",
+            user = "root",
+            password = "daniel123",
+            database = "taller"
+        )
+        return mydb
+    except:
+        mydb = mysql.connector.connect(
+            host = "100.72.37.8",
+            user = "eladio",
+            password = "taller123",
+            database = "taller"
+        )
+        return mydb
+    # mydb = mysql.connector.connect(
     #         host = "168.231.75.152",
     #         user = "admin_eladio",
     #         password = "tocornal.1857",
     #         database = "taller"
     #     )
-    #     return mydb
-    # except:
-    #     mydb = mysql.connector.connect(
-    #         host = "100.72.37.8",
-    #         user = "eladio",
-    #         password = "taller123",
-    #         database = "taller"
-    #     )
-    #     return mydb
-    mydb = mysql.connector.connect(
-            host = "168.231.75.152",
-            user = "admin_eladio",
-            password = "tocornal.1857",
-            database = "taller"
-        )
-    return mydb
+    # return mydb
     
 def get_data(query: str) -> pd.DataFrame:
     mydb = connection()
@@ -108,7 +108,7 @@ def select_data(tabla: str, columns=None, where=None, group=None, order=None, li
     if limit!=None:
         query += " LIMIT "+limit
 
-    #st.write(query)
+    st.write(query)
     
     mycursor.execute(query)
     myresult = mycursor.fetchall()
