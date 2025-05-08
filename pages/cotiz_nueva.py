@@ -15,7 +15,7 @@ def main():
     st.markdown("<h1>"+"Nueva Cotización"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
-    col1, col2, col3, col99 = st.columns((3,1,2,0.3))
+    col1, col2, col3, col99 = st.columns((2.5,1,2,0.3))
 
     
     df_clientes = ct.select_data(tabla="clientes", columns='cliente_rut, cliente_nombre, cliente_correo, cliente_telefono, cliente_direccion', where="deleted = 0")
@@ -27,7 +27,7 @@ def main():
     with col1.container(height=700):
         rut_cliente = st.selectbox("RUT Cliente", df_clientes['cliente_rut'], placeholder="Seleccionar RUT Cliente", index=None)
         
-        rut_1, rut_3, rut_2 = st.columns((9, 0.8, 1.8))
+        rut_1, rut_3, rut_2 = st.columns((6, 1, 1.8))
         rut = None
         dig_ver = None
         x = rut_1.text_input("RUT Facturación", max_chars=8, placeholder="Ingresar RUT sin puntos ni dígito verificador")

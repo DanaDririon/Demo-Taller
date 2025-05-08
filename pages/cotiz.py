@@ -63,8 +63,8 @@ def main():
     st.markdown("<h1>"+"Cotizaciones"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
-    col1_a, col2_a, col3_a, col4_a, col5_a, col6_a = st.columns((1,1,1,1,1,4))
-    nueva_cotiz = col1_a.button(label="Nueva Cotizacion ➕", type="primary")
+    col1_a, col2_a, col3_a, col4_a, col5_a, col6_a = st.columns((1,1,1,0.8,1,2.5))
+    nueva_cotiz = col1_a.button(label="Nueva Cotización ➕", type="primary")
     if nueva_cotiz:
         ct.switch_page("cotiz_nueva.py")
 
@@ -84,14 +84,14 @@ def main():
         selected_row = data.selection['rows'][0]
         selected_id_cotiz = df_cotizaciones.iloc[selected_row]['ID Cotizacion']
         st.session_state['selected_id_ctoiz'] = selected_id_cotiz
-        modificar_cotiz = col2_a.button(label="Modificar Cotizacion", type="primary",disabled=False)
-        add_items = col3_a.button(label="Añadir Items ➕", type="primary",disabled=False)
-        generar_ot = col4_a.button(label="Generar OT", type="primary",disabled=False)
+        modificar_cotiz = col2_a.button(label="Modificar Cotización 🖊️", type="primary",disabled=False)
+        add_items = col3_a.button(label="Modificar Detalle 📝", type="primary",disabled=False)
+        generar_ot = col4_a.button(label="Generar OT 📋", type="primary",disabled=False)
     else:
-        col2_a.button(label="Modificar Cotizacion", type="primary",disabled=True)
-        col3_a.button(label="Añadir Items ➕", type="primary",disabled=True)
-        col4_a.button(label="Generar OT", type="primary",disabled=True)
-        col5_a.button(label="Descargar PDF", type="primary",disabled=True)
+        col2_a.button(label="Modificar Cotización 🖊️", type="primary",disabled=True)
+        col3_a.button(label="Modificar Detalle 📝", type="primary",disabled=True)
+        col4_a.button(label="Generar OT 📋", type="primary",disabled=True)
+        col5_a.button(label="Descargar PDF 📥", type="primary",disabled=True)
         selected_row = None
         selected_id_cotiz = None
         st.session_state['selected_id_ctoiz'] = None
@@ -153,7 +153,7 @@ def main():
             }      
 
 
-            col5_a.download_button(label="Descargar PDF", 
+            col5_a.download_button(label="Descargar PDF 📥", 
                     data=ct.generador_pdf(template="template_cotizacion_ot.html", datos=datos), 
                     file_name="cotizacion_{}.pdf".format(str(selected_id_cotiz)), 
                     mime="application/pdf", 
@@ -162,6 +162,10 @@ def main():
             if add_items:
                 st.session_state['selected_id_cotiz'] = selected_id_cotiz
                 ct.switch_page("cotiz_items.py")
+            if modificar_cotiz:
+                st.session_state['selected_id_cotiz'] = selected_id_cotiz
+                ct.switch_page("cotiz_modificar.py")
+
         else:
             st.write("Seleccione una cotizacion para ver los detalles")
 
