@@ -8,6 +8,12 @@ import os
 import base64
 from PIL import Image
 #resize png file
+path_img_zipped = 'temps\\ots\\OT-5-2025-05-07 17-04-50.zip'
+from pathlib import Path
+
+path_aab = os.path.join(path_img_zipped)
+with open(path_aab, 'rb') as f:
+    st.download_button(label="Descargar Imágenes 📥", key="descarga", data=f, file_name="name_file.zip", mime="application/zip")
 
 def resize_img(img_file):
     img = Image.open(img_file,)

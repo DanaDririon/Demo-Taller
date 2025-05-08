@@ -18,8 +18,30 @@ from itertools import cycle
 from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML
 from pathlib import Path
+import zipfile
+import os
 
 pd.options.mode.chained_assignment = None
+
+def create_image_zip(zip_filename, image_dir, folder_temp):
+    """
+    Creates a zip file containing all images in a directory.
+
+    Args:
+        zip_filename (str): The name of the zip file to create.
+        image_dir (str): The path to the directory containing the images.
+    """
+    zipfile_path = os.path.join("temps",folder_temp,zip_filename)
+    with zipfile.ZipFile(zipfile_path, 'w') as zipf:
+        #st.write("Archivos en la carpeta: ", image_dir)
+        for root, _, files in os.walk(image_dir):
+            for file in files:
+                #st.write(file)
+                if file.lower().endswith(('.png', '.jpg', '.jpeg')):
+                    file_path = os.path.join(root, file)
+                    # Add the file to the zip archive, maintaining directory structure
+                    zipf.write(file_path, os.path.relpath(file_path, image_dir))
+    return zipfile_path
 
 def connection():
     try:
@@ -104,7 +126,6 @@ def select_data(tabla: str, columns=None, where=None, group=None, order=None, li
             pass
 
     return df
-
 
 def delete_data(table: str, user: str, str_id: str, id):
     mydb = connection()

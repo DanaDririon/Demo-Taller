@@ -6,8 +6,12 @@ from time import sleep
 from control_taller import utils as ct
 import os
 
-def seleccionar():
-    pass
+def delete_zip():
+    #delete file with path
+    os.remove(st.session_state['path_img_zipped'])
+    st.session_state['ver_img'] = False
+    del st.session_state['path_img_zipped']
+    #st.rerun()
 
 def repuestos(id_ots) -> pd.DataFrame:
     df_repuestos = ct.select_data(tabla="repuestos", 
@@ -38,8 +42,9 @@ def servicios_extras(id_ots) -> pd.DataFrame:
     #df['total_venta'] = df['serv_extra_precio_venta'].sum()
     return df
 
-def imagenes():
-    pass
+def imagenes(id_ots):
+    df_img = ct.select_data(tabla="img", columns='img_dir', where="deleted = 0 and img_ots_id = {}".format(id_ots))
+    return df_img
 
 def cotizaciones(id_ots):
     df_cotizaciones_cab = ct.select_data(tabla="cotiz_cab",
@@ -102,6 +107,9 @@ def filtros_detalles(df: pd.DataFrame, rut_name=None, patente=None, estado=None)
             df = df[df['estado_tipo_nombre']!="Finalizada"]
     return df
 
+def escribe():
+    st.write("Escribiendo en el archivo...")
+
 def main():
     
     #configuracion de pagina
@@ -150,14 +158,6 @@ def main():
     df_ots_clientes_final = pd.merge(df_ots_clientes_2, df_cat_ots, how='left', left_on='ots_cat_id', right_on='cat_id')
     df_ots_clientes_final = df_ots_clientes_final.drop(columns=['cat_id', 'ots_cat_id'])
 
-    
-    #df_serv_extras = servicios_extras()
-    #df_cotizaciones = cotizaciones()
-    #df_pagos = pagos()
-    #df_sum_repuestos = df_repuestos.groupby(['repuesto_ots_id']).agg({'repuesto_precio_compra':'sum',
-    #                                                            'repuesto_precio_venta':'sum',}).reset_index()
-
-
     df_ots_cabecera = df_ots_clientes_final[['ots_id', 
                                         'rut_name',
                                        'ots_rut_cliente', 
@@ -195,12 +195,9 @@ def main():
 
 
     with st.container(height=320): # Cabecera OT
-        # df_ots['rut_name'] = df_ots['RUT Cliente'] +' | '+df_ots['Nombre Cliente']
         col1, col2 , col3 , col4= st.columns((1,0.5,0.5,1))
-        #rut_filter = col1.selectbox("Buscar RUT", df_ots['RUT Cliente'].unique() , index=None, placeholder='RUT')
         rut_name_filter = col1.selectbox("Buscar Cliente", df_ots_cabecera['rut_name'].sort_values().unique() , index=None, placeholder='Cliente',label_visibility="collapsed")
         if rut_name_filter is not None:
-            #df_ots = filtros_detalles(df_ots, rut=rut_filter)
             df_ots_cabecera = filtros_detalles(df_ots_cabecera, rut_name=rut_name_filter)
 
         patente_filter = col2.selectbox("Buscar Patente", df_ots_cabecera['ots_v_patente'].unique() , index=None, placeholder='Patente',label_visibility="collapsed")
@@ -248,8 +245,7 @@ def main():
                                                         'mod_por':"Modificado Por"})
 
         data = st.dataframe(df_ots_cabecera,
-                on_select=seleccionar,
-                #on_select='rerun',
+                on_select='rerun',
                 selection_mode='single-row',
                 hide_index=True,
                 height=220,
@@ -288,7 +284,6 @@ def main():
         with tab1:
             if selected_row is not None:
                 detalle = df_ots_detalle.iloc[[selected_row]]
-                #data = st.dataframe(detalle, hide_index=True, height=300)
                 cliente_info = detalle[['RUT Cliente',
                                         'Nombre Cliente',
                                         'Correo Cliente',
@@ -388,7 +383,6 @@ def main():
                                                                             'margen':'Margen',
                                                                             'porc_margen':'% Margen'})
 
-
                 sum_valores_serv_extras = serv_extras_filtered.agg({'Costo Unitario':'sum',
                                                             'Precio Venta Unit':'sum'} ).reset_index()
                 sum_valores_serv_extras = sum_valores_serv_extras.rename(columns={'index':'Datos', 0:'Valores'})
@@ -414,14 +408,31 @@ def main():
 
         with tab5:
             if selected_row is not None:
-                st.button(label="Agregar 📷",key="a5", type="primary")
-                col1, col2 = st.columns((1,1))
-                col1.image("src\\img\\auto (1).jpg")
-                col2.image("src\\img\\auto (2).jpg")
-                col1.image("src\\img\\auto (3).jpg")
-                col2.image("src\\img\\auto (4).jpg")
-                col1.image("src\\img\\auto (5).jpg")
-                col2.image("src\\img\\auto (6).jpg")
+                list_img = imagenes(selected_id_ot)
+                #st.write(list_img)
+                col1, col2, col3 = st.columns((1,1,1))
+                if len(list_img) > 0:
+                    if len(list_img) < 9:
+                        insert_img = col1.button(label="Agregar Imágenes ➕",key="a1", type="primary")    
+                    check_img_download = col2.checkbox(label="Preparar Zip Imagenes", key="ver_img", value=False)                
+                    if check_img_download:
+                        from pathlib import Path
+                        path = str(Path("src") / "img" / "ot" / "OT-{}".format(selected_id_ot))
+                        #create unique name file
+                        name_file = "OT-{}-{}.zip".format(selected_id_ot, pd.Timestamp.now().strftime("%Y-%m-%d %H-%M-%S"))
+                        name_file_zip = "Imagenes OT-{}.zip".format(selected_id_ot)
+                        path_img_zipped = ct.create_image_zip(name_file, path, "ots")
+                        st.session_state['path_img_zipped'] = path_img_zipped
+                        with open(path_img_zipped, 'rb') as file:
+                            col3.download_button(label="Descargar Imágenes", key="descarga", data=file, file_name=name_file_zip, mime="application/zip", on_click=delete_zip)
+                    for i in range(len(list_img)):
+                        if i % 2 == 0:
+                            col1.image(list_img['img_dir'][i], width=720)
+                        else:
+                            col2.image(list_img['img_dir'][i], width=720)
+                else:
+                    st.write("No hay imágenes disponibles")
+                    insert_img = col1.button(label="Agregar Imágenes ➕",key="a2", type="primary")
             else:
                 st.write("No hay OT seleccionada")
         with tab6:
