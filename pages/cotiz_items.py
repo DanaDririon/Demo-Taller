@@ -20,7 +20,7 @@ def main():
     st.markdown("<h1>"+"Modificar Detalle Cotización"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
-    col1, col2, col3, col99 = st.columns((1,1,2.5,0.3))
+    col1, col15, col2, col25, col3 = st.columns((1,0.2,1,0.3,2.5))
 
     # Este valor viene de la cotizacion. Si es que se recarga la página, no tira error 
     if 'selected_id_cotiz' not in st.session_state:
@@ -57,7 +57,7 @@ def main():
 
     
     df_clientes = ct.select_data(tabla="clientes", columns='cliente_rut, cliente_nombre, cliente_correo, cliente_telefono, cliente_direccion', where="deleted = 0")
-    df_ids_cotiz = ct.select_data(tabla='cotiz_cab', columns='cotiz_id')
+    df_cotiz_cab = ct.select_data(tabla='cotiz_cab', columns="cotiz_rut_cliente, cotiz_rut_facturacion, cotiz_nombre_facturacion, cotiz_marca, cotiz_modelo, cotiz_year, cotiz_patente", where="cotiz_id = '{}'".format(st.session_state.selected_id_cotiz))
     df_tipos_prod = ct.select_data(tabla='tipo_prod', columns='tipo_prod_id, tipo_prod_descripcion', where='deleted = 0')
 
 
@@ -86,9 +86,22 @@ def main():
         del st.session_state.form_key5
         del st.session_state.form_key6
         del st.session_state.tabla_nuevos
-        st.switch_page("pages\\cotiz.py")
+        ct.switch_page("cotiz.py")
     
-    with col1.container(height=650):
+    ######### Datos Cliente
+    with col1.container(height=350):
+        resumen = pd.DataFrame({
+            "Información": ["RUT Cliente","RUT Facturación","Nombre Facturación","Marca","Modelo","Año","Patente"],
+            "Cliente": [df_cotiz_cab['cotiz_rut_cliente'][0],df_cotiz_cab['cotiz_rut_facturacion'][0],df_cotiz_cab['cotiz_nombre_facturacion'][0],
+                  df_cotiz_cab['cotiz_marca'][0],df_cotiz_cab['cotiz_modelo'][0],df_cotiz_cab['cotiz_year'][0],df_cotiz_cab['cotiz_patente'][0]],
+        })
+
+        st.dataframe(resumen,hide_index=True,use_container_width=True)
+        pass
+
+    ########## Agregar / Editar
+    col2.markdown("<h4>"+"Editar Item"+"</h4>", unsafe_allow_html=True)
+    with col2.container(height=650):
         tipo_item = st.selectbox("Tipo Producto",df_tipos_prod['tipo_prod_descripcion'],placeholder="Seleccionar tipo de producto",index=None,key=st.session_state.form_key1)
         tipo_item_id = None
         if tipo_item:
@@ -128,12 +141,22 @@ def main():
             agregar = st.button(label="Agregar",type="primary",disabled=True)
 
 
-
+    ########## Detalle
     col3.markdown("<h4>"+"Items cargados"+"</h4>", unsafe_allow_html=True)
-    with col3.container(height=275):
-        st.dataframe(df_cotiz_det,hide_index=True,use_container_width=True,height=250)
-    
+    with col3.container(height=325):
+        data_detalle = st.dataframe(df_cotiz_det,hide_index=True,use_container_width=True,height=225,on_select='rerun',selection_mode='single-row')
+        col3_1, col3_2, col3_3 = st.columns((1,1,5))
 
+        if len(data_detalle.selection['rows']):
+            selected_row_detalle = data_detalle.selection['rows'][0]            
+            col3_1.button("Editar",type="primary")
+            col3_2.button("Eliminar",type="primary")
+
+        else:
+            col3_1.button("Editar",disabled=True)
+            col3_2.button("Eliminar",disabled=True)
+    
+    ########## Items a agregar
     col3.markdown("<h4>"+"Items a agregar"+"</h4>", unsafe_allow_html=True)
     with col3.container(height=275):
         st.dataframe(st.session_state.tabla_nuevos,hide_index=True,use_container_width=True,
