@@ -318,7 +318,8 @@ def switch_page(page: str):
         st.warning("La página no existe.")
 
 def increase_page():
-    return     st.markdown("""
+    #incrementa la pagina
+    st.markdown("""
         <style>
                 .block-container {
                     padding-top: 1rem;
@@ -326,6 +327,37 @@ def increase_page():
                     padding-left: 1rem;
                     padding-right: 1rem;
                 }
+        </style>
+        """, unsafe_allow_html=True)
+    #define ancho sidebar
+    st.markdown(
+    """
+    <style>
+        section[data-testid="stSidebar"] {
+            width: 200px !important; # Set the width to your desired value
+            user-select: none !important;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+    )
+    #esconde boton de Deploy
+    st.markdown("""
+        <style>
+            .reportview-container {
+                margin-top: -2em;
+            }
+            #MainMenu {visibility: hidden;}
+            .stAppDeployButton {display:none;}
+            .stDeployButton {display:none;}
+            footer {visibility: hidden;}
+            #stDecoration {display:none;}
+        </style>
+        """, unsafe_allow_html=True)
+    #eliminar botones tabla
+    st.markdown("""
+        <style>
+            .stElementToolbar {display:none;}
         </style>
         """, unsafe_allow_html=True)
 
