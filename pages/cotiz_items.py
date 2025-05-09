@@ -133,12 +133,19 @@ def main():
                 st.session_state.value_keyVenta = df_cotiz_det.iloc[selected_row_detalle]['Venta'].astype(int)
                 reset_form_keys()
 
-            if col3_2.button("Eliminar",type="primary",icon=":material/delete:"):
-                pass
+            with col3_2.popover("Eliminar",icon=":material/delete:"):
+                st.markdown("¿Eliminar fila?")
+                #colyes, colno = st.columns((1,1))
+                if st.button("Sí",type="primary",icon=":material/check:"):
+                    if ct.update_data('cotiz_det',campos_modificar=['deleted'],valores_modificar=[1],
+                                      campos_id=['cotiz_det_id'],valores_id=[df_cotiz_det.iloc[selected_row_detalle]['cotiz_det_id']]):
+                        st.rerun()
+                if st.button("No",type="primary",icon=":material/close:"):
+                    st.rerun()
 
         else:
             col3_1.button("Editar",disabled=True,icon=":material/edit:")
-            col3_2.button("Eliminar",disabled=True,icon=":material/delete:")
+            col3_2.popover("Eliminar",disabled=True,icon=":material/delete:")
             
     ########## Agregar / Editar #########
     col2.markdown("<h4>"+"Editar Item"+"</h4>", unsafe_allow_html=True)
