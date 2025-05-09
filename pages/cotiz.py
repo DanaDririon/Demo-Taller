@@ -83,7 +83,7 @@ def main():
     if len(data.selection['rows']):
         selected_row = data.selection['rows'][0]
         selected_id_cotiz = df_cotizaciones.iloc[selected_row]['ID Cotizacion']
-        st.session_state['selected_id_ctoiz'] = selected_id_cotiz
+        st.session_state['selected_id_cotiz'] = selected_id_cotiz
         modificar_cotiz = col2_a.button(label="Modificar Cotización 🖊️", type="primary",disabled=False)
         add_items = col3_a.button(label="Modificar Detalle 📝", type="primary",disabled=False)
         generar_ot = col4_a.button(label="Generar OT 📋", type="primary",disabled=False)
@@ -94,7 +94,7 @@ def main():
         col5_a.button(label="Descargar PDF 📥", type="primary",disabled=True)
         selected_row = None
         selected_id_cotiz = None
-        st.session_state['selected_id_ctoiz'] = None
+        st.session_state['selected_id_cotiz'] = None
     
     with st.container(height=500):
         st.subheader("Detalles")
