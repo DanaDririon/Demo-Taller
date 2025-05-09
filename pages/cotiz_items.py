@@ -16,8 +16,12 @@ def reset_form_keys():
     st.session_state.form_keyVenta = str(uuid.uuid4())
     st.session_state.form_keyCosto = str(uuid.uuid4())
     st.session_state.form_keyProv = str(uuid.uuid4())
+    st.session_state.value_keyDesc = ""
+    st.session_state.value_keyCant = 1
+    st.session_state.value_keyVenta = ""
+    st.session_state.value_keyCosto = ""
+    st.session_state.value_keyProv = ""
     st.rerun()
-
 
 
 def main():
@@ -26,16 +30,16 @@ def main():
     st.set_page_config(layout="wide", page_title='Modificar Detalle', page_icon="src\\img\\taller_img\\icon_taller.jpg")
     ct.increase_page()
     ct.hide_deploy_button()
-    st.markdown("<h1>"+"Modificar Detalle Cotización"+"</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>"+"Modificar Detalle Cotización # "+ str(st.session_state.selected_id_cotiz) +"</h1>", unsafe_allow_html=True)
     ct.sidebar()
-
-    col1, col15, col2, col25, col3 = st.columns((1,0.1,1,0.1,2.5))
 
     # Este valor viene de la cotizacion. Si es que se recarga la página, no tira error 
     if 'selected_id_cotiz' not in st.session_state:
         st.session_state.selected_id_cotiz = 0
     
     # Llaves para resetear los valores del formulario
+    if 'form_cotizId' not in st.session_state:
+        st.session_state.form_cotizId = None
     if 'form_keyTipo' not in st.session_state:
         st.session_state.form_keyTipo = None
     if 'form_keyDesc' not in st.session_state:
@@ -51,17 +55,14 @@ def main():
 
     if 'form_cotizId' not in st.session_state:
         st.session_state.form_cotizId = None
-
-    # if 'value_keyTipo' not in st.session_state:
-    #     st.session_state.value_keyTipo = None
     if 'value_keyDesc' not in st.session_state:
         st.session_state.value_keyDesc = ""
     if 'value_keyCant' not in st.session_state:
         st.session_state.value_keyCant = 1
     if 'value_keyVenta' not in st.session_state:
-        st.session_state.value_keyVenta = 0
+        st.session_state.value_keyVenta = ""
     if 'value_keyCosto' not in st.session_state:
-        st.session_state.value_keyCosto = 0
+        st.session_state.value_keyCosto = ""
     if 'value_keyProv' not in st.session_state:
         st.session_state.value_keyProv = ""
     
@@ -84,33 +85,43 @@ def main():
     df_cotiz_det = df_cotiz_det.rename(columns={'tipo_prod_descripcion': 'Tipo Producto', 'cotiz_item': 'Descripción',
                                                 'cotiz_prov_prod': 'Proovedor', 'cotiz_cantidad': 'Cantidad', 'cotiz_costo': 'Costo',
                                                 'cotiz_precio_venta': 'Venta'})
+    
+    st.write(st.session_state)
 
-    if col1.button(label="Volver",icon=":material/arrow_back:"):
+    if st.button(label="Volver",icon=":material/arrow_back:"):
         del st.session_state.form_keyTipo
         del st.session_state.form_keyDesc
         del st.session_state.form_keyCant
         del st.session_state.form_keyVenta
         del st.session_state.form_keyCosto
         del st.session_state.form_keyProv
-        # del st.session_state.value_keyTipo
         del st.session_state.form_cotizId
         del st.session_state.value_keyDesc
         del st.session_state.value_keyCant
         del st.session_state.value_keyVenta
         del st.session_state.value_keyCosto
         del st.session_state.value_keyProv
-        #del st.session_state.tabla_nuevos
         ct.switch_page("cotiz.py")
     
     ######### Datos Cliente #########
-    with col1.container(height=350):
-        resumen = pd.DataFrame({
-            "Información": ["RUT Cliente","RUT Facturación","Nombre Facturación","Marca","Modelo","Año","Patente"],
-            "Cliente": [df_cotiz_cab['cotiz_rut_cliente'][0],df_cotiz_cab['cotiz_rut_facturacion'][0],df_cotiz_cab['cotiz_nombre_facturacion'][0],
-                  df_cotiz_cab['cotiz_marca'][0],df_cotiz_cab['cotiz_modelo'][0],df_cotiz_cab['cotiz_year'][0],df_cotiz_cab['cotiz_patente'][0]],
-        })
+    with st.container(height=115):
+        # resumen = pd.DataFrame({
+        #     "Información": ["RUT Cliente","RUT Facturación","Nombre Facturación","Marca","Modelo","Año","Patente"],
+        #     "Cliente": [df_cotiz_cab['cotiz_rut_cliente'][0],df_cotiz_cab['cotiz_rut_facturacion'][0],df_cotiz_cab['cotiz_nombre_facturacion'][0],
+        #           df_cotiz_cab['cotiz_marca'][0],df_cotiz_cab['cotiz_modelo'][0],df_cotiz_cab['cotiz_year'][0],df_cotiz_cab['cotiz_patente'][0]],
+        # })
 
-        st.dataframe(resumen,hide_index=True,use_container_width=True)
+        st.dataframe(df_cotiz_cab,hide_index=True,use_container_width=True,
+                     column_config={"cotiz_rut_cliente":"RUT Cliente",
+                                    "cotiz_rut_facturacion":"RUT Facturacion",
+                                    "cotiz_nombre_facturacion":"Nombre Facturacion",
+                                    "cotiz_marca":"Marca",
+                                    "cotiz_modelo":"Modelo",
+                                    "cotiz_year":"Año",
+                                    "cotiz_patente":"Patente"})
+
+    
+    col1, col2, col3 = st.columns((1,0.5,3.5))
 
     ########## Items cargados / Detalle #########
     col3.markdown("<h4>"+"Items cargados"+"</h4>", unsafe_allow_html=True)
@@ -129,7 +140,8 @@ def main():
                 st.session_state.value_keyCant = df_cotiz_det.iloc[selected_row_detalle]['Cantidad'].astype(int)
                 st.session_state.value_keyCosto = df_cotiz_det.iloc[selected_row_detalle]['Costo'].astype(int)
                 st.session_state.value_keyVenta = df_cotiz_det.iloc[selected_row_detalle]['Venta'].astype(int)
-                reset_form_keys()
+                st.rerun()
+                # reset_form_keys()
 
             with col3_2.popover("Eliminar",icon=":material/delete:"):
                 st.markdown("¿Eliminar fila?")
@@ -144,10 +156,15 @@ def main():
         else:
             col3_1.button("Editar",disabled=True,icon=":material/edit:")
             col3_2.popover("Eliminar",disabled=True,icon=":material/delete:")
+            if st.session_state.form_cotizId:
+                st.session_state.form_cotizId = None
+                st.session_state.form_keyTipo = None
+                reset_form_keys()
+
             
     ########## Agregar / Editar #########
-    col2.markdown("<h4>"+"Editar Item"+"</h4>", unsafe_allow_html=True)
-    with col2.container(height=650):
+    col1.markdown("<h4>"+"Editar Item"+"</h4>", unsafe_allow_html=True)
+    with col1.container(height=650):
         tipo_item = st.selectbox("Tipo Producto",df_tipos_prod['tipo_prod_descripcion'], placeholder="Seleccionar tipo de producto", index=None, key="form_keyTipo")
         tipo_item_id = None
         if tipo_item:
@@ -181,9 +198,13 @@ def main():
                                                     cant_item,
                                                     'dana','dana']):
                     st.success("Campos agregados exitosamente.")
-                    sleep(1)
                 
                     #st.session_state.form_keyTipo = str(uuid.uuid4()) # Aquí se resetea el tipo. Puede que sea más cómodo no resetearlo -> Preguntar
+                    del st.session_state.value_keyDesc
+                    del st.session_state.value_keyCant
+                    del st.session_state.value_keyVenta
+                    del st.session_state.value_keyCosto
+                    del st.session_state.value_keyProv
                     reset_form_keys()
         elif st.session_state.form_cotizId:
             if st.button(label="Modificar",type="primary",icon=":material/edit:"):
