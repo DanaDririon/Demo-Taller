@@ -112,8 +112,6 @@ def main():
 
         st.dataframe(resumen,hide_index=True,use_container_width=True)
 
-        col1.write(st.session_state)
-
     ########## Items cargados / Detalle #########
     col3.markdown("<h4>"+"Items cargados"+"</h4>", unsafe_allow_html=True)
     with col3.container(height=650):
