@@ -5,6 +5,7 @@ import numpy as np
 from time import sleep
 from control_taller import utils as ct
 import os
+from pathlib import Path
 
 def delete_zip():
     #delete file with path
@@ -40,6 +41,9 @@ def servicios_extras(id_ots) -> pd.DataFrame:
 
 def imagenes(id_ots):
     df_img = ct.select_data(tabla="img", columns='img_dir', where="deleted = 0 and img_ots_id = {}".format(id_ots))
+    df_img['img_dir'] = df_img['img_dir'].astype(str)
+    #apply img_dir as path
+    df_img['img_dir'] = df_img['img_dir'].apply(lambda x: str(Path(x)))
     return df_img
 
 def cotizaciones(id_ots):
@@ -405,6 +409,7 @@ def main():
         with tab5:
             if selected_row is not None:
                 list_img = imagenes(selected_id_ot)
+                
                 #st.write(list_img)
                 col1, col2, col3 = st.columns((1,1,1))
                 if len(list_img) > 0:
@@ -412,7 +417,7 @@ def main():
                         insert_img = col1.button(label="Agregar Imágenes",key="a1", type="primary",icon=":material/add:")    
                     check_img_download = col2.checkbox(label="Preparar Zip Imagenes", key="ver_img", value=False)                
                     if check_img_download:
-                        from pathlib import Path
+                        
                         path = str(Path("src") / "img" / "ot" / "OT-{}".format(selected_id_ot))
                         #create unique name file
                         name_file = "OT-{}-{}.zip".format(selected_id_ot, pd.Timestamp.now().strftime("%Y-%m-%d %H-%M-%S"))
