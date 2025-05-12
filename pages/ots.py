@@ -44,6 +44,7 @@ def imagenes(id_ots):
     df_img['img_dir'] = df_img['img_dir'].astype(str)
     #apply img_dir as path
     df_img['img_dir'] = df_img['img_dir'].apply(lambda x: str(Path(x)))
+    st.write(df_img)
     return df_img
 
 def cotizaciones(id_ots):
