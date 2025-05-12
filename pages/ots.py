@@ -41,9 +41,11 @@ def servicios_extras(id_ots) -> pd.DataFrame:
 
 def imagenes(id_ots):
     df_img = ct.select_data(tabla="img", columns='img_dir', where="deleted = 0 and img_ots_id = {}".format(id_ots))
+    #split img_dir by \ and take the last element
+    df_img['img_dir'] = df_img['img_dir'].str.split('\\').str[-1]
     df_img['img_dir'] = df_img['img_dir'].astype(str)
     #apply img_dir as path
-    df_img['img_dir'] = df_img['img_dir'].apply(lambda x: str(Path(x)))
+    df_img['img_dir'] = df_img['img_dir'].apply(lambda x: str(Path("src") / "img" / "ot" / "OT-{}".format(id_ots) / x))
     st.write(df_img)
     return df_img
 
