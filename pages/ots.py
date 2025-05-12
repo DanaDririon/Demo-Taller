@@ -14,32 +14,28 @@ def delete_zip():
     #st.rerun()
 
 def repuestos(id_ots) -> pd.DataFrame:
-    df_repuestos = ct.select_data(tabla="repuestos", 
-                                  columns='repuesto_id, ' \
-                                    'repuesto_proveedor, ' \
-                                    'repuesto_item, ' \
-                                    'repuesto_cantidad, ' \
-                                    'repuesto_precio_compra,' \
-                                    'repuesto_precio_venta,' \
-                                    'repuesto_ots_id' , 
-                                    where="deleted = 0 and repuesto_ots_id = {}".format(id_ots))
-    df_repuestos['total_compra'] = df_repuestos['repuesto_precio_compra'] * df_repuestos['repuesto_cantidad']
-    df_repuestos['total_venta'] = df_repuestos['repuesto_precio_venta'] * df_repuestos['repuesto_cantidad']
+    df_repuestos = ct.select_data(tabla='ots_det', 
+                                  columns='ots_prov_prod, ' \
+                                    'ots_item, ' \
+                                    'ots_cant, ' \
+                                    'ots_costo,' \
+                                    'ots_precio_venta',
+                                    where='ots_tipo_prod = 1 AND deleted = 0 AND ots_cab_id = {}'.format(id_ots)) # '1' = REPUESTOS
+    df_repuestos['total_compra'] = df_repuestos['ots_costo'] * df_repuestos['ots_cant']
+    df_repuestos['total_venta'] = df_repuestos['ots_precio_venta'] * df_repuestos['ots_cant']
     return df_repuestos
 
 def servicios_extras(id_ots) -> pd.DataFrame:
 
-    df = ct.select_data(tabla="serv_extra", 
-                                  columns='serv_extra_id,' \
-                                  'serv_ots_id, ' \
-                                    'serv_extra_desc, ' \
-                                    'serv_extra_proveedor, ' \
-                                    'serv_extra_costo,' \
-                                    'serv_extra_precio_venta',
-                                    where="deleted = 0 and serv_ots_id = {}".format(id_ots))
+    df = ct.select_data(tabla='ots_det', 
+                                  columns='ots_item, ' \
+                                    'ots_prov_prod, ' \
+                                    'ots_costo,' \
+                                    'ots_precio_venta',
+                                    where='ots_tipo_prod = 3 AND deleted = 0 AND ots_cab_id = {}'.format(id_ots)) # '3' = SERVICIOS EXTRAS
 
-    #df['total_compra'] = df['serv_extra_costo'].sum()
-    #df['total_venta'] = df['serv_extra_precio_venta'].sum()
+    df['total_compra'] = df['ots_costo'].sum()
+    df['total_venta'] = df['ots_precio_venta'].sum()
     return df
 
 def imagenes(id_ots):
@@ -47,14 +43,14 @@ def imagenes(id_ots):
     return df_img
 
 def cotizaciones(id_ots):
-    df_cotizaciones_cab = ct.select_data(tabla="cotiz_cab",
+    df_cotizaciones_cab = ct.select_data(tabla='cotiz_cab',
                                         columns='cotiz_id, cotiz_ots_id',
-                                        where="deleted = 0 and cotiz_ots_id = {}".format(id_ots)).reset_index()
+                                        where='deleted = 0 and cotiz_ots_id = {}'.format(id_ots)).reset_index()
     df_cotizaciones_cab['cotiz_ots_id'] = df_cotizaciones_cab['cotiz_ots_id'].astype(int)
     id_cabecera = df_cotizaciones_cab['cotiz_id'][0]
-    df_cotizaciones_det = ct.select_data(tabla="cotiz_det",
+    df_cotizaciones_det = ct.select_data(tabla='cotiz_det',
                                         columns='cotiz_cab_id, cotiz_tipo_prod, cotiz_costo, cotiz_precio_venta',
-                                        where="deleted = 0 and cotiz_cab_id = {}".format(id_cabecera))
+                                        where='deleted = 0 and cotiz_cab_id = {}'.format(id_cabecera))
     df_cotizaciones_det['cotiz_tipo_prod'] = df_cotizaciones_det['cotiz_tipo_prod'].astype(int)
     df_cotizaciones_det['cotiz_cab_id'] = df_cotizaciones_det['cotiz_cab_id'].astype(int)
     #st.write(df_cotizaciones_det)
@@ -65,9 +61,9 @@ def cotizaciones(id_ots):
     df_cotiz['margen'] = df_cotiz['cotiz_precio_venta'] - df_cotiz['cotiz_costo']
     df_cotiz['porc_margen'] = round((df_cotiz['margen'] / df_cotiz['cotiz_precio_venta']) * 100,2)
 
-    df_tipo_prod = ct.select_data(tabla="tipo_prod",
+    df_tipo_prod = ct.select_data(tabla='tipo_prod',
                                   columns='tipo_prod_id, tipo_prod_descripcion',
-                                  where="deleted = 0")
+                                  where='deleted = 0')
     df_tipo_prod['tipo_prod_id'] = df_tipo_prod['tipo_prod_id'].astype(int)
     df_cotiz = pd.merge(df_cotiz, df_tipo_prod, how='left', left_on='cotiz_tipo_prod', right_on='tipo_prod_id')
     df_cotiz = df_cotiz.drop(columns=['cotiz_tipo_prod', 'tipo_prod_id'])
@@ -75,14 +71,14 @@ def cotizaciones(id_ots):
     return df_cotiz
 
 def pagos(id_ots):
-    df = ct.select_data(tabla="pagos",
+    df = ct.select_data(tabla='pagos',
                         columns='pagos_id, pagos_ots_id, pagos_tipo_pago, pagos_monto, pagos_num_comprobante,pagos_fecha_pago,created_by,date_created',
-                        where="deleted = 0 and pagos_ots_id = {}".format(id_ots))
+                        where='deleted = 0 and pagos_ots_id = {}'.format(id_ots))
     #df['pagos_ots_id'] = df['pagos_ots_id'].astype(int)
     return df
 
 def clientes(df: pd.DataFrame) -> pd.DataFrame:
-    df_clientes = ct.select_data(tabla="clientes", columns='cliente_rut, cliente_nombre, cliente_correo, cliente_telefono, cliente_direccion', where="deleted = 0")
+    df_clientes = ct.select_data(tabla='clientes', columns='cliente_rut, cliente_nombre, cliente_correo, cliente_telefono, cliente_direccion', where="deleted = 0")
     df_ots_clientes_1 = pd.merge(df, df_clientes, how='left', left_on='ots_rut_cliente', right_on='cliente_rut')
     df_ots_clientes_1 = df_ots_clientes_1.drop(columns=['cliente_rut'])
     df_ots_clientes_1['rut_name'] = df_ots_clientes_1['ots_rut_cliente'] +' | '+df_ots_clientes_1['cliente_nombre']
@@ -125,8 +121,8 @@ def main():
     if 'button_disabled' not in st.session_state:
         st.session_state.button_disabled = True
 
-    col111, col222, col333, col444, col555, col666, col777 = st.columns((1,1,1,1,2,2,2))
-    if col111.button("Nueva OT ➕", type="primary"):
+    col111, col222, col333, col444, col555, col666, col777 = st.columns((1,1,1,1,1,2,2))
+    if col111.button("Nueva OT", type="primary",icon=":material/add:"):
         ct.switch_page("ots_nueva.py")
 
     df_ots = ct.select_data(tabla="ots", where="deleted = 0", order="date_created DESC")
@@ -262,8 +258,8 @@ def main():
             st.session_state['selected_id_ot'] = None
             st.session_state.button_disabled = True
 
-    modificar = col222.button("Modificar OT 🖊️", type="primary", disabled=st.session_state.button_disabled)
-    descargar = col333.button("Descargar 📥", type="primary", disabled=st.session_state.button_disabled)
+    modificar = col222.button("Modificar", type="primary",icon=":material/edit:", disabled=st.session_state.button_disabled)
+    descargar = col333.button("Descargar PDF", type="primary",icon=":material/download:", disabled=st.session_state.button_disabled)
         
     
     with st.container(height=600):
@@ -319,8 +315,8 @@ def main():
         with tab2:
             if selected_row is not None:
                 df_repuestos = repuestos(selected_id_ot)
-                agregar_repuesto = st.button(label="Agregar ➕", type="primary")
-                repuestos_filtered = df_repuestos[df_repuestos['repuesto_ots_id'] == selected_id_ot]
+                agregar_repuesto = st.button(label="Agregar", type="primary", icon=":material/add:")
+                repuestos_filtered = df_repuestos#[df_repuestos['repuesto_ots_id'] == selected_id_ot]
                 repuestos_filtered['margen'] = repuestos_filtered['total_venta'] - repuestos_filtered['total_compra']
                 repuestos_filtered['porc_margen'] = round((repuestos_filtered['margen'] / repuestos_filtered['total_venta']) * 100,2)
                 
@@ -339,13 +335,13 @@ def main():
                                                                             '$ Margen':'${:,.0f}',
                                                                             '% Margen':'{:.2f}%'})
 
-                repuestos_filtered = repuestos_filtered.drop(columns=['repuesto_ots_id'])
-                repuestos_filtered = repuestos_filtered.rename(columns={'repuesto_id':'ID Repuesto',
-                                                                        'repuesto_proveedor':'Proveedor',
-                                                                        'repuesto_item':'Item',
-                                                                        'repuesto_cantidad':'Cantidad',
-                                                                        'repuesto_precio_compra':'Precio Compra Unit',
-                                                                        'repuesto_precio_venta':'Precio Venta Unit',
+                #repuestos_filtered = repuestos_filtered.drop(columns=['repuesto_ots_id'])
+                repuestos_filtered = repuestos_filtered.rename(columns={#'repuesto_id':'ID Repuesto',
+                                                                        'ots_prov_prod':'Proveedor',
+                                                                        'ots_item':'Item',
+                                                                        'ots_cant':'Cantidad',
+                                                                        'ots_costo':'Precio Compra Unit',
+                                                                        'ots_precio_venta':'Precio Venta Unit',
                                                                         'total_compra':'Precio Total Compra',
                                                                         'total_venta':'Precio Total Venta',
                                                                         'margen':'Margen',
@@ -366,20 +362,20 @@ def main():
 
         with tab3:
             if selected_row is not None:
-                st.button(label="Agregar Serv Extra ➕",key="serv_extra_button", type="primary")
+                st.button(label="Agregar Serv Extra", key="serv_extra_button", type="primary", icon=":material/add:")
                 df_serv_extras = servicios_extras(selected_id_ot)
-                serv_extras_filtered = df_serv_extras[df_serv_extras['serv_ots_id'] == selected_id_ot]
+                serv_extras_filtered = df_serv_extras#[df_serv_extras['serv_ots_id'] == selected_id_ot]
                 
-                serv_extras_filtered = serv_extras_filtered[serv_extras_filtered['serv_ots_id'] == selected_id_ot]
-                serv_extras_filtered['margen'] = serv_extras_filtered['serv_extra_precio_venta'] - serv_extras_filtered['serv_extra_costo']
-                serv_extras_filtered['porc_margen'] = round((serv_extras_filtered['margen'] / serv_extras_filtered['serv_extra_precio_venta']) * 100,2)
+                #serv_extras_filtered = serv_extras_filtered[serv_extras_filtered['serv_ots_id'] == selected_id_ot]
+                serv_extras_filtered['margen'] = serv_extras_filtered['ots_precio_venta'] - serv_extras_filtered['ots_costo']
+                serv_extras_filtered['porc_margen'] = round((serv_extras_filtered['margen'] / serv_extras_filtered['ots_precio_venta']) * 100,2)
                 serv_extras_filtered = pd.DataFrame(serv_extras_filtered)
-                serv_extras_filtered = serv_extras_filtered.drop(columns=['serv_ots_id'])
-                serv_extras_filtered = serv_extras_filtered.rename(columns={'serv_extra_id':'ID Serv Extra',
-                                                                            'serv_extra_desc':'Descripción',
-                                                                            'serv_extra_proveedor':'Proveedor',
-                                                                            'serv_extra_costo':'Costo Unitario',
-                                                                            'serv_extra_precio_venta':'Precio Venta Unit',
+                #serv_extras_filtered = serv_extras_filtered.drop(columns=['serv_ots_id'])
+                serv_extras_filtered = serv_extras_filtered.rename(columns={#'serv_extra_id':'ID Serv Extra',
+                                                                            'ots_item':'Descripción',
+                                                                            'ots_prov_prod':'Proveedor',
+                                                                            'ots_costo':'Costo Unitario',
+                                                                            'ots_precio_venta':'Precio Venta Unit',
                                                                             'margen':'Margen',
                                                                             'porc_margen':'% Margen'})
 
@@ -413,7 +409,7 @@ def main():
                 col1, col2, col3 = st.columns((1,1,1))
                 if len(list_img) > 0:
                     if len(list_img) < 9:
-                        insert_img = col1.button(label="Agregar Imágenes ➕",key="a1", type="primary")    
+                        insert_img = col1.button(label="Agregar Imágenes",key="a1", type="primary",icon=":material/add:")    
                     check_img_download = col2.checkbox(label="Preparar Zip Imagenes", key="ver_img", value=False)                
                     if check_img_download:
                         from pathlib import Path
@@ -432,7 +428,7 @@ def main():
                             col2.image(list_img['img_dir'][i], width=720)
                 else:
                     st.write("No hay imágenes disponibles")
-                    insert_img = col1.button(label="Agregar Imágenes ➕",key="a2", type="primary")
+                    insert_img = col1.button(label="Agregar Imágenes",key="a2", type="primary",icon=":material/add:")
             else:
                 st.write("No hay OT seleccionada")
         with tab6:
@@ -467,7 +463,7 @@ def main():
         with tab7:
             if selected_row is not None:
                 df_pagos = pagos(selected_id_ot)
-                st.button(label="Añadir Pagos ➕",key="a4", type="primary")
+                st.button(label="Añadir Pagos",key="a4", type="primary", icon=":material/add:")
                 df_pagos_filtered = df_pagos[df_pagos['pagos_ots_id'] == selected_id_ot]
                 df_pagos_filtered = df_pagos_filtered.drop(columns=['pagos_ots_id'])
                 df_pagos_filtered = df_pagos_filtered.rename(columns={'pagos_id':'ID Pago',

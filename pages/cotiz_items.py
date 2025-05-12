@@ -70,14 +70,14 @@ def main():
     df_cotiz_cab = ct.select_data(tabla='cotiz_cab', columns="cotiz_rut_cliente, cotiz_rut_facturacion, cotiz_nombre_facturacion, cotiz_marca, cotiz_modelo, cotiz_year, cotiz_patente", where="cotiz_id = '{}'".format(st.session_state.selected_id_cotiz))
     df_tipos_prod = ct.select_data(tabla='tipo_prod', columns='tipo_prod_id, tipo_prod_descripcion', where='deleted = 0')
     
-    df_cotizaciones_det = ct.select_data(tabla="cotiz_det",
+    df_cotizaciones_det = ct.select_data(tabla='cotiz_det',
                                         columns='cotiz_det_id, cotiz_cab_id, cotiz_tipo_prod, cotiz_item, cotiz_prov_prod, cotiz_cantidad, cotiz_costo, cotiz_precio_venta',
-                                        where="deleted = 0 and cotiz_cab_id = {}".format(st.session_state.selected_id_cotiz))
+                                        where='deleted = 0 and cotiz_cab_id = {}'.format(st.session_state.selected_id_cotiz))
     df_cotizaciones_det['cotiz_cab_id'] = df_cotizaciones_det['cotiz_cab_id'].astype(int)
     df_cotizaciones_det['cotiz_tipo_prod'] = df_cotizaciones_det['cotiz_tipo_prod'].astype(int)
-    df_tipo_prod = ct.select_data(tabla="tipo_prod",
+    df_tipo_prod = ct.select_data(tabla='tipo_prod',
                                   columns='tipo_prod_id, tipo_prod_descripcion',
-                                  where="deleted = 0")
+                                  where='deleted = 0')
     df_tipo_prod['tipo_prod_id'] = df_tipo_prod['tipo_prod_id'].astype(int)
     df_cotiz_det = pd.merge(df_cotizaciones_det, df_tipo_prod, how='left', left_on='cotiz_tipo_prod', right_on='tipo_prod_id')
     #df_cotiz_det = df_cotiz_det.drop(columns=['cotiz_tipo_prod', 'tipo_prod_id', 'cotiz_cab_id'])
@@ -86,7 +86,7 @@ def main():
                                                 'cotiz_prov_prod': 'Proovedor', 'cotiz_cantidad': 'Cantidad', 'cotiz_costo': 'Costo',
                                                 'cotiz_precio_venta': 'Venta'})
     
-    st.write(st.session_state)
+    # st.write(st.session_state)
 
     if st.button(label="Volver",icon=":material/arrow_back:"):
         del st.session_state.form_keyTipo
