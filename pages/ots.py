@@ -297,10 +297,20 @@ def main():
                                         'Teléfono Facturación']].transpose()
                 vehiculo_info = detalle[['Patente','Marca','Modelo','Año','VIN']].transpose()
                 ot_info = detalle[['ID OT','Descripción','Tipo Reparación','Estado OT','Fecha Creación','Creado Por']].transpose()
+                info_venta = detalle[['Estado OT','Fecha Modificación','Modificado Por']].transpose()
                 
                 cliente_info = cliente_info.rename(columns={selected_row:'Detalle'})
                 vehiculo_info = vehiculo_info.rename(columns={selected_row:'Detalle'})
                 ot_info = ot_info.rename(columns={selected_row:'Detalle'})
+                info_venta = info_venta.rename(columns={selected_row:'Detalle'})
+                
+                cliente_info['Detalle'] = cliente_info['Detalle'].astype(str)
+                vehiculo_info['Detalle'] = vehiculo_info['Detalle'].astype(str)
+                ot_info['Detalle'] = ot_info['Detalle'].astype(str)
+                info_venta['Detalle'] = info_venta['Detalle'].astype(str)
+                
+                
+                
 
                 col1, col2, col3, col4= st.columns((1,1,1,1))
                 with col1:
@@ -314,7 +324,7 @@ def main():
                     st.dataframe(ot_info, use_container_width=True)
                 with col4:
                     st.markdown("<h4>"+"Info Venta"+"</h4>", unsafe_allow_html=True)
-                    st.dataframe(detalle[['Estado OT','Fecha Modificación','Modificado Por']].transpose(), use_container_width=True)
+                    st.dataframe(info_venta, use_container_width=True)
                 
             else:
                 st.write("No hay OT seleccionada")

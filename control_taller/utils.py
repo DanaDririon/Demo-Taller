@@ -120,13 +120,13 @@ def select_data(tabla: str, columns=None, where=None, group=None, order=None, li
     for i in range(len(df_types)):
         if df_types['COLUMN_NAME'][i] in df.columns:
             if df_types['DATA_TYPE'][i] == 'int' or df_types['DATA_TYPE'][i] == 'bigint' or df_types['DATA_TYPE'][i] == 'smallint' or df_types['DATA_TYPE'][i] == 'tinyint':
-                df[df_types['COLUMN_NAME'][i]] = df[df_types['COLUMN_NAME'][i]].astype(int)
+                df[df_types['COLUMN_NAME'][i]] = df[df_types['COLUMN_NAME'][i]].astype(int).fillna(0)
             elif df_types['DATA_TYPE'][i] == 'float':
-                df[df_types['COLUMN_NAME'][i]] = df[df_types['COLUMN_NAME'][i]].astype(float)
+                df[df_types['COLUMN_NAME'][i]] = df[df_types['COLUMN_NAME'][i]].astype(float).fillna(0)
             elif df_types['DATA_TYPE'][i] == 'datetime' or df_types['DATA_TYPE'][i] == 'timestamp':
-                df[df_types['COLUMN_NAME'][i]] = pd.to_datetime(df[df_types['COLUMN_NAME'][i]])
+                df[df_types['COLUMN_NAME'][i]] = pd.to_datetime(df[df_types['COLUMN_NAME'][i]]).fillna(pd.NaT)
             elif df_types['DATA_TYPE'][i] == 'varchar' or df_types['DATA_TYPE'][i] == 'text' or df_types['DATA_TYPE'][i] == 'char':
-                df[df_types['COLUMN_NAME'][i]] = df[df_types['COLUMN_NAME'][i]].astype('object')
+                df[df_types['COLUMN_NAME'][i]] = df[df_types['COLUMN_NAME'][i]].astype('object').fillna('')
             else:
                 pass
         else:
