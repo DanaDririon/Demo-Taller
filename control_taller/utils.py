@@ -12,7 +12,7 @@ from sqlalchemy import create_engine
 import pymysql
 from streamlit_javascript import st_javascript
 import numpy as np
-import janitor
+#import janitor
 import re
 from itertools import cycle
 from jinja2 import Environment, FileSystemLoader
