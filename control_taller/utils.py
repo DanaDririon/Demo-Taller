@@ -201,12 +201,12 @@ def login_check(user: str, password:str, metodo_login: int) -> bool:
     else:
         user_profile = select_data(tabla='usuarios')
         usuario_login = user_profile[user_profile['usuario_nombre']==user].reset_index(drop=True)
-        if usuario_login['pass'][0] == password:
+        if usuario_login['usuario_contraseña'][0] == password:
             st.session_state['login'] = True
             for i in range(len(usuario_login.columns.sort_values())):
                 usuario_login.columns[i]
                 st.session_state[usuario_login.columns[i]] = usuario_login[usuario_login.columns[i]][0]
-            del st.session_state['pass']
+            del st.session_state['usuario_contraseña']
             return True       
         else:
             return False
