@@ -450,30 +450,35 @@ def main():
                 st.write("No hay OT seleccionada")
         with tab6:
             if selected_row is not None:
-                st.button(label="Ir a Detalle",key="a3", type="primary")
-                df_cotizaciones = cotizaciones(selected_id_ot)
-                df_cotizaciones_filtered = df_cotizaciones[df_cotizaciones['cotiz_ots_id'] == selected_id_ot]
-                df_cotizaciones_filtered = df_cotizaciones_filtered[['cotiz_id',
-                                                                    'cotiz_ots_id',
-                                                            'tipo_prod_descripcion',
-                                                            'cotiz_costo',
-                                                            'cotiz_precio_venta',
-                                                            'margen',
-                                                            'porc_margen']]
-                df_cotizaciones_filtered = df_cotizaciones_filtered.rename(columns={'cotiz_id':'ID Cotización',
-                                            'cotiz_ots_id':'ID OT',
-                                            'tipo_prod_descripcion':'Tipo Producto',
-                                            'cotiz_costo':'Costo Unitario',
-                                            'cotiz_precio_venta':'Precio Venta Unit',
-                                            'margen':'Margen',
-                                            'porc_margen':'% Margen'})
-                
-                df_cotizaciones_filtered = df_cotizaciones_filtered.style.format({'Costo Unitario':'${:,.0f}',
-                                                                            'Precio Venta Unit':'${:,.0f}',
-                                                                            'Margen':'${:,.0f}',
-                                                                            '% Margen':'{:.2f}%'})
+                try: 
+                    cotizaciones(selected_id_ot)
+                except:
+                    st.write("No hay cotización asociada a esta OT.")
+                else:
+                    st.button(label="Ir a Detalle",key="a3", type="primary")
+                    df_cotizaciones = cotizaciones(selected_id_ot)
+                    df_cotizaciones_filtered = df_cotizaciones[df_cotizaciones['cotiz_ots_id'] == selected_id_ot]
+                    df_cotizaciones_filtered = df_cotizaciones_filtered[['cotiz_id',
+                                                                        'cotiz_ots_id',
+                                                                'tipo_prod_descripcion',
+                                                                'cotiz_costo',
+                                                                'cotiz_precio_venta',
+                                                                'margen',
+                                                                'porc_margen']]
+                    df_cotizaciones_filtered = df_cotizaciones_filtered.rename(columns={'cotiz_id':'ID Cotización',
+                                                'cotiz_ots_id':'ID OT',
+                                                'tipo_prod_descripcion':'Tipo Producto',
+                                                'cotiz_costo':'Costo Unitario',
+                                                'cotiz_precio_venta':'Precio Venta Unit',
+                                                'margen':'Margen',
+                                                'porc_margen':'% Margen'})
+                    
+                    df_cotizaciones_filtered = df_cotizaciones_filtered.style.format({'Costo Unitario':'${:,.0f}',
+                                                                                'Precio Venta Unit':'${:,.0f}',
+                                                                                'Margen':'${:,.0f}',
+                                                                                '% Margen':'{:.2f}%'})
 
-                st.dataframe(df_cotizaciones_filtered, hide_index=True, width=1000, on_select='rerun', selection_mode='single-row')
+                    st.dataframe(df_cotizaciones_filtered, hide_index=True, width=1000, on_select='rerun', selection_mode='single-row')
             else:
                 st.write("No hay OT seleccionada")
 

@@ -84,14 +84,14 @@ def main():
         selected_row = data.selection['rows'][0]
         selected_id_cotiz = df_cotizaciones.iloc[selected_row]['ID Cotizacion']
         st.session_state['selected_id_cotiz'] = selected_id_cotiz
-        modificar_cotiz = col2_a.button(label="Modificar Cotización 🖊️", type="primary",disabled=False)
-        add_items = col3_a.button(label="Modificar Detalle 📝", type="primary",disabled=False)
-        generar_ot = col4_a.button(label="Generar OT 📋", type="primary",disabled=False)
+        modificar_cotiz = col2_a.button(label="Modificar Cotización", type="primary",icon=":material/edit:",disabled=False)
+        add_items = col3_a.button(label="Modificar Detalle", type="primary",icon=":material/table_edit:",disabled=False)
+        generar_ot = col4_a.button(label="Generar OT", type="primary",icon=":material/description:",disabled=False)
     else:
-        col2_a.button(label="Modificar Cotización 🖊️", type="primary",disabled=True)
-        col3_a.button(label="Modificar Detalle 📝", type="primary",disabled=True)
-        col4_a.button(label="Generar OT 📋", type="primary",disabled=True)
-        col5_a.button(label="Descargar PDF 📥", type="primary",disabled=True)
+        col2_a.button(label="Modificar Cotización", type="primary",icon=":material/edit:",disabled=True)
+        col3_a.button(label="Modificar Detalle", type="primary",icon=":material/table_edit:",disabled=True)
+        col4_a.button(label="Generar OT", type="primary",icon=":material/description:",disabled=True)
+        col5_a.button(label="Descargar PDF", type="primary",icon=":material/download:",disabled=True)
         selected_row = None
         selected_id_cotiz = None
         st.session_state['selected_id_cotiz'] = None
@@ -153,11 +153,12 @@ def main():
             }      
 
 
-            col5_a.download_button(label="Descargar PDF 📥", 
+            col5_a.download_button(label="Descargar PDF", 
                     data=ct.generador_pdf(template="template_cotizacion_ot.html", datos=datos), 
                     file_name="cotizacion_{}.pdf".format(str(selected_id_cotiz)), 
                     mime="application/pdf", 
                     disabled=False,
+                    icon=":material/download:",
                     type="primary")
             if add_items:
                 st.session_state['selected_id_cotiz'] = selected_id_cotiz
