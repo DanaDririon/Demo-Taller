@@ -266,15 +266,8 @@ def main():
 
     modificar = col222.button("Modificar", type="primary",icon=":material/edit:", disabled=st.session_state.button_disabled)
     descargar = col333.button("Descargar PDF", type="primary",icon=":material/download:", disabled=st.session_state.button_disabled)
-        
     
     with st.container(height=600):
-        df_ejemplo = pd.DataFrame({
-        "Id": ["AAAAA", "BBBBB", "CCCCC", "DDDDD", "EEEEE", "FFFFF", "GGGGG"],
-        "Item": ["Pastillas","Amortiguadores","Uno","Fish","Cincuenta","Error","Botella"],
-        "Cantidad": [74,82,1,5,50,11,2],
-        "Precio Total": ["$1.555","222.444","$1","$666.666","$50","$321.123","$500"]
-        })
         tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["Info General", 
                                                             "Repuestos", 
                                                             "Servicios Extras",
@@ -283,52 +276,8 @@ def main():
                                                             "Cotizaciones", 
                                                             "Pagos", 
                                                             "Registro Estados"])
-        with tab1:
-            if selected_row is not None:
-                detalle = df_ots_detalle.iloc[[selected_row]]
-                cliente_info = detalle[['RUT Cliente',
-                                        'Nombre Cliente',
-                                        'Correo Cliente',
-                                        'Teléfono Cliente',
-                                        'Dirección Cliente',
-                                        'RUT Facturación',
-                                        'Nombre Facturación',
-                                        'Dirección Facturación',
-                                        'Teléfono Facturación']].transpose()
-                vehiculo_info = detalle[['Patente','Marca','Modelo','Año','VIN']].transpose()
-                ot_info = detalle[['ID OT','Descripción','Tipo Reparación','Estado OT','Fecha Creación','Creado Por']].transpose()
-                info_venta = detalle[['Estado OT','Fecha Modificación','Modificado Por']].transpose()
-                
-                cliente_info = cliente_info.rename(columns={selected_row:'Detalle'})
-                vehiculo_info = vehiculo_info.rename(columns={selected_row:'Detalle'})
-                ot_info = ot_info.rename(columns={selected_row:'Detalle'})
-                info_venta = info_venta.rename(columns={selected_row:'Detalle'})
-                
-                cliente_info['Detalle'] = cliente_info['Detalle'].astype(str)
-                vehiculo_info['Detalle'] = vehiculo_info['Detalle'].astype(str)
-                ot_info['Detalle'] = ot_info['Detalle'].astype(str)
-                info_venta['Detalle'] = info_venta['Detalle'].astype(str)
-                
-                
-                
 
-                col1, col2, col3, col4= st.columns((1,1,1,1))
-                with col1:
-                    st.markdown("<h4>"+"Cliente"+"</h4>", unsafe_allow_html=True)
-                    st.dataframe(cliente_info, use_container_width=True)
-                with col2:
-                    st.markdown("<h4>"+"Vehículo"+"</h4>", unsafe_allow_html=True)
-                    st.dataframe(vehiculo_info, use_container_width=True)
-                with col3:
-                    st.markdown("<h4>"+"OT"+"</h4>", unsafe_allow_html=True)
-                    st.dataframe(ot_info, use_container_width=True)
-                with col4:
-                    st.markdown("<h4>"+"Info Venta"+"</h4>", unsafe_allow_html=True)
-                    st.dataframe(info_venta, use_container_width=True)
-                
-            else:
-                st.write("No hay OT seleccionada")
-        with tab2:
+        with tab2: # Repuestos
             if selected_row is not None:
                 df_repuestos = repuestos(selected_id_ot)
                 agregar_repuesto = st.button(label="Agregar", type="primary", icon=":material/add:")
@@ -345,6 +294,7 @@ def main():
                 sum_valores_repuestos = sum_valores_repuestos.set_index('Datos').T
                 sum_valores_repuestos['$ Margen'] = sum_valores_repuestos['Total Venta'] - sum_valores_repuestos['Total Compra']
                 sum_valores_repuestos['% Margen'] = round((sum_valores_repuestos['$ Margen'] / sum_valores_repuestos['Total Venta']) * 100,2)
+                sum_valores_repuestos_final = sum_valores_repuestos
                 #set format to currency
                 sum_valores_repuestos = sum_valores_repuestos.style.format({'Total Compra':'${:,.0f}',
                                                                             'Total Venta':'${:,.0f}',
@@ -376,7 +326,7 @@ def main():
             else:
                 st.write("No hay OT seleccionada")
 
-        with tab3:
+        with tab3: # Servicios Extras
             if selected_row is not None:
                 st.button(label="Agregar Serv Extra", key="serv_extra_button", type="primary", icon=":material/add:")
                 df_serv_extras = servicios_extras(selected_id_ot)
@@ -404,6 +354,7 @@ def main():
                                                                             'Precio Venta Unit':'Total Venta'})
                 sum_valores_serv_extras['$ Margen'] = sum_valores_serv_extras['Total Venta'] - sum_valores_serv_extras['Total Costo']
                 sum_valores_serv_extras['% Margen'] = round((sum_valores_serv_extras['$ Margen'] / sum_valores_serv_extras['Total Venta']) * 100,2)
+                sum_valores_serv_extras_final = sum_valores_serv_extras
                 #set format to currency
                 sum_valores_serv_extras = sum_valores_serv_extras.style.format({'Total Costo':'${:,.0f}',
                                                                             'Total Venta':'${:,.0f}',
@@ -415,10 +366,65 @@ def main():
                 col2.dataframe(sum_valores_serv_extras, hide_index=True, use_container_width=True)
             else:
                 st.write("No hay OT seleccionada")
-        with tab4:
+        with tab4: # Mano de Obra
             st.write("En proceso de desarrollo")
 
-        with tab5:
+        with tab1: # Info General
+            if selected_row is not None:
+                detalle = df_ots_detalle.iloc[[selected_row]]
+                cliente_info = detalle[['RUT Cliente',
+                                        'Nombre Cliente',
+                                        'Correo Cliente',
+                                        'Teléfono Cliente',
+                                        'Dirección Cliente',
+                                        'RUT Facturación',
+                                        'Nombre Facturación',
+                                        'Dirección Facturación',
+                                        'Teléfono Facturación']].transpose()
+                vehiculo_info = detalle[['Patente','Marca','Modelo','Año','VIN']].transpose()
+                ot_info = detalle[['ID OT','Descripción','Tipo Reparación','Estado OT','Fecha Creación','Creado Por']].transpose()
+                print(sum_valores_repuestos_final['Total Compra'])
+                info_venta = pd.DataFrame({'Detalle':["Repuestos","Servicios Extras","Mano de Obra","Otros","Total"],
+                                           'Costo':[sum_valores_repuestos_final['Total Compra']['Valores'],sum_valores_serv_extras_final['Total Costo']['Valores'],0,0,int(sum_valores_repuestos_final['Total Compra']['Valores'])+int(sum_valores_serv_extras_final['Total Costo']['Valores'])],
+                                           'Venta':[sum_valores_repuestos_final['Total Venta']['Valores'],sum_valores_serv_extras_final['Total Venta']['Valores'],0,0,int(sum_valores_repuestos_final['Total Venta'])+int(sum_valores_serv_extras_final['Total Venta'])],
+                                           '% Margen':[sum_valores_repuestos_final['% Margen']['Valores'],sum_valores_serv_extras_final['% Margen']['Valores'],0,0,""],
+                                           '$ Margen':[sum_valores_repuestos_final['$ Margen']['Valores'],sum_valores_serv_extras_final['$ Margen']['Valores'],0,0,""]})
+                # info_venta = info_venta.style.format({'Costo':'${:,.0f}',
+                #                                             'Venta':'${:,.0f}',
+                #                                             '% Margen':'{:.2f}%',
+                #                                             '$ Margen':'${:,.0f}'})
+                #info_venta = detalle[['Estado OT','Fecha Modificación','Modificado Por']].transpose()
+                
+                cliente_info = cliente_info.rename(columns={selected_row:'Detalle'})
+                vehiculo_info = vehiculo_info.rename(columns={selected_row:'Detalle'})
+                ot_info = ot_info.rename(columns={selected_row:'Detalle'})
+                #info_venta = info_venta.rename(columns={selected_row:'Detalle'})
+                
+                cliente_info['Detalle'] = cliente_info['Detalle'].astype(str)
+                vehiculo_info['Detalle'] = vehiculo_info['Detalle'].astype(str)
+                ot_info['Detalle'] = ot_info['Detalle'].astype(str)
+                #info_venta['Detalle'] = info_venta['Detalle'].astype(str)
+                
+                
+                
+
+                col1, col2, col3, col4= st.columns((1,1,1,1.5))
+                with col1:
+                    st.markdown("<h4>"+"Cliente"+"</h4>", unsafe_allow_html=True)
+                    st.dataframe(cliente_info, use_container_width=True)
+                with col2:
+                    st.markdown("<h4>"+"Vehículo"+"</h4>", unsafe_allow_html=True)
+                    st.dataframe(vehiculo_info, use_container_width=True)
+                with col3:
+                    st.markdown("<h4>"+"OT"+"</h4>", unsafe_allow_html=True)
+                    st.dataframe(ot_info, use_container_width=True)
+                with col4:
+                    st.markdown("<h4>"+"Info Venta"+"</h4>", unsafe_allow_html=True)
+                    st.dataframe(info_venta, use_container_width=True,hide_index=True)
+                
+            else:
+                st.write("No hay OT seleccionada")
+        with tab5: # Imágenes
             if selected_row is not None:
                 list_img = imagenes(selected_id_ot)
                 
@@ -448,7 +454,7 @@ def main():
                     insert_img = col1.button(label="Agregar Imágenes",key="a2", type="primary",icon=":material/add:")
             else:
                 st.write("No hay OT seleccionada")
-        with tab6:
+        with tab6: # Cotizaciones
             if selected_row is not None:
                 try: 
                     cotizaciones(selected_id_ot)
@@ -482,7 +488,7 @@ def main():
             else:
                 st.write("No hay OT seleccionada")
 
-        with tab7:
+        with tab7: # Pagos
             if selected_row is not None:
                 df_pagos = pagos(selected_id_ot)
                 st.button(label="Añadir Pagos",key="a4", type="primary", icon=":material/add:")
@@ -496,7 +502,7 @@ def main():
                                                             'created_by':'Creado Por'})
                 st.dataframe(df_pagos_filtered, hide_index=True, width=1500)
 
-        with tab8:
+        with tab8: # Registro Estados
             if selected_row is not None:
                 df_log_filtered = df_log_ots_3[df_log_ots_3['log_ots_id']==selected_id_ot]
                 df_log_filtered = df_log_filtered.rename(columns={'log_ots_id':'ID OT',
