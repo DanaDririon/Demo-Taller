@@ -10,7 +10,6 @@ def main():
     st.set_page_config(layout="centered", page_title='Login - Intranet Taller', page_icon="src\\img\\taller_img\\icon_taller.jpg")
     st.session_state['login'] = False
     st.markdown("<h1 style='text-align: center;'>"+"Inicio de Sesión"+"</h1>", unsafe_allow_html=True)
-    
     metodo_login = ct.select_data(tabla='login_metodo', where='deleted = 0')['login_metodo_id'][0]
     metodo_login = int(metodo_login)
     with st.container():
