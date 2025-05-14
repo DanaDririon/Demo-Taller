@@ -25,6 +25,10 @@ def reset_form_keys():
 
 
 def main():
+
+    # Este valor viene de la cotizacion. Si es que se recarga la página, no tira error 
+    if 'selected_id_cotiz' not in st.session_state:
+        st.session_state.selected_id_cotiz = 0
     
     #configuracion de pagina
     st.set_page_config(layout="wide", page_title='Modificar Detalle', page_icon="src\\img\\taller_img\\icon_taller.jpg")
@@ -32,39 +36,35 @@ def main():
     ct.hide_deploy_button()
     st.markdown("<h1>"+"Modificar Detalle Cotización # "+ str(st.session_state.selected_id_cotiz) +"</h1>", unsafe_allow_html=True)
     ct.sidebar()
-
-    # Este valor viene de la cotizacion. Si es que se recarga la página, no tira error 
-    if 'selected_id_cotiz' not in st.session_state:
-        st.session_state.selected_id_cotiz = 0
     
     # Llaves para resetear los valores del formulario
     if 'form_cotizId' not in st.session_state:
-        st.session_state.form_cotizId = None
+        st.session_state['form_cotizId'] = None
     if 'form_keyTipo' not in st.session_state:
-        st.session_state.form_keyTipo = None
+        st.session_state['form_keyTipo'] = None
     if 'form_keyDesc' not in st.session_state:
-        st.session_state.form_keyDesc = str(uuid.uuid4())
+        st.session_state['form_keyDesc'] = str(uuid.uuid4())
     if 'form_keyCant' not in st.session_state:
-        st.session_state.form_keyCant = str(uuid.uuid4())
+        st.session_state['form_keyCant'] = str(uuid.uuid4())
     if 'form_keyVenta' not in st.session_state:
-        st.session_state.form_keyVenta = str(uuid.uuid4())
+        st.session_state['form_keyVenta'] = str(uuid.uuid4())
     if 'form_keyCosto' not in st.session_state:
-        st.session_state.form_keyCosto = str(uuid.uuid4())
+        st.session_state['form_keyCosto'] = str(uuid.uuid4())
     if 'form_keyProv' not in st.session_state:
-        st.session_state.form_keyProv = str(uuid.uuid4())
+        st.session_state['form_keyProv'] = str(uuid.uuid4())
 
     if 'form_cotizId' not in st.session_state:
-        st.session_state.form_cotizId = None
+        st.session_state['form_cotizId'] = None
     if 'value_keyDesc' not in st.session_state:
-        st.session_state.value_keyDesc = ""
+        st.session_state['value_keyDesc'] = ""
     if 'value_keyCant' not in st.session_state:
-        st.session_state.value_keyCant = 1
+        st.session_state['value_keyCant'] = 1
     if 'value_keyVenta' not in st.session_state:
-        st.session_state.value_keyVenta = ""
+        st.session_state['value_keyVenta'] = ""
     if 'value_keyCosto' not in st.session_state:
-        st.session_state.value_keyCosto = ""
+        st.session_state['value_keyCosto'] = ""
     if 'value_keyProv' not in st.session_state:
-        st.session_state.value_keyProv = ""
+        st.session_state['value_keyProv'] = ""
     
     # df_clientes = ct.select_data(tabla="clientes", columns='cliente_rut, cliente_nombre, cliente_correo, cliente_telefono, cliente_direccion', where="deleted = 0")
     df_cotiz_cab = ct.select_data(tabla='cotiz_cab', columns="cotiz_rut_cliente, cotiz_rut_facturacion, cotiz_nombre_facturacion, cotiz_marca, cotiz_modelo, cotiz_year, cotiz_patente", where="cotiz_id = '{}'".format(st.session_state.selected_id_cotiz))

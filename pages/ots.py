@@ -431,8 +431,9 @@ def main():
                 #st.write(list_img)
                 col1, col2, col3 = st.columns((1,1,1))
                 if len(list_img) > 0:
-                    if len(list_img) < 9:
-                        insert_img = col1.button(label="Agregar Imágenes",key="a1", type="primary",icon=":material/add:")    
+                    if len(list_img) < 11:
+                        if col1.button(label="Agregar Imágenes",key="a1", type="primary",icon=":material/add:"):
+                            ct.switch_page("ots_imagenes.py")
                     check_img_download = col2.checkbox(label="Preparar Zip Imagenes", key="ver_img", value=False)                
                     if check_img_download:
                         
@@ -450,8 +451,9 @@ def main():
                         else:
                             col2.image(list_img['img_dir'][i], width=720)
                 else:
+                    if col1.button(label="Agregar Imágenes",key="a2", type="primary",icon=":material/add:"):
+                        ct.switch_page("ots_imagenes.py")
                     st.write("No hay imágenes disponibles")
-                    insert_img = col1.button(label="Agregar Imágenes",key="a2", type="primary",icon=":material/add:")
             else:
                 st.write("No hay OT seleccionada")
         with tab6: # Cotizaciones
