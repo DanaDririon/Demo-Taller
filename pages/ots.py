@@ -125,7 +125,7 @@ def main():
         st.session_state['selected_id_ot'] = None
 
     if 'button_disabled' not in st.session_state:
-        st.session_state.button_disabled = True
+        st.session_state['button_disabled'] = True
 
     col111, col222, col333, col444, col555, col666, col777 = st.columns((1,1,1,1,1,2,2))
     if col111.button("Nueva OT", type="primary",icon=":material/add:"):
@@ -218,7 +218,7 @@ def main():
                                                         'ots_v_patente':'Patente',
                                                         'ots_v_marca':'Marca',
                                                         'ots_v_modelo':'Modelo',
-                                                        'cat_nombre':'Tipo Reparación',
+                                                        'cat_nombre':'Tipo',
                                                         'estado_tipo_nombre':'Estado OT',
                                                         'date_created':'Fecha Creación',
                                                         'created_by':'Creado Por'})
@@ -239,7 +239,7 @@ def main():
                                                         'ots_v_año':'Año',
                                                         'ots_v_vin':'VIN',
                                                         'ots_descripcion':'Descripción',
-                                                        'cat_nombre':'Tipo Reparación',
+                                                        'cat_nombre':'Tipo',
                                                         'estado_tipo_nombre':'Estado OT',
                                                         'date_created':'Fecha Creación',
                                                         'date_mod':'Fecha Modificación',
@@ -257,15 +257,15 @@ def main():
             selected_row = data.selection['rows'][0]
             selected_id_ot = df_ots_cabecera.iloc[selected_row]['ID OT']
             st.session_state['selected_id_ot'] = selected_id_ot
-            st.session_state.button_disabled = False
+            st.session_state['button_disabled'] = False
         else:
             selected_row = None
             selected_id_ot = None
             st.session_state['selected_id_ot'] = None
-            st.session_state.button_disabled = True
+            st.session_state['button_disabled'] = True
 
-    modificar = col222.button("Modificar", type="primary",icon=":material/edit:", disabled=st.session_state.button_disabled)
-    descargar = col333.button("Descargar PDF", type="primary",icon=":material/download:", disabled=st.session_state.button_disabled)
+    modificar = col222.button("Modificar", type="primary",icon=":material/edit:", disabled=st.session_state['button_disabled'])
+    descargar = col333.button("Descargar PDF", type="primary",icon=":material/download:", disabled=st.session_state['button_disabled'])
     
     with st.container(height=600):
         tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["Info General", 
@@ -382,7 +382,7 @@ def main():
                                         'Dirección Facturación',
                                         'Teléfono Facturación']].transpose()
                 vehiculo_info = detalle[['Patente','Marca','Modelo','Año','VIN']].transpose()
-                ot_info = detalle[['ID OT','Descripción','Tipo Reparación','Estado OT','Fecha Creación','Creado Por']].transpose()
+                ot_info = detalle[['ID OT','Descripción','Tipo','Estado OT','Fecha Creación','Creado Por']].transpose()
                 print(sum_valores_repuestos_final['Total Compra'])
                 info_venta = pd.DataFrame({'Detalle':["Repuestos","Servicios Extras","Mano de Obra","Otros","Total"],
                                            'Costo':[sum_valores_repuestos_final['Total Compra']['Valores'],sum_valores_serv_extras_final['Total Costo']['Valores'],0,0,int(sum_valores_repuestos_final['Total Compra']['Valores'])+int(sum_valores_serv_extras_final['Total Costo']['Valores'])],

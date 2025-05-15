@@ -11,18 +11,24 @@ def nuevo_prod_select():
     pass
  
 def reset_form_keys():
-    st.session_state.form_keyDesc = str(uuid.uuid4())
-    st.session_state.form_keyCant = str(uuid.uuid4())
-    st.session_state.form_keyVenta = str(uuid.uuid4())
-    st.session_state.form_keyCosto = str(uuid.uuid4())
-    st.session_state.form_keyProv = str(uuid.uuid4())
-    st.session_state.value_keyDesc = ""
-    st.session_state.value_keyCant = 1
-    st.session_state.value_keyVenta = ""
-    st.session_state.value_keyCosto = ""
-    st.session_state.value_keyProv = ""
+    st.session_state['form_keyDesc'] = str(uuid.uuid4())
+    st.session_state['form_keyCant'] = str(uuid.uuid4())
+    st.session_state['form_keyVenta'] = str(uuid.uuid4())
+    st.session_state['form_keyCosto'] = str(uuid.uuid4())
+    st.session_state['form_keyProv'] = str(uuid.uuid4())
+    st.session_state['value_keyDesc'] = ""
+    st.session_state['value_keyCant'] = 1
+    st.session_state['value_keyVenta'] = ""
+    st.session_state['value_keyCosto'] = ""
+    st.session_state['value_keyProv'] = ""
     st.rerun()
 
+def del_value_keys():
+    del st.session_state['value_keyDesc']
+    del st.session_state['value_keyCant']
+    del st.session_state['value_keyVenta']
+    del st.session_state['value_keyCosto']
+    del st.session_state['value_keyProv']
 
 def main():
 
@@ -90,17 +96,13 @@ def main():
 
     if st.button(label="Volver",icon=":material/arrow_back:"):
         del st.session_state.form_keyTipo
-        del st.session_state.form_keyDesc
-        del st.session_state.form_keyCant
-        del st.session_state.form_keyVenta
-        del st.session_state.form_keyCosto
-        del st.session_state.form_keyProv
-        del st.session_state.form_cotizId
-        del st.session_state.value_keyDesc
-        del st.session_state.value_keyCant
-        del st.session_state.value_keyVenta
-        del st.session_state.value_keyCosto
-        del st.session_state.value_keyProv
+        del st.session_state['form_keyDesc']
+        del st.session_state['form_keyCant']
+        del st.session_state['form_keyVenta']
+        del st.session_state['form_keyCosto']
+        del st.session_state['form_keyProv']
+        del st.session_state['form_cotizId']
+        del_value_keys()
         ct.switch_page("cotiz.py")
     
     ######### Datos Cliente #########
@@ -133,13 +135,13 @@ def main():
         if len(data_detalle.selection['rows']):
             selected_row_detalle = data_detalle.selection['rows'][0]
             if col3_1.button("Editar",type="primary",icon=":material/edit:"):
-                st.session_state.form_cotizId = df_cotiz_det.iloc[selected_row_detalle]['cotiz_det_id']
+                st.session_state['form_cotizId'] = df_cotiz_det.iloc[selected_row_detalle]['cotiz_det_id']
                 st.session_state.form_keyTipo = df_cotiz_det.iloc[selected_row_detalle]['Tipo Producto']
-                st.session_state.value_keyDesc = df_cotiz_det.iloc[selected_row_detalle]['Descripción']
-                st.session_state.value_keyProv = df_cotiz_det.iloc[selected_row_detalle]['Proovedor']
-                st.session_state.value_keyCant = df_cotiz_det.iloc[selected_row_detalle]['Cantidad'].astype(int)
-                st.session_state.value_keyCosto = df_cotiz_det.iloc[selected_row_detalle]['Costo'].astype(int)
-                st.session_state.value_keyVenta = df_cotiz_det.iloc[selected_row_detalle]['Venta'].astype(int)
+                st.session_state['value_keyDesc'] = df_cotiz_det.iloc[selected_row_detalle]['Descripción']
+                st.session_state['value_keyProv'] = df_cotiz_det.iloc[selected_row_detalle]['Proovedor']
+                st.session_state['value_keyCant'] = df_cotiz_det.iloc[selected_row_detalle]['Cantidad'].astype(int)
+                st.session_state['value_keyCosto'] = df_cotiz_det.iloc[selected_row_detalle]['Costo'].astype(int)
+                st.session_state['value_keyVenta'] = df_cotiz_det.iloc[selected_row_detalle]['Venta'].astype(int)
                 st.rerun()
                 # reset_form_keys()
 
@@ -156,8 +158,8 @@ def main():
         else:
             col3_1.button("Editar",disabled=True,icon=":material/edit:")
             col3_2.popover("Eliminar",disabled=True,icon=":material/delete:")
-            if st.session_state.form_cotizId:
-                st.session_state.form_cotizId = None
+            if st.session_state['form_cotizId']:
+                st.session_state['form_cotizId'] = None
                 st.session_state.form_keyTipo = None
                 reset_form_keys()
 
@@ -169,16 +171,16 @@ def main():
         tipo_item_id = None
         if tipo_item:
             tipo_item_id = int(df_tipo_prod[df_tipo_prod['tipo_prod_descripcion']==tipo_item]['tipo_prod_id'].iloc[0]) #Error si no exite tipo_item
-        desc_item = st.text_input("Descripción", placeholder="Añadir descripción del producto",key=st.session_state.form_keyDesc,value=st.session_state.value_keyDesc).upper()
-        prov_item = st.text_input("Proovedor", placeholder="Proovedor producto",key=st.session_state.form_keyProv, value=st.session_state.value_keyProv).upper()
-        cant_item = st.number_input("Cantidad Producto",key=st.session_state.form_keyCant, value=st.session_state.value_keyCant)
+        desc_item = st.text_input("Descripción", placeholder="Añadir descripción del producto",key=st.session_state['form_keyDesc'],value=st.session_state['value_keyDesc']).upper()
+        prov_item = st.text_input("Proovedor", placeholder="Proovedor producto",key=st.session_state['form_keyProv'], value=st.session_state['value_keyProv']).upper()
+        cant_item = st.number_input("Cantidad Producto",key=st.session_state['form_keyCant'], value=st.session_state['value_keyCant'])
         check_cant = ct.check_int(cant_item)
-        costo_item = st.text_input("Costo Producto",placeholder="0",key=st.session_state.form_keyCosto, value=st.session_state.value_keyCosto)
+        costo_item = st.text_input("Costo Producto",placeholder="0",key=st.session_state['form_keyCosto'], value=st.session_state['value_keyCosto'])
         check_costo = ct.check_int(costo_item)
-        venta_item = st.text_input("Venta Producto",placeholder="0",key=st.session_state.form_keyVenta, value=st.session_state.value_keyVenta)
+        venta_item = st.text_input("Venta Producto",placeholder="0",key=st.session_state['form_keyVenta'], value=st.session_state['value_keyVenta'])
         check_venta = ct.check_int(venta_item)
 
-        if tipo_item and desc_item and check_cant and check_venta and check_costo and not st.session_state.form_cotizId:
+        if tipo_item and desc_item and check_cant and check_venta and check_costo and not st.session_state['form_cotizId']:
             if st.button(label="Agregar",type="primary",icon=":material/add:"):                
                 if ct.insert_data('cotiz_det',
                                     campos_insertar=['cotiz_cab_id',
@@ -200,13 +202,9 @@ def main():
                     st.success("Campos agregados exitosamente.")
                 
                     #st.session_state.form_keyTipo = str(uuid.uuid4()) # Aquí se resetea el tipo. Puede que sea más cómodo no resetearlo -> Preguntar
-                    del st.session_state.value_keyDesc
-                    del st.session_state.value_keyCant
-                    del st.session_state.value_keyVenta
-                    del st.session_state.value_keyCosto
-                    del st.session_state.value_keyProv
+                    del_value_keys()
                     reset_form_keys()
-        elif st.session_state.form_cotizId:
+        elif st.session_state['form_cotizId']:
             if st.button(label="Modificar",type="primary",icon=":material/edit:"):
                 if ct.update_data('cotiz_det',
                                     campos_modificar=['cotiz_item',
@@ -224,16 +222,12 @@ def main():
                                                     cant_item,
                                                     'dana'],
                                   campos_id=['cotiz_det_id'],
-                                  valores_id=[st.session_state.form_cotizId]):
+                                  valores_id=[st.session_state['form_cotizId']]):
                     st.success("Campos modificados exitosamente.")
                     sleep(1)
                     del st.session_state.form_keyTipo
-                    del st.session_state.form_cotizId
-                    del st.session_state.value_keyDesc
-                    del st.session_state.value_keyCant
-                    del st.session_state.value_keyVenta
-                    del st.session_state.value_keyCosto
-                    del st.session_state.value_keyProv
+                    del st.session_state['form_cotizId']
+                    del_value_keys()
                     reset_form_keys()
             
         else:

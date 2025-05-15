@@ -10,7 +10,7 @@ import uuid
 from PIL import Image
 
 def imagenes(id_ots):
-    df_img = ct.select_data(tabla='img', columns='img_dir', where="deleted = 0 and img_ots_id = {}".format(id_ots))
+    df_img = ct.select_data(tabla='img', columns='img_dir, img_pos', where="deleted = 0 and img_ots_id = {}".format(id_ots))
     #split img_dir by \ and take the last element
     df_img['img_dir'] = df_img['img_dir'].str.split('\\').str[-1]
     df_img['img_dir'] = df_img['img_dir'].astype(str)

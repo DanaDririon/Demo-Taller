@@ -17,18 +17,18 @@ def main():
     ct.sidebar()
 
     if 'rut_selected' not in st.session_state:
-        st.session_state.rut_selected = '0'
+        st.session_state['rut_selected'] = '0'
 
     col1, col2, col3, col4 = st.columns((3,1,1,1))
 
     if col1.button(label="Volver",icon=":material/arrow_back:"):
-        st.session_state.rut_selected = None
+        st.session_state['rut_selected'] = None
         ct.switch_page("clientes.py")
 
-    clean_rut = ct.extract_digits_rut(st.session_state.rut_selected)
+    clean_rut = ct.extract_digits_rut(st.session_state['rut_selected'])
 
-    df_clientes = ct.select_data("clientes", where="cliente_rut = '{}'".format(st.session_state.rut_selected))
-    df_clientes = df_clientes[df_clientes['cliente_rut'] == st.session_state.rut_selected]
+    df_clientes = ct.select_data("clientes", where="cliente_rut = '{}'".format(st.session_state['rut_selected']))
+    df_clientes = df_clientes[df_clientes['cliente_rut'] == st.session_state['rut_selected']]
 
 
     with col1.container(height=570):

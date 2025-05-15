@@ -34,7 +34,7 @@ def main():
     col01, col02, col3, col4, col5, col6, col7 = st.columns((1.2,1.5,1,1,1.5,2,2))
     
     if 'rut_selected' not in st.session_state:
-        st.session_state.rut_selected = None
+        st.session_state['rut_selected'] = None
 
     if col01.button("Nuevo Cliente", type="primary", icon=":material/add:"):
         ct.switch_page("clientes_nuevo.py")
@@ -70,12 +70,12 @@ def main():
 
         if len(data.selection['rows']):
             selected_row = data.selection['rows'][0]
-            st.session_state.rut_selected = df_clientes.at[selected_row,'cliente_rut']
+            st.session_state['rut_selected'] = df_clientes.at[selected_row,'cliente_rut']
             if col02.button("Modificar Cliente", type="primary", icon=":material/edit:"):
                 ct.switch_page("clientes_modificar.py")
         else:
             selected_row = None
-            st.session_state.rut_selected = None
+            st.session_state['rut_selected'] = None
             col02.button("Modificar Cliente", type="primary", icon=":material/edit:", disabled=True)
 
 

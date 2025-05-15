@@ -44,7 +44,7 @@ def main():
     st.markdown("<h1>"+"Nueva Cotización"+"</h1>", unsafe_allow_html=True)
     ct.sidebar()
 
-    if 'valid_patente' not in st.session_state.keys():
+    if 'valid_patente' not in st.session_state:
         st.session_state['valid_patente'] = False
         st.session_state['patente_nueva'] = ""
 

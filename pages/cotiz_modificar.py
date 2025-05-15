@@ -22,17 +22,17 @@ def main():
 
     # Este valor viene de la cotizacion. Si es que se recarga la página, no tira error 
     if 'selected_id_cotiz' not in st.session_state:
-        st.session_state.selected_id_cotiz = 0
+        st.session_state['selected_id_cotiz'] = 0
     
     col1, col2, col3, col99 = st.columns((2.5,1,2.5,0.3))
 
     if col1.button(label="Volver",icon=":material/arrow_back:"):
         ct.switch_page("cotiz.py")
     
-    df_cotiz_cab = ct.select_data(tabla='cotiz_cab', columns="cotiz_rut_cliente, cotiz_rut_facturacion, cotiz_nombre_facturacion, cotiz_marca, cotiz_modelo, cotiz_year, cotiz_patente", where="cotiz_id = '{}'".format(st.session_state.selected_id_cotiz))
+    df_cotiz_cab = ct.select_data(tabla='cotiz_cab', columns="cotiz_rut_cliente, cotiz_rut_facturacion, cotiz_nombre_facturacion, cotiz_marca, cotiz_modelo, cotiz_year, cotiz_patente", where="cotiz_id = '{}'".format(st.session_state['selected_id_cotiz']))
     df_cotizaciones_det = ct.select_data(tabla="cotiz_det",
                                         columns='cotiz_cab_id, cotiz_tipo_prod, cotiz_item, cotiz_prov_prod, cotiz_cantidad, cotiz_costo, cotiz_precio_venta',
-                                        where="deleted = 0 and cotiz_cab_id = {}".format(st.session_state.selected_id_cotiz))
+                                        where="deleted = 0 and cotiz_cab_id = {}".format(st.session_state['selected_id_cotiz']))
     df_cotizaciones_det['cotiz_cab_id'] = df_cotizaciones_det['cotiz_cab_id'].astype(int)
     df_cotizaciones_det['cotiz_tipo_prod'] = df_cotizaciones_det['cotiz_tipo_prod'].astype(int)
     df_tipo_prod = ct.select_data(tabla="tipo_prod",
@@ -79,7 +79,7 @@ def main():
                                 valores_modificar=[rut_cliente, rut_clean, fact_nomb,
                                                     marca,modelo,año,patente,'dana'],
                                 campos_id=['cotiz_id'],
-                                valores_id=[st.session_state.selected_id_cotiz]):
+                                valores_id=[st.session_state['selected_id_cotiz']]):
                     st.success("Registro modificado exitosamente.")
                 else:
                     st.error("Error de Query. Contactar desarrollador.")
