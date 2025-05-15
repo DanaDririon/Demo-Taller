@@ -8,7 +8,15 @@ import os
 import uuid
 
 def del_keys():
-    pass
+    del st.session_state['selected_id_cotiz']
+    del st.session_state['form_keyTipo']
+    del st.session_state['form_keyCliente']
+    del st.session_state['form_keyRUT']
+    del st.session_state['form_valueNomb']
+    del st.session_state['form_valuePatente']
+    del st.session_state['form_valueMarca']
+    del st.session_state['form_valueModelo']
+    del st.session_state['form_valueYear']
 
 def main():
     
@@ -23,7 +31,8 @@ def main():
 
     if 'selected_id_cotiz' in st.session_state:
         df_cotiz_cab = ct.select_data(tabla="cotiz_cab",
-                                            columns='cotiz_id, cotiz_cat_id, cotiz_ots_id, cotiz_rut_cliente, cotiz_rut_facturacion, cotiz_nombre_facturacion, cotiz_patente, cotiz_marca, cotiz_modelo, cotiz_year, date_created',
+                                            columns='cotiz_id, cotiz_cat_id, cotiz_ots_id, cotiz_rut_cliente, cotiz_rut_facturacion, ' \
+                                            'cotiz_nombre_facturacion, cotiz_patente, cotiz_marca, cotiz_modelo, cotiz_year, date_created',
                                             where="deleted = 0 AND cotiz_id = {}".format(st.session_state['selected_id_cotiz']))
         df_cotiz_cab['cotiz_ots_id'] = df_cotiz_cab['cotiz_ots_id'].astype(int)
         df_cotiz_cab = df_cotiz_cab.fillna('')
@@ -46,6 +55,7 @@ def main():
     if 'selected_id_cotiz' not in st.session_state:
         st.session_state['selected_id_cotiz'] = 0
         st.session_state['form_keyTipo'] = None
+        st.session_state['form_keyCliente'] = None
         st.session_state['form_keyRUT'] = None
         st.session_state['form_valueNomb'] = None
         
@@ -56,11 +66,14 @@ def main():
 
     col1, col2, col3, col99 = st.columns((2.8,1,2,0.3))
 
-    if col1.button(label="Volver",icon=":material/arrow_back:"):
-        ct.switch_page("ots.py")
-        del st.session_state['selected_id_cotiz']
-        del st.session_state['form_keyTipo']
-        del st.session_state['form_keyCliente']
+    if st.session_state['selected_id_cotiz']:
+        if col1.button(label="Volver",icon=":material/arrow_back:"):
+            del_keys()
+            ct.switch_page("cotiz.py")
+    else:
+        if col1.button(label="Volver",icon=":material/arrow_back:"):
+            del_keys()
+            ct.switch_page("ots.py")
 
     with col1.container(height=570):
         df_clientes = ct.select_data(tabla="clientes", columns='cliente_rut, cliente_nombre, cliente_correo, cliente_telefono, cliente_direccion', where="deleted = 0")
@@ -105,12 +118,14 @@ def main():
         })
 
         st.dataframe(resumen,hide_index=True)
-        if check_telefono and check_dir_fact and categoria:
+        if check_telefono and check_dir_fact and check_año and vin and categoria:
             agregar = st.button(label='Finalizar',type="primary")
             if agregar:
                 if ct.insert_data('ots',
-                                campos_insertar = ['cliente_rut','cliente_nombre','cliente_correo','cliente_telefono','cliente_direccion','created_by','mod_by'],
-                                valores_insertar = [rut_cliente, fact_nomb, fact_dir, tel_ini+telefono, fact_dir, 'dana', 'dana']):
+                                campos_insertar = ['cliente_rut','cliente_nombre','cliente_correo',
+                                                   'cliente_telefono','cliente_direccion','created_by','mod_by'],
+                                valores_insertar = [rut_cliente, fact_nomb, fact_dir,
+                                                     tel_ini+telefono, fact_dir, 'dana', 'dana']):
                     st.success("Registro creado exitosamente.")
                     sleep(1.2)
                     ct.switch_page("ots.py")

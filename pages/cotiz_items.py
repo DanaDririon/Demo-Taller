@@ -34,13 +34,13 @@ def main():
 
     # Este valor viene de la cotizacion. Si es que se recarga la página, no tira error 
     if 'selected_id_cotiz' not in st.session_state:
-        st.session_state.selected_id_cotiz = 0
+        st.session_state['selected_id_cotiz'] = 0
     
     #configuracion de pagina
     st.set_page_config(layout="wide", page_title='Modificar Detalle', page_icon="src\\img\\taller_img\\icon_taller.jpg")
     ct.increase_page()
     ct.hide_deploy_button()
-    st.markdown("<h1>"+"Modificar Detalle Cotización # "+ str(st.session_state.selected_id_cotiz) +"</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>"+"Modificar Detalle Cotización # "+ str(st.session_state['selected_id_cotiz']) +"</h1>", unsafe_allow_html=True)
     ct.sidebar()
     
     # Llaves para resetear los valores del formulario
@@ -73,12 +73,12 @@ def main():
         st.session_state['value_keyProv'] = ""
     
     # df_clientes = ct.select_data(tabla="clientes", columns='cliente_rut, cliente_nombre, cliente_correo, cliente_telefono, cliente_direccion', where="deleted = 0")
-    df_cotiz_cab = ct.select_data(tabla='cotiz_cab', columns="cotiz_rut_cliente, cotiz_rut_facturacion, cotiz_nombre_facturacion, cotiz_marca, cotiz_modelo, cotiz_year, cotiz_patente", where="cotiz_id = '{}'".format(st.session_state.selected_id_cotiz))
+    df_cotiz_cab = ct.select_data(tabla='cotiz_cab', columns="cotiz_rut_cliente, cotiz_rut_facturacion, cotiz_nombre_facturacion, cotiz_marca, cotiz_modelo, cotiz_year, cotiz_patente", where="cotiz_id = '{}'".format(st.session_state['selected_id_cotiz']))
     df_tipos_prod = ct.select_data(tabla='tipo_prod', columns='tipo_prod_id, tipo_prod_descripcion', where='deleted = 0')
     
     df_cotizaciones_det = ct.select_data(tabla='cotiz_det',
                                         columns='cotiz_det_id, cotiz_cab_id, cotiz_tipo_prod, cotiz_item, cotiz_prov_prod, cotiz_cantidad, cotiz_costo, cotiz_precio_venta',
-                                        where='deleted = 0 and cotiz_cab_id = {}'.format(st.session_state.selected_id_cotiz))
+                                        where='deleted = 0 and cotiz_cab_id = {}'.format(st.session_state['selected_id_cotiz']))
     df_cotizaciones_det['cotiz_cab_id'] = df_cotizaciones_det['cotiz_cab_id'].astype(int)
     df_cotizaciones_det['cotiz_tipo_prod'] = df_cotizaciones_det['cotiz_tipo_prod'].astype(int)
     df_tipo_prod = ct.select_data(tabla='tipo_prod',
@@ -95,7 +95,7 @@ def main():
     # st.write(st.session_state)
 
     if st.button(label="Volver",icon=":material/arrow_back:"):
-        del st.session_state.form_keyTipo
+        del st.session_state['form_keyTipo']
         del st.session_state['form_keyDesc']
         del st.session_state['form_keyCant']
         del st.session_state['form_keyVenta']
@@ -136,7 +136,7 @@ def main():
             selected_row_detalle = data_detalle.selection['rows'][0]
             if col3_1.button("Editar",type="primary",icon=":material/edit:"):
                 st.session_state['form_cotizId'] = df_cotiz_det.iloc[selected_row_detalle]['cotiz_det_id']
-                st.session_state.form_keyTipo = df_cotiz_det.iloc[selected_row_detalle]['Tipo Producto']
+                st.session_state['form_keyTipo'] = df_cotiz_det.iloc[selected_row_detalle]['Tipo Producto']
                 st.session_state['value_keyDesc'] = df_cotiz_det.iloc[selected_row_detalle]['Descripción']
                 st.session_state['value_keyProv'] = df_cotiz_det.iloc[selected_row_detalle]['Proovedor']
                 st.session_state['value_keyCant'] = df_cotiz_det.iloc[selected_row_detalle]['Cantidad'].astype(int)
@@ -160,7 +160,7 @@ def main():
             col3_2.popover("Eliminar",disabled=True,icon=":material/delete:")
             if st.session_state['form_cotizId']:
                 st.session_state['form_cotizId'] = None
-                st.session_state.form_keyTipo = None
+                st.session_state['form_keyTipo'] = None
                 reset_form_keys()
 
             
@@ -191,7 +191,7 @@ def main():
                                                      'cotiz_precio_venta',
                                                      'cotiz_cantidad',
                                                      'created_by','mod_by'],
-                                    valores_insertar=[st.session_state.selected_id_cotiz,
+                                    valores_insertar=[st.session_state['selected_id_cotiz'],
                                                     desc_item,
                                                     tipo_item_id,
                                                     prov_item,
@@ -201,7 +201,7 @@ def main():
                                                     'dana','dana']):
                     st.success("Campos agregados exitosamente.")
                 
-                    #st.session_state.form_keyTipo = str(uuid.uuid4()) # Aquí se resetea el tipo. Puede que sea más cómodo no resetearlo -> Preguntar
+                    #st.session_state['form_keyTipo'] = str(uuid.uuid4()) # Aquí se resetea el tipo. Puede que sea más cómodo no resetearlo -> Preguntar
                     del_value_keys()
                     reset_form_keys()
         elif st.session_state['form_cotizId']:
@@ -225,7 +225,7 @@ def main():
                                   valores_id=[st.session_state['form_cotizId']]):
                     st.success("Campos modificados exitosamente.")
                     sleep(1)
-                    del st.session_state.form_keyTipo
+                    del st.session_state['form_keyTipo']
                     del st.session_state['form_cotizId']
                     del_value_keys()
                     reset_form_keys()
