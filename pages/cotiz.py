@@ -7,7 +7,7 @@ from control_taller import utils as ct
 import os
 def cotizaciones_cabecera():
     df_cotizaciones_cab = ct.select_data(tabla="cotiz_cab",
-                                        columns='cotiz_id, cotiz_ots_id, cotiz_rut_cliente, cotiz_nombre_facturacion, cotiz_patente, cotiz_marca, cotiz_modelo, cotiz_year, date_created',
+                                        columns='cotiz_id, cotiz_cat_id, cotiz_ots_id, cotiz_rut_cliente, cotiz_nombre_facturacion, cotiz_patente, cotiz_marca, cotiz_modelo, cotiz_year, date_created',
                                         where="deleted = 0")
     df_cotizaciones_cab['cotiz_ots_id'] = df_cotizaciones_cab['cotiz_ots_id'].astype(int)
     df_cotizaciones_cab = df_cotizaciones_cab.fillna('')
@@ -15,15 +15,20 @@ def cotizaciones_cabecera():
                                         columns='cotiz_cab_id, cotiz_costo, cotiz_precio_venta',
                                         where="deleted = 0")
     
-    df_cotiz = pd.merge(df_cotizaciones_cab, df_cotizaciones_det, how='left', left_on='cotiz_id', right_on='cotiz_cab_id').drop(columns=['cotiz_cab_id'])
-    df_cotiz = df_cotiz.groupby(['cotiz_id', 'cotiz_ots_id', 'cotiz_rut_cliente', 'cotiz_nombre_facturacion','cotiz_patente', 'cotiz_marca','cotiz_modelo','cotiz_year', 'date_created'], as_index=False).agg({'cotiz_costo': 'sum', 'cotiz_precio_venta': 'sum'})
+    df_cat_ots = ct.select_data(tabla="categorias_ots", columns='cat_id, cat_nombre', where="deleted = 0")
+    
+    df_cotiz_merge = pd.merge(df_cotizaciones_cab, df_cotizaciones_det, how='left', left_on='cotiz_id', right_on='cotiz_cab_id').drop(columns=['cotiz_cab_id'])
+    df_cotiz = pd.merge(df_cotiz_merge,df_cat_ots, how='left', left_on='cotiz_cat_id', right_on='cat_id')
+    df_cotiz = df_cotiz.drop(columns=['cat_id', 'cotiz_cat_id'])
+    df_cotiz = df_cotiz.groupby(['cotiz_id', 'cotiz_ots_id', 'cat_nombre', 'cotiz_rut_cliente', 'cotiz_nombre_facturacion','cotiz_patente', 'cotiz_marca','cotiz_modelo','cotiz_year', 'date_created'], as_index=False).agg({'cotiz_costo': 'sum', 'cotiz_precio_venta': 'sum'})
     
     df_cotiz['margen'] = df_cotiz['cotiz_precio_venta'] - df_cotiz['cotiz_costo']
     df_cotiz['porc_margen'] = round((df_cotiz['margen'] / df_cotiz['cotiz_precio_venta']) * 100,2)
     df_cotiz = df_cotiz.rename(columns={'cotiz_id': 'ID Cotizacion', 'cotiz_ots_id': 'OT Asociada', 'cotiz_rut_cliente': 'Rut Cliente',
+                                        'cat_nombre':'Tipo',
                                         'cotiz_nombre_facturacion': 'Nombre Facturacion', 'cotiz_patente': 'Patente',
-                                         'cotiz_marca': 'Marca', 'cotiz_modelo': 'Modelo', 'cotiz_year': 'Año',
-                                          'date_created': 'Fecha Creacion',
+                                        'cotiz_marca': 'Marca', 'cotiz_modelo': 'Modelo', 'cotiz_year': 'Año',
+                                        'date_created': 'Fecha Creacion',
                                         'cotiz_costo': 'Costo', 'cotiz_precio_venta': 'Precio Venta', 'margen': 'Margen',
                                         'porc_margen': '% Margen'})
     df_cotiz = df_cotiz.sort_values(by=['Fecha Creacion'], ascending=False)
@@ -72,13 +77,13 @@ def main():
     #df_cotizaciones
 
     with st.container(height=400):
-        st.subheader("Cotizaciones")
+        #st.subheader("Cotizaciones")
         df_cotizaciones = cotizaciones_cabecera()
         df_cotizaciones_styler = df_cotizaciones.style.format({'Costo': '${:,.0f}'.format,
                                     'Precio Venta': '${:,.0f}'.format,
                                     'Margen': '${:,.0f}'.format,
                                     '% Margen': '{:,.2f}%'.format})
-        data = st.dataframe(df_cotizaciones_styler, hide_index=True, use_container_width=True, on_select="rerun", selection_mode="single-row")
+        data = st.dataframe(df_cotizaciones_styler, hide_index=True, use_container_width=True, on_select="rerun", selection_mode="single-row", height=350)
 
     if len(data.selection['rows']):
         selected_row = data.selection['rows'][0]
@@ -166,6 +171,10 @@ def main():
             if modificar_cotiz:
                 st.session_state['selected_id_cotiz'] = selected_id_cotiz
                 ct.switch_page("cotiz_modificar.py")
+            if generar_ot:
+                st.session_state['selected_id_cotiz'] = selected_id_cotiz
+                ct.switch_page("ots_nueva.py")
+                pass
 
         else:
             st.write("Seleccione una cotizacion para ver los detalles")
