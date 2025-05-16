@@ -5,6 +5,10 @@ import numpy as np
 from time import sleep
 from control_taller import utils as ct
 import os
+
+def clear_df_key():
+    del st.session_state["df_key"]
+
 def cotizaciones_cabecera():
     df_cotizaciones_cab = ct.select_data(tabla="cotiz_cab",
                                         columns='cotiz_id, cotiz_cat_id, cotiz_ots_id, cotiz_rut_cliente, cotiz_nombre_facturacion, cotiz_patente, cotiz_marca, cotiz_modelo, cotiz_year, date_created',
@@ -60,6 +64,18 @@ def cotizaciones_detalle(id_cotizacion):
     # df_cotiz_det_resumen = df_cotiz_det_resumen.drop(columns=['ID Cotizacion'])
     return df_cotiz_det, df_cotiz_det_resumen
 
+def filtros_detalles(df: pd.DataFrame, rut_name=None, patente=None, estado=None) -> pd.DataFrame:
+    if rut_name != None:
+        df = df[df['rut_name']==rut_name]
+    if patente != None:
+        df = df[df['Patente']==patente]
+    # if estado != None:
+    #     if estado=="Finalizadas":
+    #         df = df[df['estado_tipo_nombre']=="Finalizada"]
+    #     else:
+    #         df = df[df['estado_tipo_nombre']!="Finalizada"]
+    return df
+
 def main():
     #configuracion de pagina
     st.set_page_config(layout="wide", page_title='Cotizaciones', page_icon="src\\img\\taller_img\\icon_taller.jpg")
@@ -73,39 +89,46 @@ def main():
     if nueva_cotiz:
         ct.switch_page("cotiz_nueva.py")
 
-    col_error, col_e = st.columns((1,1))
-
     #df_cotizaciones
 
     with st.container(height=400):
         #st.subheader("Cotizaciones")
         df_cotizaciones = cotizaciones_cabecera()
+
+        colx, coly, colz , colw= st.columns((1,0.5,0.5,1))
+
+        patente_filter = coly.selectbox("Buscar Patente", df_cotizaciones['Patente'].unique() , index=None, placeholder='Patente',label_visibility="collapsed",key="form_keyPatente",on_change=clear_df_key)
+        if patente_filter:
+            df_cotizaciones = filtros_detalles(df_cotizaciones, patente=patente_filter)
+
         df_cotizaciones_styler = df_cotizaciones.style.format({'Costo': '${:,.0f}'.format,
                                     'Precio Venta': '${:,.0f}'.format,
                                     'Margen': '${:,.0f}'.format,
                                     '% Margen': '{:,.2f}%'.format})
-        data = st.dataframe(df_cotizaciones_styler, hide_index=True, use_container_width=True, on_select="rerun", selection_mode="single-row", height=350)
+        data = st.dataframe(df_cotizaciones_styler, hide_index=True, use_container_width=True, on_select="rerun", selection_mode="single-row", height=350,key="df_key")
 
     if len(data.selection['rows']):
         selected_row = data.selection['rows'][0]
-        selected_id_cotiz = df_cotizaciones.iloc[selected_row]['ID Cotizacion']
-        st.session_state['selected_id_cotiz'] = selected_id_cotiz
+        id_cotiz = df_cotizaciones.iloc[selected_row]['ID Cotizacion']
+        st.session_state['selected_id_cotiz'] = id_cotiz
         modificar_cotiz = col2_a.button(label="Modificar Cotización", type="primary",icon=":material/edit:",disabled=False)
         add_items = col3_a.button(label="Modificar Detalle", type="primary",icon=":material/table_edit:",disabled=False)
-        generar_ot = col4_a.button(label="Generar OT", type="primary",icon=":material/description:",disabled=False)
+        
+        tiene_ot = df_cotizaciones[df_cotizaciones['ID Cotizacion'] == id_cotiz]['OT Asociada'].array[0] > 0
+        generar_ot = col4_a.button(label="Generar OT", type="primary",icon=":material/description:",disabled=tiene_ot)
     else:
         col2_a.button(label="Modificar Cotización", type="primary",icon=":material/edit:",disabled=True)
         col3_a.button(label="Modificar Detalle", type="primary",icon=":material/table_edit:",disabled=True)
         col4_a.button(label="Generar OT", type="primary",icon=":material/description:",disabled=True)
         col5_a.button(label="Descargar PDF", type="primary",icon=":material/download:",disabled=True)
         selected_row = None
-        selected_id_cotiz = None
+        id_cotiz = None
         st.session_state['selected_id_cotiz'] = None
     
     with st.container(height=500):
         st.subheader("Detalles")
-        if selected_id_cotiz is not None:
-            df_cotizaciones_det, df_cotiz_det_resumen = cotizaciones_detalle(selected_id_cotiz)
+        if id_cotiz is not None:
+            df_cotizaciones_det, df_cotiz_det_resumen = cotizaciones_detalle(id_cotiz)
             df_cotizaciones_det_styler = df_cotizaciones_det.style.format({'Costo': '${:,.0f}'.format,
                                     'Precio Venta': '${:,.0f}'.format,
                                     'Margen': '${:,.0f}'.format,
@@ -121,7 +144,7 @@ def main():
 
             datos = {
                 'tipo_documento': 'Cotizacion',
-                'num_documento' : selected_id_cotiz,
+                'num_documento' : id_cotiz,
                 'nombre_cliente': df_cotizaciones.iloc[selected_row]['Nombre Facturacion'],
                 'fecha_ingreso': pd.to_datetime(df_cotizaciones.iloc[selected_row]['Fecha Creacion']).strftime('%d-%m-%Y'),
                 'fecha_entrega' : '',
@@ -161,25 +184,17 @@ def main():
 
             col5_a.download_button(label="Descargar PDF", 
                     data=ct.generador_pdf(template="template_cotizacion_ot.html", datos=datos), 
-                    file_name="cotizacion_{}.pdf".format(str(selected_id_cotiz)), 
+                    file_name="cotizacion_{}.pdf".format(str(id_cotiz)), 
                     mime="application/pdf", 
                     disabled=False,
                     icon=":material/download:",
                     type="primary")
             if add_items:
-                st.session_state['selected_id_cotiz'] = selected_id_cotiz
                 ct.switch_page("cotiz_items.py")
             if modificar_cotiz:
-                st.session_state['selected_id_cotiz'] = selected_id_cotiz
                 ct.switch_page("cotiz_modificar.py")
             if generar_ot:
-                st.session_state['selected_id_cotiz'] = selected_id_cotiz
-                if df_cotizaciones[df_cotizaciones['ID Cotizacion'] == selected_id_cotiz]['OT Asociada'].array[0] > 0:
-                    col_error.error("Cotización ya tiene OT asociada.")
-                    sleep(2)
-                    st.rerun()
-                else:
-                    ct.switch_page("ots_nueva.py")
+                ct.switch_page("ots_nueva.py")
 
         else:
             st.write("Seleccione una cotizacion para ver los detalles")
