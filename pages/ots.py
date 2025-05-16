@@ -128,8 +128,10 @@ def main():
         st.session_state['button_disabled'] = True
 
     col111, col222, col333, col444, col555, col666, col777 = st.columns((1,1,1,1,1,2,2))
-    if col111.button("Nueva OT", type="primary",icon=":material/add:"):
-        ct.switch_page("ots_nueva.py")
+    # if col111.button("Nueva OT", type="primary",icon=":material/add:"):
+    #     ct.switch_page("ots_nueva.py")
+    modificar = col111.button("Modificar", type="primary",icon=":material/edit:", disabled=st.session_state['button_disabled'])
+    descargar = col222.button("Descargar PDF", type="primary",icon=":material/download:", disabled=st.session_state['button_disabled'])
 
     df_ots = ct.select_data(tabla="ots", where="deleted = 0", order="date_created DESC")
 
@@ -263,9 +265,6 @@ def main():
             selected_id_ot = None
             st.session_state['selected_id_ot'] = None
             st.session_state['button_disabled'] = True
-
-    modificar = col222.button("Modificar", type="primary",icon=":material/edit:", disabled=st.session_state['button_disabled'])
-    descargar = col333.button("Descargar PDF", type="primary",icon=":material/download:", disabled=st.session_state['button_disabled'])
     
     with st.container(height=600):
         tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["Info General", 

@@ -170,7 +170,7 @@ def main():
         tipo_item = st.selectbox("Tipo Producto",df_tipos_prod['tipo_prod_descripcion'], placeholder="Seleccionar tipo de producto", index=None, key="form_keyTipo")
         tipo_item_id = None
         if tipo_item:
-            tipo_item_id = int(df_tipo_prod[df_tipo_prod['tipo_prod_descripcion']==tipo_item]['tipo_prod_id'].iloc[0]) #Error si no exite tipo_item
+            tipo_item_id = df_tipo_prod[df_tipo_prod['tipo_prod_descripcion']==tipo_item]['tipo_prod_id'].astype(int) #Error si no exite tipo_item
         desc_item = st.text_input("Descripción", placeholder="Añadir descripción del producto",key=st.session_state['form_keyDesc'],value=st.session_state['value_keyDesc']).upper()
         prov_item = st.text_input("Proovedor", placeholder="Proovedor producto",key=st.session_state['form_keyProv'], value=st.session_state['value_keyProv']).upper()
         cant_item = st.number_input("Cantidad Producto",key=st.session_state['form_keyCant'], value=st.session_state['value_keyCant'])

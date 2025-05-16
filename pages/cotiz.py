@@ -73,7 +73,7 @@ def main():
     if nueva_cotiz:
         ct.switch_page("cotiz_nueva.py")
 
-    col_error = st.columns((1))
+    col_error, col_e = st.columns((1,1))
 
     #df_cotizaciones
 
@@ -176,6 +176,8 @@ def main():
                 st.session_state['selected_id_cotiz'] = selected_id_cotiz
                 if df_cotizaciones[df_cotizaciones['ID Cotizacion'] == selected_id_cotiz]['OT Asociada'].array[0] > 0:
                     col_error.error("Cotización ya tiene OT asociada.")
+                    sleep(2)
+                    st.rerun()
                 else:
                     ct.switch_page("ots_nueva.py")
 
