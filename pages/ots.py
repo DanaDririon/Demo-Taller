@@ -112,6 +112,9 @@ def filtros_detalles(df: pd.DataFrame, rut_name=None, patente=None, estado=None)
 def escribe():
     st.write("Escribiendo en el archivo...")
 
+def clear_df_key():
+    del st.session_state["df_key"]
+
 def main():
     
     #configuracion de pagina
@@ -200,16 +203,16 @@ def main():
 
     with st.container(height=320): # Cabecera OT
         col1, col2 , col3 , col4= st.columns((1,0.5,0.5,1))
-        rut_name_filter = col1.selectbox("Buscar Cliente", df_ots_cabecera['rut_name'].sort_values().unique() , index=None, placeholder='Cliente',label_visibility="collapsed")
+        rut_name_filter = col1.selectbox("Buscar Cliente", df_ots_cabecera['rut_name'].sort_values().unique() , index=None, placeholder='Cliente',label_visibility="collapsed",on_change=clear_df_key)
         if rut_name_filter is not None:
             df_ots_cabecera = filtros_detalles(df_ots_cabecera, rut_name=rut_name_filter)
 
-        patente_filter = col2.selectbox("Buscar Patente", df_ots_cabecera['ots_v_patente'].unique() , index=None, placeholder='Patente',label_visibility="collapsed")
-        if patente_filter:
+        patente_filter = col2.selectbox("Buscar Patente", df_ots_cabecera['ots_v_patente'].unique() , index=None, placeholder='Patente',label_visibility="collapsed",on_change=clear_df_key)
+        if patente_filter is not None:
             df_ots_cabecera = filtros_detalles(df_ots_cabecera, patente=patente_filter)
 
-        estado_filter = col3.selectbox("Buscar Estado", ("Abiertas","Finalizadas") , index=None, placeholder='Estado',label_visibility="collapsed")
-        if estado_filter:
+        estado_filter = col3.selectbox("Buscar Estado", ("Abiertas","Finalizadas") , index=None, placeholder='Estado',label_visibility="collapsed",on_change=clear_df_key)
+        if estado_filter is not None:
             df_ots_cabecera = filtros_detalles(df_ots_cabecera, estado=estado_filter)
 
         df_ots_cabecera = df_ots_cabecera.drop(columns=['rut_name'])
@@ -253,7 +256,8 @@ def main():
                 selection_mode='single-row',
                 hide_index=True,
                 height=220,
-                use_container_width=True)
+                use_container_width=True,
+                key="df_key")
         
         if len(data.selection['rows']):
             selected_row = data.selection['rows'][0]

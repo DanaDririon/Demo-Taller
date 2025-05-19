@@ -28,6 +28,7 @@ def cotizaciones_cabecera():
     
     df_cotiz['margen'] = df_cotiz['cotiz_precio_venta'] - df_cotiz['cotiz_costo']
     df_cotiz['porc_margen'] = round((df_cotiz['margen'] / df_cotiz['cotiz_precio_venta']) * 100,2)
+    df_cotiz['rut_name'] = df_cotiz['cotiz_rut_cliente'] +' | '+df_cotiz['cotiz_nombre_facturacion']
     df_cotiz = df_cotiz.rename(columns={'cotiz_id': 'ID Cotizacion', 'cotiz_ots_id': 'OT Asociada', 'cotiz_rut_cliente': 'Rut Cliente',
                                         'cat_nombre':'Tipo',
                                         'cotiz_nombre_facturacion': 'Nombre Facturacion', 'cotiz_patente': 'Patente',
@@ -97,15 +98,19 @@ def main():
 
         colx, coly, colz , colw= st.columns((1,0.5,0.5,1))
 
-        patente_filter = coly.selectbox("Buscar Patente", df_cotizaciones['Patente'].unique() , index=None, placeholder='Patente',label_visibility="collapsed",key="form_keyPatente",on_change=clear_df_key)
-        if patente_filter:
+        rut_name_filter = colx.selectbox("Buscar Cliente", df_cotizaciones['rut_name'].sort_values().unique() , index=None, placeholder='Cliente',label_visibility="collapsed",on_change=clear_df_key)
+        if rut_name_filter is not None:
+            df_cotizaciones = filtros_detalles(df_cotizaciones, rut_name=rut_name_filter)
+
+        patente_filter = coly.selectbox("Buscar Patente", df_cotizaciones['Patente'].unique() , index=None, placeholder='Patente',label_visibility="collapsed",on_change=clear_df_key)
+        if patente_filter is not None:
             df_cotizaciones = filtros_detalles(df_cotizaciones, patente=patente_filter)
 
         df_cotizaciones_styler = df_cotizaciones.style.format({'Costo': '${:,.0f}'.format,
                                     'Precio Venta': '${:,.0f}'.format,
                                     'Margen': '${:,.0f}'.format,
                                     '% Margen': '{:,.2f}%'.format})
-        data = st.dataframe(df_cotizaciones_styler, hide_index=True, use_container_width=True, on_select="rerun", selection_mode="single-row", height=350,key="df_key")
+        data = st.dataframe(df_cotizaciones_styler, hide_index=True, use_container_width=True, on_select="rerun", selection_mode="single-row", height=300,column_config={'rut_name':None}, key="df_key")
 
     if len(data.selection['rows']):
         selected_row = data.selection['rows'][0]
